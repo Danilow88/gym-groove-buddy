@@ -299,6 +299,48 @@ const mockExercises: Exercise[] = [
     lastWeight: 0,
     lastReps: 15,
     lastSets: 3
+  },
+  
+  // GLÚTEOS
+  {
+    id: '27',
+    name: 'Elevação Pélvica (Hip Thrust)',
+    muscle: 'Glúteos',
+    description: 'Exercício principal para desenvolvimento dos glúteos',
+    videoUrl: 'https://www.youtube.com/watch?v=8BBEIfhl9y8',
+    lastWeight: 80,
+    lastReps: 10,
+    lastSets: 4
+  },
+  {
+    id: '28',
+    name: 'Glute Bridge',
+    muscle: 'Glúteos',
+    description: 'Variação no chão focada em ativação dos glúteos',
+    videoUrl: 'https://www.youtube.com/watch?v=LM8XHLYJoYs',
+    lastWeight: 0,
+    lastReps: 15,
+    lastSets: 3
+  },
+  {
+    id: '29',
+    name: 'Agachamento Búlgaro',
+    muscle: 'Glúteos',
+    description: 'Unilateral que enfatiza glúteos e quadríceps',
+    videoUrl: 'https://www.youtube.com/watch?v=2C-uNgKwPLE',
+    lastWeight: 20,
+    lastReps: 10,
+    lastSets: 3
+  },
+  {
+    id: '30',
+    name: 'Coice na Polia (Cable Kickback)',
+    muscle: 'Glúteos',
+    description: 'Isolamento dos glúteos com foco em extensão do quadril',
+    videoUrl: 'https://www.youtube.com/watch?v=wrWWZ1bQnZs',
+    lastWeight: 15,
+    lastReps: 12,
+    lastSets: 3
   }
 ];
 

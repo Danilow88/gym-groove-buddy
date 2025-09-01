@@ -31,10 +31,12 @@ export function ExerciseCard({ exercise, onAddSet, onPlayVideo, className }: Exe
           </div>
           {exercise.videoUrl && (
             <Button
-              variant="ghost"
-              size="sm"
+              variant="default"
+              size="icon"
               onClick={() => onPlayVideo(exercise.id)}
-              className="text-spotify-green hover:text-spotify-green-hover hover:bg-spotify-surface ml-2"
+              className="ml-2 rounded-full bg-spotify-green text-white hover:bg-spotify-green-hover shadow-spotify"
+              aria-label="Assistir vídeo do exercício"
+              title="Assistir vídeo"
             >
               <Play className="h-4 w-4" />
             </Button>
