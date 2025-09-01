@@ -8,6 +8,7 @@ import Workout from "./pages/Workout";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
 import Timers from "./pages/Timers";
+import Admin from "./pages/Admin";
 import Login from "./pages/auth/Login";
 import { useAuth } from "@/hooks/use-auth";
 import NotFound from "./pages/NotFound";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/timers" element={<Timers />} />
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
           <Route path="/login" element={<Login />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

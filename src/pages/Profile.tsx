@@ -2,12 +2,14 @@ import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorkout } from "@/hooks/use-workout";
-import { User, Trophy, Target, Calendar, LogOut, LogIn } from "lucide-react";
+import { useAdmin } from "@/hooks/use-admin";
+import { User, Trophy, Target, Calendar, LogOut, LogIn, Heart } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
 const Profile = () => {
-  const { workoutHistory } = useWorkout();
+  const { workoutHistory, exercises } = useWorkout();
   const { isAuthenticated, user, signOut } = useAuth();
+  const { getWorkoutPlansForUser } = useAdmin();
 
   const totalWorkouts = workoutHistory.length;
   const totalSets = workoutHistory.reduce((total, session) => total + session.sets.length, 0);
@@ -17,6 +19,13 @@ const Profile = () => {
     const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
     return sessionDate >= weekAgo;
   }).length;
+
+  const myWorkoutPlans = user ? getWorkoutPlansForUser(user.id) : [];
+
+  const getExerciseName = (exerciseId: string) => {
+    const exercise = exercises.find(ex => ex.id === exerciseId);
+    return exercise?.name || 'Exercício desconhecido';
+  };
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -65,6 +74,48 @@ const Profile = () => {
           <div className="text-2xl font-bold text-spotify-green mb-1">{thisWeek}</div>
           <div className="text-sm text-muted-foreground">treinos realizados</div>
         </Card>
+
+        {/* My Workout Plans from Admin */}
+        {myWorkoutPlans.length > 0 && (
+          <Card className="bg-gradient-card border-border p-4">
+            <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Heart className="h-5 w-5 text-spotify-green" />
+              Planos Criados pela Yara ({myWorkoutPlans.length})
+            </h2>
+            <div className="space-y-3">
+              {myWorkoutPlans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className="bg-spotify-surface rounded-lg p-3 border border-border"
+                >
+                  <h3 className="font-medium text-foreground mb-2">
+                    {plan.name}
+                  </h3>
+                  <div className="text-sm text-muted-foreground mb-2">
+                    {plan.exercises.length} exercícios
+                  </div>
+                  <div className="text-xs text-muted-foreground mb-2">
+                    {plan.exercises.map(id => getExerciseName(id)).slice(0, 3).join(', ')}
+                    {plan.exercises.length > 3 && `, +${plan.exercises.length - 3} outros`}
+                  </div>
+                  {plan.observations && (
+                    <div className="bg-background p-2 rounded border border-border">
+                      <p className="text-sm text-foreground">
+                        <strong>Observações da Yara:</strong>
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {plan.observations}
+                      </p>
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Criado em: {plan.createdAt.toLocaleDateString('pt-BR')}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
 
         <Card className="bg-gradient-card border-border p-4">
           <h3 className="font-medium text-foreground mb-3">Configurações</h3>

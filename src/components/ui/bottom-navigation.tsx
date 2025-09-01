@@ -1,8 +1,9 @@
-import { Home, Dumbbell, History, User, Timer } from "lucide-react";
+import { Home, Dumbbell, History, User, Timer, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
 
-const navigationItems = [
+const baseNavigationItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Dumbbell, label: "Treino", path: "/workout" },
   { icon: Timer, label: "Cronômetros", path: "/timers" },
@@ -11,6 +12,12 @@ const navigationItems = [
 ];
 
 export function BottomNavigation() {
+  const { isAdminUser } = useAdminAuth();
+  
+  const navigationItems = isAdminUser 
+    ? [...baseNavigationItems, { icon: Settings, label: "Admin", path: "/admin" }]
+    : baseNavigationItems;
+
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-spotify-card border-t border-border backdrop-blur-lg z-50">
       <div className="flex items-center justify-around py-2 px-4 max-w-md mx-auto">
