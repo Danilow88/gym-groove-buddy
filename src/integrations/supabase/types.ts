@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_configs: {
+        Row: {
+          admin_email: string
+          created_at: string
+          id: string
+          is_active: boolean
+          updated_at: string
+        }
+        Insert: {
+          admin_email: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Update: {
+          admin_email?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -41,12 +65,146 @@ export type Database = {
         }
         Relationships: []
       }
+      workout_plans: {
+        Row: {
+          created_at: string
+          created_by: string
+          exercises: Json
+          id: string
+          name: string
+          observations: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          exercises?: Json
+          id?: string
+          name: string
+          observations?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          exercises?: Json
+          id?: string
+          name?: string
+          observations?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_plans_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "workout_plans_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      workout_sessions: {
+        Row: {
+          created_at: string
+          date: string
+          duration: number | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          duration?: number | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          duration?: number | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_sessions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      workout_sets: {
+        Row: {
+          exercise_id: string
+          id: string
+          reps: number
+          session_id: string
+          timestamp: string
+          weight: number
+        }
+        Insert: {
+          exercise_id: string
+          id?: string
+          reps?: number
+          session_id: string
+          timestamp?: string
+          weight?: number
+        }
+        Update: {
+          exercise_id?: string
+          id?: string
+          reps?: number
+          session_id?: string
+          timestamp?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_sets_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_workout_plans: {
+        Args: {
+          target_user_id: string
+        }
+        Returns: {
+          id: string
+          name: string
+          exercises: Json
+          observations: string | null
+          created_by: string
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      is_admin: {
+        Args: {
+          user_email?: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
