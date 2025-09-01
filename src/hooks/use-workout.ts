@@ -68,10 +68,20 @@ const mockExercises: Exercise[] = [
     lastReps: 12,
     lastSets: 3
   },
+  {
+    id: '5',
+    name: 'Supino Declinado',
+    muscle: 'Peito',
+    description: 'Trabalha a parte inferior do peitoral',
+    videoUrl: 'https://www.youtube.com/watch?v=SrqOu55lrYU',
+    lastWeight: 75,
+    lastReps: 10,
+    lastSets: 3
+  },
   
   // COSTAS
   {
-    id: '5',
+    id: '6',
     name: 'Remada Curvada',
     muscle: 'Costas',
     description: 'Excelente para desenvolvimento do latíssimo do dorso',
@@ -81,7 +91,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '6',
+    id: '7',
     name: 'Pull Down',
     muscle: 'Costas',
     description: 'Trabalha latíssimo e redondo maior',
@@ -91,7 +101,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '7',
+    id: '8',
     name: 'Remada Baixa',
     muscle: 'Costas',
     description: 'Foca na parte média das costas',
@@ -101,7 +111,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '8',
+    id: '9',
     name: 'Levantamento Terra',
     muscle: 'Costas',
     description: 'Exercício composto para toda a cadeia posterior',
@@ -110,10 +120,20 @@ const mockExercises: Exercise[] = [
     lastReps: 6,
     lastSets: 3
   },
+  {
+    id: '10',
+    name: 'Barra Fixa',
+    muscle: 'Costas',
+    description: 'Exercício com peso corporal para largura das costas',
+    videoUrl: 'https://www.youtube.com/watch?v=eGo4IYlbE5g',
+    lastWeight: 0,
+    lastReps: 8,
+    lastSets: 3
+  },
   
   // PERNAS
   {
-    id: '9',
+    id: '11',
     name: 'Agachamento',
     muscle: 'Pernas',
     description: 'Movimento fundamental para fortalecimento das pernas',
@@ -123,7 +143,7 @@ const mockExercises: Exercise[] = [
     lastSets: 4
   },
   {
-    id: '10',
+    id: '12',
     name: 'Leg Press',
     muscle: 'Pernas',
     description: 'Exercício para quadríceps e glúteos',
@@ -133,7 +153,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '11',
+    id: '13',
     name: 'Extensão de Pernas',
     muscle: 'Pernas',
     description: 'Isolamento do quadríceps',
@@ -143,7 +163,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '12',
+    id: '14',
     name: 'Mesa Flexora',
     muscle: 'Pernas',
     description: 'Isolamento dos posteriores de coxa',
@@ -153,7 +173,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '13',
+    id: '15',
     name: 'Elevação Panturrilha',
     muscle: 'Pernas',
     description: 'Exercício para panturrilhas',
@@ -162,10 +182,60 @@ const mockExercises: Exercise[] = [
     lastReps: 20,
     lastSets: 4
   },
+  {
+    id: '16',
+    name: 'Afundo',
+    muscle: 'Pernas',
+    description: 'Exercício unilateral para pernas e glúteos',
+    videoUrl: 'https://www.youtube.com/watch?v=QOVaHwm-Q6U',
+    lastWeight: 40,
+    lastReps: 12,
+    lastSets: 3
+  },
+  {
+    id: '17',
+    name: 'Stiff',
+    muscle: 'Pernas',
+    description: 'Trabalha posteriores de coxa e glúteos',
+    videoUrl: 'https://www.youtube.com/watch?v=1uDiW5--rTM',
+    lastWeight: 60,
+    lastReps: 12,
+    lastSets: 3
+  },
+  {
+    id: '18',
+    name: 'Agachamento Búlgaro',
+    muscle: 'Pernas',
+    description: 'Exercício unilateral avançado para pernas',
+    videoUrl: 'https://www.youtube.com/watch?v=2C-uNgKwPLE',
+    lastWeight: 30,
+    lastReps: 10,
+    lastSets: 3
+  },
+  {
+    id: '19',
+    name: 'Cadeira Adutora',
+    muscle: 'Pernas',
+    description: 'Isolamento dos músculos adutores',
+    videoUrl: 'https://www.youtube.com/watch?v=cAyRw7z4BQM',
+    lastWeight: 50,
+    lastReps: 15,
+    lastSets: 3
+  },
+  {
+    id: '20',
+    name: 'Cadeira Abdutora',
+    muscle: 'Pernas',
+    description: 'Trabalha os músculos abdutores',
+    videoUrl: 'https://www.youtube.com/watch?v=YV0gLbcAJ8w',
+    lastWeight: 45,
+    lastReps: 15,
+    lastSets: 3
+  },
   
   // OMBROS
   {
-    id: '14',
+    id: '21',
     name: 'Desenvolvimento',
     muscle: 'Ombros',
     description: 'Trabalha deltoides anterior, medial e posterior',
@@ -175,7 +245,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '15',
+    id: '22',
     name: 'Elevação Lateral',
     muscle: 'Ombros',
     description: 'Isolamento do deltoide medial',
@@ -185,7 +255,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '16',
+    id: '23',
     name: 'Elevação Frontal',
     muscle: 'Ombros',
     description: 'Trabalha a parte anterior do deltoide',
@@ -195,7 +265,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '17',
+    id: '24',
     name: 'Elevação Posterior',
     muscle: 'Ombros',
     description: 'Foca no deltoide posterior',
@@ -204,10 +274,20 @@ const mockExercises: Exercise[] = [
     lastReps: 15,
     lastSets: 3
   },
+  {
+    id: '25',
+    name: 'Remada Alta',
+    muscle: 'Ombros',
+    description: 'Exercício composto para ombros e trapézio',
+    videoUrl: 'https://www.youtube.com/watch?v=amCU-ziHITM',
+    lastWeight: 35,
+    lastReps: 12,
+    lastSets: 3
+  },
   
   // BÍCEPS
   {
-    id: '18',
+    id: '26',
     name: 'Rosca Direta',
     muscle: 'Bíceps',
     description: 'Isolamento do bíceps braquial',
@@ -217,7 +297,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '19',
+    id: '27',
     name: 'Rosca Martelo',
     muscle: 'Bíceps',
     description: 'Trabalha bíceps e antebraço',
@@ -227,7 +307,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '20',
+    id: '28',
     name: 'Rosca Scott',
     muscle: 'Bíceps',
     description: 'Isolamento máximo do bíceps',
@@ -236,10 +316,30 @@ const mockExercises: Exercise[] = [
     lastReps: 10,
     lastSets: 3
   },
+  {
+    id: '29',
+    name: 'Rosca Concentrada',
+    muscle: 'Bíceps',
+    description: 'Exercício de isolamento unilateral',
+    videoUrl: 'https://www.youtube.com/watch?v=0AUGkch3tzc',
+    lastWeight: 18,
+    lastReps: 12,
+    lastSets: 3
+  },
+  {
+    id: '30',
+    name: 'Rosca no Cabo',
+    muscle: 'Bíceps',
+    description: 'Tensão constante no bíceps',
+    videoUrl: 'https://www.youtube.com/watch?v=NFzTWp2qpiE',
+    lastWeight: 25,
+    lastReps: 12,
+    lastSets: 3
+  },
   
   // TRÍCEPS
   {
-    id: '21',
+    id: '31',
     name: 'Tríceps Testa',
     muscle: 'Tríceps',
     description: 'Exercício de isolamento para tríceps',
@@ -249,7 +349,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '22',
+    id: '32',
     name: 'Mergulho',
     muscle: 'Tríceps',
     description: 'Exercício com peso corporal para tríceps',
@@ -259,7 +359,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '23',
+    id: '33',
     name: 'Tríceps Pulley',
     muscle: 'Tríceps',
     description: 'Isolamento do tríceps no cabo',
@@ -268,10 +368,30 @@ const mockExercises: Exercise[] = [
     lastReps: 12,
     lastSets: 3
   },
+  {
+    id: '34',
+    name: 'Tríceps Coice',
+    muscle: 'Tríceps',
+    description: 'Exercício unilateral com halteres',
+    videoUrl: 'https://www.youtube.com/watch?v=_gsUck-7M74',
+    lastWeight: 15,
+    lastReps: 12,
+    lastSets: 3
+  },
+  {
+    id: '35',
+    name: 'Tríceps Supino Fechado',
+    muscle: 'Tríceps',
+    description: 'Exercício composto para tríceps',
+    videoUrl: 'https://www.youtube.com/watch?v=nEF0bv2FW94',
+    lastWeight: 50,
+    lastReps: 10,
+    lastSets: 3
+  },
   
   // ABDÔMEN
   {
-    id: '24',
+    id: '36',
     name: 'Abdominal Reto',
     muscle: 'Abdômen',
     description: 'Exercício básico para reto abdominal',
@@ -281,7 +401,7 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '25',
+    id: '37',
     name: 'Prancha',
     muscle: 'Abdômen',
     description: 'Exercício isométrico para core',
@@ -291,11 +411,31 @@ const mockExercises: Exercise[] = [
     lastSets: 3
   },
   {
-    id: '26',
+    id: '38',
     name: 'Abdominal Oblíquo',
     muscle: 'Abdômen',
     description: 'Trabalha os músculos oblíquos',
     videoUrl: 'https://www.youtube.com/watch?v=8ioA-ycHOCo',
+    lastWeight: 0,
+    lastReps: 15,
+    lastSets: 3
+  },
+  {
+    id: '39',
+    name: 'Abdominal Bicicleta',
+    muscle: 'Abdômen',
+    description: 'Exercício dinâmico para oblíquos',
+    videoUrl: 'https://www.youtube.com/watch?v=9FGilxCbdz8',
+    lastWeight: 0,
+    lastReps: 20,
+    lastSets: 3
+  },
+  {
+    id: '40',
+    name: 'Elevação de Pernas',
+    muscle: 'Abdômen',
+    description: 'Trabalha a parte inferior do abdômen',
+    videoUrl: 'https://www.youtube.com/watch?v=JB2oyawG9KI',
     lastWeight: 0,
     lastReps: 15,
     lastSets: 3

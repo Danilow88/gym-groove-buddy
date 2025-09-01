@@ -20,7 +20,7 @@ const Index = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="absolute bottom-4 left-4 right-4">
           <h1 className="text-3xl font-bold text-foreground mb-2">
-            Gym Groove Buddy
+            Gym Buddy
           </h1>
           <p className="text-muted-foreground">
             Seu companheiro de treino definitivo
