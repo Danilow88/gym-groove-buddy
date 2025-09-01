@@ -2,10 +2,12 @@ import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorkout } from "@/hooks/use-workout";
-import { User, Trophy, Target, Calendar } from "lucide-react";
+import { User, Trophy, Target, Calendar, LogOut, LogIn } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const Profile = () => {
   const { workoutHistory } = useWorkout();
+  const { isAuthenticated, user, signOut } = useAuth();
 
   const totalWorkouts = workoutHistory.length;
   const totalSets = workoutHistory.reduce((total, session) => total + session.sets.length, 0);
@@ -26,7 +28,7 @@ const Profile = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-foreground">Perfil</h1>
-            <p className="text-sm text-spotify-green">Atleta Dedicado</p>
+            <p className="text-sm text-spotify-green">{isAuthenticated ? (user?.email || "Usuário") : "Convidado"}</p>
           </div>
         </div>
       </div>
@@ -73,9 +75,15 @@ const Profile = () => {
             <Button variant="outline" className="w-full justify-start border-border hover:bg-spotify-surface">
               Configurações do App
             </Button>
-            <Button variant="outline" className="w-full justify-start border-border hover:bg-spotify-surface">
-              Sobre
-            </Button>
+            {isAuthenticated ? (
+              <Button onClick={signOut} variant="destructive" className="w-full justify-start">
+                <LogOut className="h-4 w-4 mr-2" /> Sair
+              </Button>
+            ) : (
+              <Button asChild className="w-full justify-start bg-gradient-primary">
+                <a href="/login"><LogIn className="h-4 w-4 mr-2" /> Entrar</a>
+              </Button>
+            )}
           </div>
         </Card>
       </div>

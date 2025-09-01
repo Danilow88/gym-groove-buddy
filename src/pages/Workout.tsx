@@ -6,8 +6,9 @@ import { AddSetModal } from "@/components/workout/add-set-modal";
 import { VideoModal } from "@/components/workout/video-modal";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
-import { Play, Square, Filter } from "lucide-react";
+import { Play, Square, Filter, Timer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { CountdownTimer } from "@/components/timer/countdown-timer";
 
 const Workout = () => {
   const { 
@@ -25,6 +26,7 @@ const Workout = () => {
   const [showAddSetModal, setShowAddSetModal] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isWorkoutActive, setIsWorkoutActive] = useState(false);
+  const [showRestTimer, setShowRestTimer] = useState(false);
 
   const handleAddSet = (exerciseId: string) => {
     setSelectedExercise(exerciseId);
@@ -105,6 +107,25 @@ const Workout = () => {
 
       {/* Exercise List */}
       <div className="p-4 space-y-4">
+        {/* Rest Timer */}
+        <div className="bg-spotify-surface rounded-lg p-3">
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <Timer className="h-4 w-4 text-spotify-green" />
+              <span className="text-sm font-medium text-foreground">Cronômetro de Descanso</span>
+            </div>
+            <button
+              className="text-xs text-spotify-green hover:text-spotify-green-hover"
+              onClick={() => setShowRestTimer((v) => !v)}
+            >
+              {showRestTimer ? "Esconder" : "Mostrar"}
+            </button>
+          </div>
+          {showRestTimer && (
+            <CountdownTimer label="Descanso" defaultSeconds={60} minSeconds={15} maxSeconds={240} step={5} />
+          )}
+        </div>
+
         {getFilteredExercises().map((exercise) => {
           const currentSets = getCurrentSetsForExercise(exercise.id);
           return (
