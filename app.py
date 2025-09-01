@@ -396,7 +396,7 @@ def fetch_history(supabase: Optional[Client]) -> List[WorkoutSession]:
 # -----------------------------
 # UI
 # -----------------------------
-st.set_page_config(page_title="Keegan Gym Buddy", page_icon="🏋️", layout="centered")
+st.set_page_config(page_title="Gym Buddy", page_icon="🏋️", layout="centered")
 
 if "exercises" not in st.session_state:
     st.session_state.exercises = seed_exercises()
@@ -407,7 +407,7 @@ if "workout_history_local" not in st.session_state:
 
 supabase_client = get_supabase_client()
 
-st.sidebar.title("Keegan")
+st.sidebar.title("Gym Buddy")
 page = st.sidebar.radio("Navegação", ["Início", "Treino", "Histórico", "Perfil"])
 
 
@@ -418,7 +418,7 @@ def keegan_tip() -> str:
 
 
 def render_home():
-    st.title("Keegan Gym Buddy")
+    st.title("Gym Buddy")
     st.caption("Seu companheiro de treino definitivo")
 
     st.success("Pronto para treinar?")
