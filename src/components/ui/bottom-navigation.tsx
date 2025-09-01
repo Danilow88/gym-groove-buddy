@@ -1,10 +1,11 @@
-import { Home, Dumbbell, History, User } from "lucide-react";
+import { Home, Dumbbell, History, User, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
 
 const navigationItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Dumbbell, label: "Treino", path: "/workout" },
+  { icon: Timer, label: "Cronômetros", path: "/timers" },
   { icon: History, label: "Histórico", path: "/history" },
   { icon: User, label: "Perfil", path: "/profile" },
 ];
