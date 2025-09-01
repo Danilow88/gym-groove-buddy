@@ -7,7 +7,6 @@ import Index from "./pages/Index";
 import Workout from "./pages/Workout";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
-import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,7 +22,6 @@ const App = () => (
           <Route path="/workout" element={<Workout />} />
           <Route path="/history" element={<History />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/auth" element={<Auth />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
