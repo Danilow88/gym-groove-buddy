@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { AddSetModal } from "@/components/workout/add-set-modal";
 import { VideoModal } from "@/components/workout/video-modal";
+import { RestTimer } from "@/components/workout/rest-timer";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
 import { Play, Square, Filter, Timer } from "lucide-react";
@@ -27,6 +28,11 @@ const Workout = () => {
   const [showVideoModal, setShowVideoModal] = useState(false);
   const [isWorkoutActive, setIsWorkoutActive] = useState(false);
   const [showRestTimer, setShowRestTimer] = useState(false);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
+
+  const canStartWorkout = useMemo(() => selectedExerciseIds.length > 0 && selectedExerciseIds.length <= 15, [selectedExerciseIds]);
+  const selectionCountLabel = useMemo(() => `${selectedExerciseIds.length} selecionado(s)`, [selectedExerciseIds]);
 
   const handleAddSet = (exerciseId: string) => {
     setSelectedExercise(exerciseId);
@@ -49,9 +55,29 @@ const Workout = () => {
     }
   };
 
+  const toggleSelectExercise = (exerciseId: string) => {
+    setSelectedExerciseIds(prev => {
+      const exists = prev.includes(exerciseId);
+      if (exists) return prev.filter(id => id !== exerciseId);
+      if (prev.length >= 15) {
+        toast({ title: "Limite atingido", description: "Você pode escolher até 15 exercícios." });
+        return prev;
+      }
+      return [...prev, exerciseId];
+    });
+  };
+
+  const handleStartWorkout = () => {
+    if (!canStartWorkout) return;
+    setIsSelecting(false);
+    setIsWorkoutActive(true);
+    toast({ title: "Treino iniciado", description: selectionCountLabel });
+  };
+
   const handleFinishWorkout = () => {
     finishWorkout();
     setIsWorkoutActive(false);
+    setSelectedExerciseIds([]);
     toast({
       title: "Treino finalizado!",
       description: "Parabéns! Seu treino foi salvo no histórico.",
@@ -71,6 +97,26 @@ const Workout = () => {
               {isWorkoutActive ? "Treino em andamento" : "Selecione os exercícios"}
             </p>
           </div>
+          <div className="flex items-center gap-2">
+            {!isWorkoutActive && (
+              <>
+                {!isSelecting ? (
+                  <Button onClick={() => setIsSelecting(true)} size="sm" className="bg-spotify-green hover:bg-spotify-green-hover">
+                    Selecionar exercícios
+                  </Button>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-muted-foreground">{selectionCountLabel}</span>
+                    <Button onClick={() => setIsSelecting(false)} variant="secondary" size="sm" className="bg-spotify-surface">
+                      Cancelar
+                    </Button>
+                    <Button onClick={handleStartWorkout} disabled={!canStartWorkout} size="sm" className="bg-spotify-green hover:bg-spotify-green-hover disabled:opacity-50">
+                      <Play className="h-4 w-4 mr-2" /> Iniciar treino
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
           {isWorkoutActive && (
             <Button
               onClick={handleFinishWorkout}
@@ -82,6 +128,7 @@ const Workout = () => {
               Finalizar
             </Button>
           )}
+          </div>
         </div>
         
         {/* Filter */}
@@ -134,6 +181,9 @@ const Workout = () => {
                 exercise={exercise}
                 onAddSet={handleAddSet}
                 onPlayVideo={handlePlayVideo}
+                selectable={isSelecting}
+                selected={selectedExerciseIds.includes(exercise.id)}
+                onToggleSelect={toggleSelectExercise}
               />
               
               {/* Current Sets */}
@@ -160,6 +210,13 @@ const Workout = () => {
           );
         })}
       </div>
+
+      {/* Rest Timer */}
+      {isWorkoutActive && (
+        <div className="px-4">
+          <RestTimer defaultSeconds={60} />
+        </div>
+      )}
 
       {/* Modals */}
       {selectedExerciseData && (

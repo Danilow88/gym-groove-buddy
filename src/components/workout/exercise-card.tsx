@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Play, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -16,10 +17,13 @@ interface ExerciseCardProps {
   };
   onAddSet: (exerciseId: string) => void;
   onPlayVideo: (exerciseId: string) => void;
+  selectable?: boolean;
+  selected?: boolean;
+  onToggleSelect?: (exerciseId: string) => void;
   className?: string;
 }
 
-export function ExerciseCard({ exercise, onAddSet, onPlayVideo, className }: ExerciseCardProps) {
+export function ExerciseCard({ exercise, onAddSet, onPlayVideo, selectable, selected, onToggleSelect, className }: ExerciseCardProps) {
   return (
     <Card className={cn("bg-gradient-card border-border hover:shadow-card transition-all duration-300 hover:scale-[1.02]", className)}>
       <div className="p-4">
@@ -29,12 +33,27 @@ export function ExerciseCard({ exercise, onAddSet, onPlayVideo, className }: Exe
             <p className="text-sm text-spotify-green font-medium mb-1">{exercise.muscle}</p>
             <p className="text-xs text-muted-foreground">{exercise.description}</p>
           </div>
+          {selectable && (
+            <div className="flex items-center mr-2">
+              <Checkbox
+                checked={!!selected}
+                onCheckedChange={() => onToggleSelect && onToggleSelect(exercise.id)}
+                className={cn(
+                  "h-5 w-5 rounded-md border-border",
+                  selected ? "bg-spotify-green border-spotify-green" : "bg-spotify-surface"
+                )}
+                aria-label="Selecionar exercício"
+              />
+            </div>
+          )}
           {exercise.videoUrl && (
             <Button
-              variant="ghost"
-              size="sm"
+              variant="default"
+              size="icon"
               onClick={() => onPlayVideo(exercise.id)}
-              className="text-spotify-green hover:text-spotify-green-hover hover:bg-spotify-surface ml-2"
+              className="ml-2 rounded-full bg-spotify-green text-white hover:bg-spotify-green-hover shadow-spotify"
+              aria-label="Assistir vídeo do exercício"
+              title="Assistir vídeo"
             >
               <Play className="h-4 w-4" />
             </Button>
@@ -52,13 +71,15 @@ export function ExerciseCard({ exercise, onAddSet, onPlayVideo, className }: Exe
           </div>
         )}
         
-        <Button 
-          onClick={() => onAddSet(exercise.id)}
-          className="w-full bg-gradient-primary hover:bg-spotify-green-hover shadow-spotify transition-all duration-300"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Adicionar Série
-        </Button>
+        {!selectable && (
+          <Button 
+            onClick={() => onAddSet(exercise.id)}
+            className="w-full bg-gradient-primary hover:bg-spotify-green-hover shadow-spotify transition-all duration-300"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Série
+          </Button>
+        )}
       </div>
     </Card>
   );
