@@ -52,16 +52,25 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+				/* Spotify-inspired colors */
+				'spotify-green': 'hsl(var(--spotify-green))',
+				'spotify-green-hover': 'hsl(var(--spotify-green-hover))',
+				'spotify-dark': 'hsl(var(--spotify-dark))',
+				'spotify-darker': 'hsl(var(--spotify-darker))',
+				'spotify-card': 'hsl(var(--spotify-card))',
+				'spotify-surface': 'hsl(var(--spotify-surface))'
+			},
+			backgroundImage: {
+				'gradient-primary': 'var(--gradient-primary)',
+				'gradient-card': 'var(--gradient-card)',
+				'gradient-surface': 'var(--gradient-surface)'
+			},
+			boxShadow: {
+				'spotify': 'var(--shadow-spotify)',
+				'card': 'var(--shadow-card)'
+			},
+			transitionTimingFunction: {
+				'spotify': 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
