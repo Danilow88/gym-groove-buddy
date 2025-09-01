@@ -1,4 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from './use-auth';
 
 export interface Exercise {
   id: string;
@@ -767,10 +769,68 @@ const mockExercises: Exercise[] = [
 ];
 
 export function useWorkout() {
+  const { user } = useAuth();
   const [exercises] = useState<Exercise[]>(mockExercises);
   const [currentSets, setCurrentSets] = useState<WorkoutSet[]>([]);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutSession[]>([]);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('Todos');
+  const [loading, setLoading] = useState(false);
+
+  // Load workout history from localStorage and potentially Supabase
+  useEffect(() => {
+    loadWorkoutHistory();
+  }, [user]);
+
+  const loadWorkoutHistory = async () => {
+    setLoading(true);
+    try {
+      // Load from localStorage first
+      const localHistory = localStorage.getItem('workout_history');
+      if (localHistory) {
+        const parsed = JSON.parse(localHistory);
+        setWorkoutHistory(parsed.map((session: any) => ({
+          ...session,
+          date: new Date(session.date)
+        })));
+      }
+
+      // TODO: When we have Supabase access, load from database
+      // if (user) {
+      //   const { data, error } = await supabase
+      //     .from('workout_sessions')
+      //     .select('*')
+      //     .eq('user_id', user.id)
+      //     .order('date', { ascending: false });
+      //   if (data && !error) {
+      //     setWorkoutHistory(data);
+      //   }
+      // }
+    } catch (error) {
+      console.error('Error loading workout history:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveWorkoutSession = async (session: WorkoutSession) => {
+    try {
+      // Save to localStorage
+      const updatedHistory = [session, ...workoutHistory];
+      localStorage.setItem('workout_history', JSON.stringify(updatedHistory));
+      
+      // TODO: When we have Supabase access, save to database
+      // if (user) {
+      //   await supabase.from('workout_sessions').insert({
+      //     user_id: user.id,
+      //     date: session.date,
+      //     sets: session.sets,
+      //     duration: session.duration
+      //   });
+      // }
+    } catch (error) {
+      console.error('Error saving workout session:', error);
+    }
+  };
 
   const addSet = useCallback((exerciseId: string, weight: number, reps: number) => {
     const newSet: WorkoutSet = {
@@ -783,17 +843,19 @@ export function useWorkout() {
     setCurrentSets(prev => [...prev, newSet]);
   }, []);
 
-  const finishWorkout = useCallback(() => {
+  const finishWorkout = useCallback(async () => {
     if (currentSets.length > 0) {
       const session: WorkoutSession = {
         id: Math.random().toString(36).substr(2, 9),
         date: new Date(),
         sets: currentSets
       };
+      
       setWorkoutHistory(prev => [session, ...prev]);
+      await saveWorkoutSession(session);
       setCurrentSets([]);
     }
-  }, [currentSets]);
+  }, [currentSets, workoutHistory]);
 
   const getCurrentSetsForExercise = useCallback((exerciseId: string) => {
     return currentSets.filter(set => set.exerciseId === exerciseId);
@@ -816,11 +878,13 @@ export function useWorkout() {
     currentSets,
     workoutHistory,
     selectedMuscleGroup,
+    loading,
     addSet,
     finishWorkout,
     getCurrentSetsForExercise,
     getFilteredExercises,
     getMuscleGroups,
-    setSelectedMuscleGroup
+    setSelectedMuscleGroup,
+    loadWorkoutHistory
   };
 }

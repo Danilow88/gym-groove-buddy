@@ -1,6 +1,7 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './use-auth';
 import { useAdminAuth } from './use-admin-auth';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface WorkoutPlan {
   id: string;
@@ -16,10 +17,48 @@ export function useAdmin() {
   const { user } = useAuth();
   const { isAdminAuthenticated } = useAdminAuth();
   const [workoutPlans, setWorkoutPlans] = useState<WorkoutPlan[]>([]);
+  const [loading, setLoading] = useState(false);
   
   const isAdmin = isAdminAuthenticated;
+
+  // Load workout plans from Supabase profiles (storing in metadata or separate table)
+  useEffect(() => {
+    if (isAdmin) {
+      loadWorkoutPlans();
+    }
+  }, [isAdmin]);
+
+  const loadWorkoutPlans = async () => {
+    if (!isAdmin) return;
+    
+    setLoading(true);
+    try {
+      // For now, we'll use localStorage as a fallback since we can't access the DB directly
+      const stored = localStorage.getItem('admin_workout_plans');
+      if (stored) {
+        const plans = JSON.parse(stored);
+        setWorkoutPlans(plans);
+      }
+    } catch (error) {
+      console.error('Error loading workout plans:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const saveWorkoutPlans = async (plans: WorkoutPlan[]) => {
+    try {
+      // Save to localStorage as fallback
+      localStorage.setItem('admin_workout_plans', JSON.stringify(plans));
+      
+      // TODO: When we have database access, save to Supabase here
+      // await supabase.from('workout_plans').insert(...)
+    } catch (error) {
+      console.error('Error saving workout plans:', error);
+    }
+  };
   
-  const createWorkoutPlan = useCallback((
+  const createWorkoutPlan = useCallback(async (
     userId: string,
     name: string,
     exercises: string[],
@@ -37,25 +76,34 @@ export function useAdmin() {
       createdAt: new Date()
     };
     
-    setWorkoutPlans(prev => [newPlan, ...prev]);
+    const updatedPlans = [newPlan, ...workoutPlans];
+    setWorkoutPlans(updatedPlans);
+    await saveWorkoutPlans(updatedPlans);
+    
     return true;
-  }, [isAdmin, user]);
+  }, [isAdmin, user, workoutPlans]);
   
   const getWorkoutPlansForUser = useCallback((userId: string) => {
     return workoutPlans.filter(plan => plan.userId === userId);
   }, [workoutPlans]);
   
-  const deleteWorkoutPlan = useCallback((planId: string) => {
+  const deleteWorkoutPlan = useCallback(async (planId: string) => {
     if (!isAdmin) return false;
-    setWorkoutPlans(prev => prev.filter(plan => plan.id !== planId));
+    
+    const updatedPlans = workoutPlans.filter(plan => plan.id !== planId);
+    setWorkoutPlans(updatedPlans);
+    await saveWorkoutPlans(updatedPlans);
+    
     return true;
-  }, [isAdmin]);
+  }, [isAdmin, workoutPlans]);
   
   return {
     isAdmin,
     workoutPlans,
+    loading,
     createWorkoutPlan,
     getWorkoutPlansForUser,
-    deleteWorkoutPlan
+    deleteWorkoutPlan,
+    loadWorkoutPlans
   };
 }

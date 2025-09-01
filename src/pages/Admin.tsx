@@ -17,7 +17,7 @@ const Admin = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { isAdminUser, isAdminAuthenticated, authenticateAdmin, logoutAdmin } = useAdminAuth();
-  const { isAdmin, workoutPlans, createWorkoutPlan, deleteWorkoutPlan } = useAdmin();
+  const { isAdmin, workoutPlans, loading, createWorkoutPlan, deleteWorkoutPlan } = useAdmin();
   const { exercises, getMuscleGroups } = useWorkout();
   const { toast } = useToast();
 
@@ -122,7 +122,7 @@ const Admin = () => {
     );
   }
 
-  const handleCreatePlan = () => {
+  const handleCreatePlan = async () => {
     if (!workoutName.trim() || selectedExercises.length === 0 || !selectedUserId.trim()) {
       toast({
         title: "Erro",
@@ -132,24 +132,32 @@ const Admin = () => {
       return;
     }
 
-    const success = createWorkoutPlan(
-      selectedUserId,
-      workoutName,
-      selectedExercises,
-      observations
-    );
+    try {
+      const success = await createWorkoutPlan(
+        selectedUserId,
+        workoutName,
+        selectedExercises,
+        observations
+      );
 
-    if (success) {
+      if (success) {
+        toast({
+          title: "Treino criado!",
+          description: `Treino "${workoutName}" criado com sucesso.`,
+        });
+        
+        // Reset form
+        setSelectedUserId('');
+        setWorkoutName('');
+        setSelectedExercises([]);
+        setObservations('');
+      }
+    } catch (error) {
       toast({
-        title: "Treino criado!",
-        description: `Treino "${workoutName}" criado com sucesso.`,
+        title: "Erro",
+        description: "Ocorreu um erro ao criar o treino.",
+        variant: "destructive"
       });
-      
-      // Reset form
-      setSelectedUserId('');
-      setWorkoutName('');
-      setSelectedExercises([]);
-      setObservations('');
     }
   };
 
@@ -171,12 +179,20 @@ const Admin = () => {
     return exercise?.name || 'Exercício desconhecido';
   };
 
-  const handleDeletePlan = (planId: string) => {
-    const success = deleteWorkoutPlan(planId);
-    if (success) {
+  const handleDeletePlan = async (planId: string) => {
+    try {
+      const success = await deleteWorkoutPlan(planId);
+      if (success) {
+        toast({
+          title: "Treino excluído!",
+          description: "Plano de treino removido com sucesso.",
+        });
+      }
+    } catch (error) {
       toast({
-        title: "Treino excluído!",
-        description: "Plano de treino removido com sucesso.",
+        title: "Erro",
+        description: "Ocorreu um erro ao excluir o treino.",
+        variant: "destructive"
       });
     }
   };
@@ -318,9 +334,10 @@ const Admin = () => {
             <Button
               onClick={handleCreatePlan}
               className="w-full bg-spotify-green hover:bg-spotify-green-hover"
+              disabled={loading}
             >
               <CheckCircle className="h-4 w-4 mr-2" />
-              Criar Plano de Treino
+              {loading ? 'Criando...' : 'Criar Plano de Treino'}
             </Button>
           </div>
         </Card>

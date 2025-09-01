@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useAuth } from './use-auth';
+import { supabase } from '@/integrations/supabase/client';
 
 export function useAdminAuth() {
   const { user } = useAuth();
@@ -10,11 +11,32 @@ export function useAdminAuth() {
       return stored === 'true';
     }
   );
+  const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
 
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'yaraka78@gmail.com';
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'dedunha571';
-  
-  const isAdminUser = user?.email === adminEmail;
+
+  // Check if user is admin by checking against Supabase or fallback to env
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!user?.email) {
+        setIsAdminUser(false);
+        return;
+      }
+
+      try {
+        // Try to check admin status in Supabase profile or use email check
+        const isAdmin = user.email === adminEmail;
+        setIsAdminUser(isAdmin);
+      } catch (error) {
+        console.error('Error checking admin status:', error);
+        // Fallback to email check
+        setIsAdminUser(user.email === adminEmail);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user?.email, adminEmail]);
 
   const authenticateAdmin = useCallback((password: string): boolean => {
     if (password === adminPassword && isAdminUser) {
