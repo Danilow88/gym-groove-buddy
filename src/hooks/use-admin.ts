@@ -66,35 +66,78 @@ export function useAdmin() {
   ) => {
     if (!isAdmin || !user) return false;
     
-    const newPlan: WorkoutPlan = {
-      id: Math.random().toString(36).substr(2, 9),
-      userId,
-      name,
-      exercises,
-      observations,
-      createdBy: user.email || 'Admin',
-      createdAt: new Date()
-    };
-    
-    const updatedPlans = [newPlan, ...workoutPlans];
-    setWorkoutPlans(updatedPlans);
-    await saveWorkoutPlans(updatedPlans);
-    
-    return true;
+        try {
+      // Save to Supabase
+      const { data, error } = await supabase.from('workout_plans').insert([{
+        user_id: userId,
+        name,
+        exercises,
+        observations,
+        created_by: user.id
+      }]).select().single();
+
+      if (error) {
+        console.error('Error saving to Supabase:', error);
+        // Fallback to local storage
+        const newPlan: WorkoutPlan = {
+          id: Math.random().toString(36).substr(2, 9),
+          userId,
+          name,
+          exercises,
+          observations,
+          createdBy: user.email || 'Admin',
+          createdAt: new Date()
+        };
+        const updatedPlans = [newPlan, ...workoutPlans];
+        setWorkoutPlans(updatedPlans);
+        await saveWorkoutPlans(updatedPlans);
+        return true;
+      }
+
+      // Update local state with Supabase data
+      const newPlan: WorkoutPlan = {
+        id: data.id,
+        userId: data.user_id,
+        name: data.name,
+        exercises: data.exercises,
+        observations: data.observations || '',
+        createdBy: user.email || 'Admin',
+        createdAt: new Date(data.created_at)
+      };
+      const updatedPlans = [newPlan, ...workoutPlans];
+      setWorkoutPlans(updatedPlans);
+      return true;
+    } catch (error) {
+      console.error('Error creating workout plan:', error);
+      return false;
+    }
   }, [isAdmin, user, workoutPlans]);
   
   const getWorkoutPlansForUser = useCallback((userId: string) => {
     return workoutPlans.filter(plan => plan.userId === userId);
   }, [workoutPlans]);
   
-  const deleteWorkoutPlan = useCallback(async (planId: string) => {
+    const deleteWorkoutPlan = useCallback(async (planId: string) => {
     if (!isAdmin) return false;
-    
-    const updatedPlans = workoutPlans.filter(plan => plan.id !== planId);
-    setWorkoutPlans(updatedPlans);
-    await saveWorkoutPlans(updatedPlans);
-    
-    return true;
+
+    try {
+      // Delete from Supabase
+      const { error } = await supabase.from('workout_plans').delete().eq('id', planId);
+      
+      if (error) {
+        console.error('Error deleting from Supabase:', error);
+      }
+
+      // Update local state regardless
+      const updatedPlans = workoutPlans.filter(plan => plan.id !== planId);
+      setWorkoutPlans(updatedPlans);
+      await saveWorkoutPlans(updatedPlans);
+
+      return true;
+    } catch (error) {
+      console.error('Error deleting workout plan:', error);
+      return false;
+    }
   }, [isAdmin, workoutPlans]);
   
   return {

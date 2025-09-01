@@ -794,17 +794,26 @@ export function useWorkout() {
         })));
       }
 
-      // TODO: When we have Supabase access, load from database
-      // if (user) {
-      //   const { data, error } = await supabase
-      //     .from('workout_sessions')
-      //     .select('*')
-      //     .eq('user_id', user.id)
-      //     .order('date', { ascending: false });
-      //   if (data && !error) {
-      //     setWorkoutHistory(data);
-      //   }
-      // }
+      // Load from Supabase
+      if (user) {
+        const { data, error } = await supabase
+          .from('workout_sessions')
+          .select(`
+            *,
+            workout_sets (*)
+          `)
+          .eq('user_id', user.id)
+          .order('date', { ascending: false });
+        if (data && !error) {
+          const transformedHistory = data.map(session => ({
+            id: session.id,
+            date: new Date(session.date),
+            duration: session.duration || 0,
+            sets: session.workout_sets || []
+          }));
+          setWorkoutHistory(transformedHistory);
+        }
+      }
     } catch (error) {
       console.error('Error loading workout history:', error);
     } finally {
@@ -818,15 +827,31 @@ export function useWorkout() {
       const updatedHistory = [session, ...workoutHistory];
       localStorage.setItem('workout_history', JSON.stringify(updatedHistory));
       
-      // TODO: When we have Supabase access, save to database
-      // if (user) {
-      //   await supabase.from('workout_sessions').insert({
-      //     user_id: user.id,
-      //     date: session.date,
-      //     sets: session.sets,
-      //     duration: session.duration
-      //   });
-      // }
+      // Save to Supabase
+      if (user) {
+        const { data: sessionData, error: sessionError } = await supabase
+          .from('workout_sessions')
+          .insert([{
+            user_id: user.id,
+            date: session.date.toISOString(),
+            duration: session.duration
+          }])
+          .select()
+          .single();
+
+        if (sessionData && !sessionError) {
+          // Save workout sets
+          const setsData = session.sets.map(set => ({
+            session_id: sessionData.id,
+            exercise_id: set.exerciseId,
+            weight: set.weight,
+            reps: set.reps,
+            timestamp: new Date().toISOString()
+          }));
+
+          await supabase.from('workout_sets').insert(setsData);
+        }
+      }
     } catch (error) {
       console.error('Error saving workout session:', error);
     }
