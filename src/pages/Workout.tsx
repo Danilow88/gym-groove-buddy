@@ -1,15 +1,25 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { AddSetModal } from "@/components/workout/add-set-modal";
 import { VideoModal } from "@/components/workout/video-modal";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
-import { Play, Square } from "lucide-react";
+import { Play, Square, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Workout = () => {
-  const { exercises, addSet, finishWorkout, getCurrentSetsForExercise } = useWorkout();
+  const { 
+    exercises, 
+    addSet, 
+    finishWorkout, 
+    getCurrentSetsForExercise, 
+    getFilteredExercises, 
+    getMuscleGroups, 
+    selectedMuscleGroup, 
+    setSelectedMuscleGroup 
+  } = useWorkout();
   const { toast } = useToast();
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [showAddSetModal, setShowAddSetModal] = useState(false);
@@ -71,11 +81,31 @@ const Workout = () => {
             </Button>
           )}
         </div>
+        
+        {/* Filter */}
+        <div className="mt-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Filter className="h-4 w-4 text-spotify-green" />
+            <span className="text-sm font-medium text-foreground">Filtrar por grupo muscular:</span>
+          </div>
+          <Select value={selectedMuscleGroup} onValueChange={setSelectedMuscleGroup}>
+            <SelectTrigger className="w-full bg-spotify-surface border-border">
+              <SelectValue placeholder="Selecione um grupo muscular" />
+            </SelectTrigger>
+            <SelectContent className="bg-spotify-card border-border">
+              {getMuscleGroups().map((group) => (
+                <SelectItem key={group} value={group} className="text-foreground hover:bg-spotify-surface">
+                  {group}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       {/* Exercise List */}
       <div className="p-4 space-y-4">
-        {exercises.map((exercise) => {
+        {getFilteredExercises().map((exercise) => {
           const currentSets = getCurrentSetsForExercise(exercise.id);
           return (
             <div key={exercise.id}>
