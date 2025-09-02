@@ -27,14 +27,10 @@ export function useAdmin() {
 
   // Load workout plans from Supabase profiles (storing in metadata or separate table)
   useEffect(() => {
-    if (isAdmin) {
-      loadWorkoutPlans();
-    }
-  }, [isAdmin]);
+    loadWorkoutPlans();
+  }, []);
 
   const loadWorkoutPlans = async () => {
-    if (!isAdmin) return;
-    
     setLoading(true);
     try {
       // For now, we'll use localStorage as a fallback since we can't access the DB directly
@@ -70,56 +66,54 @@ export function useAdmin() {
     exerciseSettings?: Record<string, { sets: number; rest: number; weight: number }>,
     options?: { planType?: 'daily' | 'weekly' | 'monthly' | 'custom'; periodStartDate?: string; periodEndDate?: string }
   ) => {
-    if (!isAdmin || !user) return false;
-    
-        try {
-      // Save to Supabase
-      const { data, error } = await supabase.from('workout_plans').insert([{
-        user_id: userId,
-        name,
-        exercises,
-        observations,
-        created_by: user.id,
-        plan_type: options?.planType || 'daily',
-        period_start_date: options?.periodStartDate || null,
-        period_end_date: options?.periodEndDate || null
-      }]).select().single();
-
-      if (error) {
-        console.error('Error saving to Supabase:', error);
-        // Fallback to local storage
-        const newPlan: WorkoutPlan = {
-          id: Math.random().toString(36).substr(2, 9),
-          userId,
+    try {
+      if (isAdmin && user) {
+        const { data, error } = await supabase.from('workout_plans').insert([{
+          user_id: userId,
           name,
           exercises,
           observations,
-          createdBy: user.email || 'Admin',
-          createdAt: new Date(),
-          exerciseSettings: exerciseSettings || {},
-          planType: options?.planType || 'daily',
-          periodStartDate: options?.periodStartDate || null,
-          periodEndDate: options?.periodEndDate || null
-        };
-        const updatedPlans = [newPlan, ...workoutPlans];
-        setWorkoutPlans(updatedPlans);
-        await saveWorkoutPlans(updatedPlans);
-        return true;
+          created_by: user.id,
+          plan_type: options?.planType || 'daily',
+          period_start_date: options?.periodStartDate || null,
+          period_end_date: options?.periodEndDate || null
+        }]).select().single();
+
+        if (!error && data) {
+          const newPlan: WorkoutPlan = {
+            id: data.id,
+            userId: data.user_id,
+            name: data.name,
+            exercises: data.exercises,
+            observations: data.observations || '',
+            createdBy: user.email || 'Admin',
+            createdAt: new Date(data.created_at),
+            exerciseSettings: exerciseSettings || {},
+            planType: data.plan_type,
+            periodStartDate: data.period_start_date,
+            periodEndDate: data.period_end_date
+          };
+          const updatedPlans = [newPlan, ...workoutPlans];
+          setWorkoutPlans(updatedPlans);
+          await saveWorkoutPlans(updatedPlans);
+          return true;
+        }
+        console.error('Error saving to Supabase:', error);
       }
 
-      // Update local state with Supabase data
+      // Fallback local (sem exigir admin autenticado)
       const newPlan: WorkoutPlan = {
-        id: data.id,
-        userId: data.user_id,
-        name: data.name,
-        exercises: data.exercises,
-        observations: data.observations || '',
-        createdBy: user.email || 'Admin',
-        createdAt: new Date(data.created_at),
+        id: Math.random().toString(36).substr(2, 9),
+        userId,
+        name,
+        exercises,
+        observations,
+        createdBy: user?.email || 'Admin',
+        createdAt: new Date(),
         exerciseSettings: exerciseSettings || {},
-        planType: data.plan_type,
-        periodStartDate: data.period_start_date,
-        periodEndDate: data.period_end_date
+        planType: options?.planType || 'daily',
+        periodStartDate: options?.periodStartDate || null,
+        periodEndDate: options?.periodEndDate || null
       };
       const updatedPlans = [newPlan, ...workoutPlans];
       setWorkoutPlans(updatedPlans);
