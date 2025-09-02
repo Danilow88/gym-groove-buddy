@@ -7,7 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useMobility } from "@/hooks/use-mobility";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
-import { StretchHorizontal } from "lucide-react";
+import { StretchHorizontal, Play } from "lucide-react";
+import { VideoModal } from "@/components/workout/video-modal";
+import { CountdownTimer } from "@/components/timer/countdown-timer";
 
 const Mobility = () => {
   const { items, loading, create, remove } = useMobility();
@@ -16,6 +18,9 @@ const Mobility = () => {
   const [description, setDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard" | undefined>(undefined);
+  const [videoOpen, setVideoOpen] = useState(false);
+  const [videoTitle, setVideoTitle] = useState("");
+  const [videoSrc, setVideoSrc] = useState("");
 
   const canManage = isAdminUser && isAdminAuthenticated;
 
@@ -72,22 +77,33 @@ const Mobility = () => {
                     <div className="text-xs text-muted-foreground capitalize">{ex.difficulty}</div>
                   )}
                 </div>
-                {canManage && (
+                <div className="flex items-center gap-2">
+                  {ex.video_url && (
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => { setVideoTitle(ex.title); setVideoSrc(ex.video_url!); setVideoOpen(true); }}
+                      className="bg-spotify-green"
+                    >
+                      <Play className="h-4 w-4 mr-1" /> Vídeo
+                    </Button>
+                  )}
+                  {canManage && (
                   <Button variant="destructive" size="sm" onClick={() => remove(ex.id)}>Excluir</Button>
-                )}
+                  )}
+                </div>
               </div>
               {ex.description && <div className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{ex.description}</div>}
-              {ex.video_url && (
-                <a className="text-sm text-spotify-green underline mt-2 inline-block" href={ex.video_url} target="_blank" rel="noreferrer">
-                  Ver vídeo
-                </a>
-              )}
+              <div className="mt-3">
+                <CountdownTimer label="Cronômetro de mobilidade" defaultSeconds={60} minSeconds={15} maxSeconds={300} step={5} />
+              </div>
             </Card>
           ))}
           {items.length === 0 && !loading && (
             <div className="text-sm text-muted-foreground">Nenhum exercício cadastrado</div>
           )}
         </div>
+        <VideoModal isOpen={videoOpen} onClose={() => setVideoOpen(false)} exerciseName={videoTitle} videoUrl={videoSrc} />
       </div>
       <BottomNavigation />
     </div>
