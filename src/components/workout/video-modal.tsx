@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useExerciseVideos } from "@/hooks/use-exercise-videos";
+import { getGenericVideoByMuscleGroup } from "@/data/exercise-videos";
 import { useEffect, useState } from "react";
 import { Loader2, Wifi, WifiOff, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -51,6 +52,16 @@ export function VideoModal({ isOpen, onClose, exerciseName, exerciseId, muscleGr
   };
 
   const handleVideoError = () => {
+    // Fallback para vídeo genérico do mesmo grupo muscular (YouTube)
+    if (muscleGroup) {
+      const genericUrl = getGenericVideoByMuscleGroup(muscleGroup);
+      const finalUrl = genericUrl.includes('youtube') ? convertYouTubeUrl(genericUrl) : genericUrl;
+      setVideoUrl(finalUrl);
+      setPlayerType('youtube');
+      setIsLocal(false);
+      setVideoError(false);
+      return;
+    }
     setVideoError(true);
   };
 

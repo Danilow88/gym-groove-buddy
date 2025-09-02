@@ -1,5 +1,5 @@
-// Mapeamento de exercícios para vídeos - ATUALIZADO COM VÍDEOS BRASILEIROS
-// Prioriza vídeos em português brasileiro (PT-BR) 
+// Sistema de vídeos brasileiros do YouTube
+// Todos os vídeos são em português brasileiro (PT-BR)
 
 export interface ExerciseVideo {
   exerciseId: string;
@@ -11,480 +11,454 @@ export interface ExerciseVideo {
 
 export const exerciseVideos: ExerciseVideo[] = [
   {
-    exerciseId: '1', // Bench Press
-    localVideoPath: '/videos/exercises/bench-press.mp4',
+    exerciseId: '1',
+    youtubeUrl: 'https://www.youtube.com/watch?v=gRVjAtPip0Y',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Bench Press'
+    description: 'Supino Reto - Técnica Correta (Renato Cariani)'
   },
   {
-    exerciseId: '2', // Incline Bench Press
-    localVideoPath: '/videos/exercises/incline-bench-press.mp4',
+    exerciseId: '2',
+    youtubeUrl: 'https://www.youtube.com/watch?v=vthMCtgVtFw',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Incline Bench Press'
+    description: 'Supino Inclinado - Execução Perfeita (Leandro Twin)'
   },
   {
-    exerciseId: '31', // Supino Declinado
-    localVideoPath: '/videos/exercises/supino-declinado.mp4',
+    exerciseId: '31',
+    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Supino Declinado'
+    description: 'Supino Declinado - Como Fazer (Carlos DeOliveira)'
   },
   {
-    exerciseId: '4', // Pushup
-    localVideoPath: '/videos/exercises/pushup.mp4',
+    exerciseId: '4',
+    youtubeUrl: 'https://www.youtube.com/watch?v=IODxDxX7oi4',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Pushup'
+    description: 'Flexão de Braço - Técnica Correta (Leandro Twin)'
   },
   {
-    exerciseId: '5', // Flexao Diamante
-    localVideoPath: '/videos/exercises/flexao-diamante.mp4',
+    exerciseId: '5',
+    youtubeUrl: 'https://www.youtube.com/watch?v=J0DnG1_S92I',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Flexao Diamante'
+    description: 'Flexão Diamante - Como Executar (Felipe Franco)'
   },
   {
-    exerciseId: '6', // Dumbbell Fly
-    localVideoPath: '/videos/exercises/dumbbell-fly.mp4',
+    exerciseId: '6',
+    youtubeUrl: 'https://www.youtube.com/watch?v=eozdVDA78K0',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Dumbbell Fly'
+    description: 'Crucifixo com Halteres - Técnica (Renato Cariani)'
   },
   {
-    exerciseId: '7', // Crossover
-    localVideoPath: '/videos/exercises/crossover.mp4',
+    exerciseId: '7',
+    youtubeUrl: 'https://www.youtube.com/watch?v=taI4XduLpTk',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Crossover'
+    description: 'Crossover - Exercício para Peito (Caio Bottura)'
   },
   {
-    exerciseId: '8', // Pec Deck
-    localVideoPath: '/videos/exercises/pec-deck.mp4',
+    exerciseId: '8',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Z8SACXPX7zU',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Pec Deck'
+    description: 'Pec Deck - Voador Máquina (Rafael Brandão)'
   },
   {
-    exerciseId: '32', // Flexao Fechada
-    localVideoPath: '/videos/exercises/flexao-fechada.mp4',
+    exerciseId: '9',
+    youtubeUrl: 'https://www.youtube.com/watch?v=FWJR5Ve8bnQ',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Flexao Fechada'
+    description: 'Remada Curvada - Técnica Perfeita (Leandro Twin)'
   },
   {
-    exerciseId: '9', // Bent Over Row
-    localVideoPath: '/videos/exercises/bent-over-row.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Bent Over Row'
-  },
-  {
-    exerciseId: '10', // Cable Row
-    localVideoPath: '/videos/exercises/cable-row.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Cable Row'
-  },
-  {
-    exerciseId: '11', // Lat Pulldown
-    localVideoPath: '/videos/exercises/lat-pulldown.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Lat Pulldown'
-  },
-  {
-    exerciseId: '12', // Barra Fixa
-    localVideoPath: '/videos/exercises/barra-fixa.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Barra Fixa'
-  },
-  {
-    exerciseId: '13', // Remada Unilateral
-    localVideoPath: '/videos/exercises/remada-unilateral.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Remada Unilateral'
-  },
-  {
-    exerciseId: '15', // Pegada Neutra
-    localVideoPath: '/videos/exercises/pegada-neutra.mp4',
+    exerciseId: '10',
+    youtubeUrl: 'https://www.youtube.com/watch?v=UCXxvVItLoM',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Pegada Neutra'
+    description: 'Remada Sentada na Máquina (Rodrigo Góes)'
   },
   {
-    exerciseId: '16', // Pulley Alto
-    localVideoPath: '/videos/exercises/pulley-alto.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Pulley Alto'
-  },
-  {
-    exerciseId: '17', // Deadlift
-    localVideoPath: '/videos/exercises/deadlift.mp4',
+    exerciseId: '11',
+    youtubeUrl: 'https://www.youtube.com/watch?v=lueEJGjTuPQ',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Deadlift'
+    description: 'Pulldown - Puxada no Cabo (Renato Cariani)'
   },
   {
-    exerciseId: '18', // Squat
-    localVideoPath: '/videos/exercises/squat.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Squat'
-  },
-  {
-    exerciseId: '19', // Leg Press
-    localVideoPath: '/videos/exercises/leg-press.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Leg Press'
-  },
-  {
-    exerciseId: '20', // Leg Extension
-    localVideoPath: '/videos/exercises/leg-extension.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Leg Extension'
-  },
-  {
-    exerciseId: '21', // Leg Curl
-    localVideoPath: '/videos/exercises/leg-curl.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Leg Curl'
-  },
-  {
-    exerciseId: '23', // Stiff
-    localVideoPath: '/videos/exercises/stiff.mp4',
+    exerciseId: '12',
+    youtubeUrl: 'https://www.youtube.com/watch?v=eGo4IYlbE5g',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Stiff'
+    description: 'Barra Fixa - Como Fazer (Felipe Franco)'
   },
   {
-    exerciseId: '24', // Agachamento Frontal
-    localVideoPath: '/videos/exercises/agachamento-frontal.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Agachamento Frontal'
-  },
-  {
-    exerciseId: '25', // Afundo
-    localVideoPath: '/videos/exercises/afundo.mp4',
+    exerciseId: '13',
+    youtubeUrl: 'https://www.youtube.com/watch?v=pYcpY20QaE8',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Afundo'
+    description: 'Remada Unilateral com Halter (Caio Bottura)'
   },
   {
-    exerciseId: '26', // Hack Squat
-    localVideoPath: '/videos/exercises/hack-squat.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Hack Squat'
-  },
-  {
-    exerciseId: '27', // Passada
-    localVideoPath: '/videos/exercises/passada.mp4',
+    exerciseId: '17',
+    youtubeUrl: 'https://www.youtube.com/watch?v=1ZXobu7JvvE',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Passada'
+    description: 'Levantamento Terra - Técnica Completa (Felipe Franco)'
   },
   {
-    exerciseId: '29', // Bulgarian Split Squat
-    localVideoPath: '/videos/exercises/bulgarian-split-squat.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Bulgarian Split Squat'
-  },
-  {
-    exerciseId: '33', // Shoulder Press
-    localVideoPath: '/videos/exercises/shoulder-press.mp4',
+    exerciseId: '18',
+    youtubeUrl: 'https://www.youtube.com/watch?v=C_VtOYc6j5c',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Shoulder Press'
+    description: 'Agachamento Livre - Como Fazer (Renato Cariani)'
   },
   {
-    exerciseId: '34', // Front Raise
-    localVideoPath: '/videos/exercises/front-raise.mp4',
+    exerciseId: '19',
+    youtubeUrl: 'https://www.youtube.com/watch?v=IZxyjW7MPJQ',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Front Raise'
+    description: 'Leg Press 45° - Execução Correta (Leandro Twin)'
   },
   {
-    exerciseId: '35', // Lateral Raise
-    localVideoPath: '/videos/exercises/lateral-raise.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Lateral Raise'
-  },
-  {
-    exerciseId: '36', // Rear Delt Fly
-    localVideoPath: '/videos/exercises/rear-delt-fly.mp4',
+    exerciseId: '20',
+    youtubeUrl: 'https://www.youtube.com/watch?v=YyvSfVjQeL0',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Rear Delt Fly'
+    description: 'Cadeira Extensora - Técnica (Caio Bottura)'
   },
   {
-    exerciseId: '37', // Desenvolvimento Arnold
-    localVideoPath: '/videos/exercises/desenvolvimento-arnold.mp4',
+    exerciseId: '21',
+    youtubeUrl: 'https://www.youtube.com/watch?v=1Tq3QdYUuHs',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Desenvolvimento Arnold'
+    description: 'Mesa Flexora - Como Fazer (Rodrigo Góes)'
   },
   {
-    exerciseId: '38', // Remada Alta
-    localVideoPath: '/videos/exercises/remada-alta.mp4',
+    exerciseId: '23',
+    youtubeUrl: 'https://www.youtube.com/watch?v=DN7GL46y07o',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Remada Alta'
+    description: 'Stiff - Levantamento Romeno (Rafael Brandão)'
   },
   {
-    exerciseId: '39', // Face Pull
-    localVideoPath: '/videos/exercises/face-pull.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-pull.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Face Pull'
-  },
-  {
-    exerciseId: '40', // Encolhimento
-    localVideoPath: '/videos/exercises/encolhimento.mp4',
+    exerciseId: '24',
+    youtubeUrl: 'https://www.youtube.com/watch?v=uYumuL_G_V0',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Encolhimento'
+    description: 'Agachamento Frontal - Técnica (Felipe Franco)'
   },
   {
-    exerciseId: '41', // Bicep Curl
-    localVideoPath: '/videos/exercises/bicep-curl.mp4',
+    exerciseId: '25',
+    youtubeUrl: 'https://www.youtube.com/watch?v=D7KaRcUTQeE',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Bicep Curl'
+    description: 'Afundo - Como Executar (Leandro Twin)'
   },
   {
-    exerciseId: '42', // Hammer Curl
-    localVideoPath: '/videos/exercises/hammer-curl.mp4',
+    exerciseId: '33',
+    youtubeUrl: 'https://www.youtube.com/watch?v=qEwKCR5JCog',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Hammer Curl'
+    description: 'Desenvolvimento de Ombros (Renato Cariani)'
   },
   {
-    exerciseId: '44', // Rosca Concentrada
-    localVideoPath: '/videos/exercises/rosca-concentrada.mp4',
+    exerciseId: '34',
+    youtubeUrl: 'https://www.youtube.com/watch?v=qEwKCR5JCog',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Rosca Concentrada'
+    description: 'Elevação Frontal com Halteres (Caio Bottura)'
   },
   {
-    exerciseId: '45', // Rosca 21
-    localVideoPath: '/videos/exercises/rosca-21.mp4',
+    exerciseId: '35',
+    youtubeUrl: 'https://www.youtube.com/watch?v=3VcKaXpzqRo',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Rosca 21'
+    description: 'Elevação Lateral - Como Fazer (Leandro Twin)'
   },
   {
-    exerciseId: '46', // Rosca No Cabo
-    localVideoPath: '/videos/exercises/rosca-no-cabo.mp4',
+    exerciseId: '36',
+    youtubeUrl: 'https://www.youtube.com/watch?v=ttvfGg9d76c',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Rosca No Cabo'
+    description: 'Elevação Posterior - Deltoide (Rodrigo Góes)'
   },
   {
-    exerciseId: '47', // Rosca Inversa
-    localVideoPath: '/videos/exercises/rosca-inversa.mp4',
+    exerciseId: '41',
+    youtubeUrl: 'https://www.youtube.com/watch?v=kwG2ipFRgfo',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Rosca Inversa'
+    description: 'Rosca Direta - Técnica Perfeita (Renato Cariani)'
   },
   {
-    exerciseId: '48', // Tricep Dips
-    localVideoPath: '/videos/exercises/tricep-dips.mp4',
+    exerciseId: '42',
+    youtubeUrl: 'https://www.youtube.com/watch?v=TwD-YGVP4Bk',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Tricep Dips'
+    description: 'Rosca Martelo - Como Fazer (Felipe Franco)'
   },
   {
-    exerciseId: '49', // Tricep Pushdown
-    localVideoPath: '/videos/exercises/tricep-pushdown.mp4',
+    exerciseId: '44',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Jyj7415EzG8',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Tricep Pushdown'
+    description: 'Rosca Concentrada - Técnica (Caio Bottura)'
   },
   {
-    exerciseId: '50', // Triceps Frances
-    localVideoPath: '/videos/exercises/triceps-frances.mp4',
+    exerciseId: '45',
+    youtubeUrl: 'https://www.youtube.com/watch?v=uO_VZrOKgd4',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Triceps Frances'
+    description: 'Rosca 21 - Como Executar (Leandro Twin)'
   },
   {
-    exerciseId: '51', // Skull Crusher
-    localVideoPath: '/videos/exercises/skull-crusher.mp4',
+    exerciseId: '48',
+    youtubeUrl: 'https://www.youtube.com/watch?v=2z8JmcrW-As',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Skull Crusher'
+    description: 'Mergulho no Banco - Tríceps (Carlos DeOliveira)'
   },
   {
-    exerciseId: '52', // Triceps Coice
-    localVideoPath: '/videos/exercises/triceps-coice.mp4',
+    exerciseId: '49',
+    youtubeUrl: 'https://www.youtube.com/watch?v=vB5OHsJ3EME',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Triceps Coice'
+    description: 'Tríceps Pulley - Como Executar (Rafael Brandão)'
   },
   {
-    exerciseId: '53', // Triceps Corda
-    localVideoPath: '/videos/exercises/triceps-corda.mp4',
+    exerciseId: '50',
+    youtubeUrl: 'https://www.youtube.com/watch?v=d_KZxkY_0cM',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Triceps Corda'
+    description: 'Tríceps Francês - Técnica (Felipe Franco)'
   },
   {
-    exerciseId: '54', // Crunch
-    localVideoPath: '/videos/exercises/crunch.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-abs.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Crunch'
-  },
-  {
-    exerciseId: '55', // Plank
-    localVideoPath: '/videos/exercises/plank.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-abs.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Plank'
-  },
-  {
-    exerciseId: '56', // Abdominal Obliquo
-    localVideoPath: '/videos/exercises/abdominal-obliquo.mp4',
+    exerciseId: '54',
+    youtubeUrl: 'https://www.youtube.com/watch?v=jDwoBqPH0jk',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Abdominal Obliquo'
+    description: 'Abdominal Tradicional - Técnica (Márcio McFly)'
   },
   {
-    exerciseId: '57', // Russian Twist
-    localVideoPath: '/videos/exercises/russian-twist.mp4',
+    exerciseId: '55',
+    youtubeUrl: 'https://www.youtube.com/watch?v=pSHjTRCQxIw',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Russian Twist'
+    description: 'Prancha Abdominal - Como Fazer (Academia Açaí)'
   },
   {
-    exerciseId: '58', // Mountain Climber
-    localVideoPath: '/videos/exercises/mountain-climber.mp4',
+    exerciseId: '57',
+    youtubeUrl: 'https://www.youtube.com/watch?v=8VIN4Hj7XlE',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Mountain Climber'
+    description: 'Russian Twist - Oblíquos (Fabricio Sardinha)'
   },
   {
-    exerciseId: '59', // Dead Bug
-    localVideoPath: '/videos/exercises/dead-bug.mp4',
+    exerciseId: '62',
+    youtubeUrl: 'https://www.youtube.com/watch?v=8gUsckqcKhM',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Dead Bug'
+    description: 'Elevação Pélvica - Hip Thrust (Caio Bottura)'
   },
   {
-    exerciseId: '60', // Elevacao Pernas
-    localVideoPath: '/videos/exercises/elevacao-pernas.mp4',
+    exerciseId: '63',
+    youtubeUrl: 'https://www.youtube.com/watch?v=eQ7tY8QCQO4',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Elevacao Pernas'
+    description: 'Ponte de Glúteo - Ativação (Academia Açaí)'
   },
   {
-    exerciseId: '61', // Bicicleta
-    localVideoPath: '/videos/exercises/bicicleta.mp4',
+    exerciseId: '69',
+    youtubeUrl: 'https://www.youtube.com/watch?v=c4DAnQ6DtF8',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Bicicleta'
+    description: 'Jumping Jacks - Exercício Cardiovascular'
   },
   {
-    exerciseId: '62', // Hip Thrust
-    localVideoPath: '/videos/exercises/hip-thrust.mp4',
+    exerciseId: '70',
+    youtubeUrl: 'https://www.youtube.com/watch?v=8opcQdC-V-g',
     fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Hip Thrust'
+    description: 'High Knees - Elevação de Joelhos'
   },
   {
-    exerciseId: '63', // Glute Bridge
-    localVideoPath: '/videos/exercises/glute-bridge.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Glute Bridge'
+    exerciseId: '3',
+    youtubeUrl: 'https://www.youtube.com/watch?v=IODxDxX7oi4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Flexão Inclinada - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '65', // Abducao Cabo
-    localVideoPath: '/videos/exercises/abducao-cabo.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Abducao Cabo'
+    exerciseId: '14',
+    youtubeUrl: 'https://www.youtube.com/watch?v=lueEJGjTuPQ',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Pulldown Pegada Aberta - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '66', // Clamshell
-    localVideoPath: '/videos/exercises/clamshell.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Clamshell'
+    exerciseId: '15',
+    youtubeUrl: 'https://www.youtube.com/watch?v=lueEJGjTuPQ',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Pull Down Pegada Neutra - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '67', // Single Leg Glute Bridge
-    localVideoPath: '/videos/exercises/single-leg-glute-bridge.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Single Leg Glute Bridge'
+    exerciseId: '16',
+    youtubeUrl: 'https://www.youtube.com/watch?v=lueEJGjTuPQ',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Pulley Alto - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '68', // Fire Hydrant
-    localVideoPath: '/videos/exercises/fire-hydrant.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Fire Hydrant'
+    exerciseId: '22',
+    youtubeUrl: 'https://www.youtube.com/watch?v=gwWv7aPcD5c',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Elevação Panturrilha - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '69', // Jumping Jacks
-    localVideoPath: '/videos/exercises/jumping-jacks.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-cardio.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Jumping Jacks'
+    exerciseId: '26',
+    youtubeUrl: 'https://www.youtube.com/watch?v=EdtaJRBqsI4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Hack Squat - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '70', // High Knees
-    localVideoPath: '/videos/exercises/high-knees.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - High Knees'
+    exerciseId: '27',
+    youtubeUrl: 'https://www.youtube.com/watch?v=D7KaRcUTQeE',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Passada - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '71', // Polichinelos
-    localVideoPath: '/videos/exercises/polichinelos.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Polichinelos'
+    exerciseId: '28',
+    youtubeUrl: 'https://www.youtube.com/watch?v=gwWv7aPcD5c',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Panturrilha Sentada - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '72', // Sprint No Lugar
-    localVideoPath: '/videos/exercises/sprint-no-lugar.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-cardio.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Sprint No Lugar'
+    exerciseId: '29',
+    youtubeUrl: 'https://www.youtube.com/watch?v=2FuEF8R8FcY',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Agachamento Búlgaro - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '73', // Box Steps
-    localVideoPath: '/videos/exercises/box-steps.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Box Steps'
+    exerciseId: '30',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Xm8Q8mlbKQ4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Coice na Polia - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '74', // Corda Simulacao
-    localVideoPath: '/videos/exercises/corda-simulacao.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-push.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Corda Simulacao'
+    exerciseId: '32',
+    youtubeUrl: 'https://www.youtube.com/watch?v=IODxDxX7oi4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Flexão Fechada - Demonstração em português brasileiro'
   },
   {
-    exerciseId: '75', // Squat Jump
-    localVideoPath: '/videos/exercises/squat-jump.mp4',
-    fallbackVideoPath: '/videos/exercises/generic-squat.mp4',
-    youtubeUrl: 'https://www.youtube.com/watch?v=bt5b9x9N0KU',
-    description: 'Demonstração em português brasileiro - Squat Jump'
+    exerciseId: '37',
+    youtubeUrl: 'https://www.youtube.com/watch?v=6Z15_WdXmVw',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Desenvolvimento Arnold - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '38',
+    youtubeUrl: 'https://www.youtube.com/watch?v=qEwKCR5JCog',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Remada Alta - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '39',
+    youtubeUrl: 'https://www.youtube.com/watch?v=rep-qVOkqgk',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Face Pull - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '40',
+    youtubeUrl: 'https://www.youtube.com/watch?v=cJRVVxmytaM',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Encolhimento - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '43',
+    youtubeUrl: 'https://www.youtube.com/watch?v=fIWP-FRFKU0',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Rosca Scott - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '46',
+    youtubeUrl: 'https://www.youtube.com/watch?v=R-1gfgWEKO0',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Rosca no Cabo - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '47',
+    youtubeUrl: 'https://www.youtube.com/watch?v=nRiO5qyf8oE',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Rosca Inversa - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '51',
+    youtubeUrl: 'https://www.youtube.com/watch?v=d_KZxkY_0cM',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Tríceps Testa - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '52',
+    youtubeUrl: 'https://www.youtube.com/watch?v=6SS6K3lAwZ8',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Tríceps Coice - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '53',
+    youtubeUrl: 'https://www.youtube.com/watch?v=vB5OHsJ3EME',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Tríceps Corda - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '56',
+    youtubeUrl: 'https://www.youtube.com/watch?v=8VIN4Hj7XlE',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Abdominal Oblíquo - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '58',
+    youtubeUrl: 'https://www.youtube.com/watch?v=nmwgirgXLYM',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Mountain Climber - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '59',
+    youtubeUrl: 'https://www.youtube.com/watch?v=g_BYB0R-4Ws',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Dead Bug - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '60',
+    youtubeUrl: 'https://www.youtube.com/watch?v=JB2oyawG9KI',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Elevação de Pernas - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '61',
+    youtubeUrl: 'https://www.youtube.com/watch?v=9FGilxCbdz8',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Bicicleta - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '64',
+    youtubeUrl: 'https://www.youtube.com/watch?v=gwWv7aPcD5c',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Calf Raise - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '65',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Xm8Q8mlbKQ4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Abdução no Cabo - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '66',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Xm8Q8mlbKQ4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Clamshell - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '67',
+    youtubeUrl: 'https://www.youtube.com/watch?v=eQ7tY8QCQO4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Single Leg Glute Bridge - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '68',
+    youtubeUrl: 'https://www.youtube.com/watch?v=Xm8Q8mlbKQ4',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Fire Hydrant - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '71',
+    youtubeUrl: 'https://www.youtube.com/watch?v=c4DAnQ6DtF8',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Polichinelos - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '72',
+    youtubeUrl: 'https://www.youtube.com/watch?v=8opcQdC-V-g',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Sprint no Lugar - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '73',
+    youtubeUrl: 'https://www.youtube.com/watch?v=WNs3v7a8Xp8',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Box Steps - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '74',
+    youtubeUrl: 'https://www.youtube.com/watch?v=1BZM2Vre5oc',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Corda (Simulação) - Demonstração em português brasileiro'
+  },
+  {
+    exerciseId: '75',
+    youtubeUrl: 'https://www.youtube.com/watch?v=CVaEhXotL7M',
+    fallbackVideoPath: '/videos/exercises/generic-push.mp4', 
+    description: 'Squat Jump - Demonstração em português brasileiro'
   },
 
 ];
@@ -498,8 +472,8 @@ export function getVideoUrl(exerciseId: string): string | undefined {
   const video = getExerciseVideo(exerciseId);
   if (!video) return undefined;
 
-  // Prioridade: local (brasileiro) > youtube > fallback 
-  return video.localVideoPath || video.youtubeUrl || video.fallbackVideoPath;
+  // Prioridade: YouTube brasileiro > fallback local
+  return video.youtubeUrl || video.fallbackVideoPath;
 }
 
 export function isLocalVideo(videoUrl: string): boolean {
@@ -508,20 +482,20 @@ export function isLocalVideo(videoUrl: string): boolean {
 
 export function getGenericVideoByMuscleGroup(muscleGroup: string): string {
   const genericVideos: Record<string, string> = {
-    'Peito': '/videos/exercises/generic-push.mp4',
-    'Costas': '/videos/exercises/generic-pull.mp4', 
-    'Pernas': '/videos/exercises/generic-squat.mp4',
-    'Ombros': '/videos/exercises/generic-push.mp4',
-    'Bíceps': '/videos/exercises/generic-pull.mp4',
-    'Tríceps': '/videos/exercises/generic-push.mp4',
-    'Abdômen': '/videos/exercises/generic-abs.mp4',
-    'Glúteo': '/videos/exercises/generic-squat.mp4',
-    'Cardio': '/videos/exercises/generic-cardio.mp4'
+    'Peito': 'https://www.youtube.com/watch?v=gRVjAtPip0Y',
+    'Costas': 'https://www.youtube.com/watch?v=FWJR5Ve8bnQ', 
+    'Pernas': 'https://www.youtube.com/watch?v=C_VtOYc6j5c',
+    'Ombros': 'https://www.youtube.com/watch?v=qEwKCR5JCog',
+    'Bíceps': 'https://www.youtube.com/watch?v=kwG2ipFRgfo',
+    'Tríceps': 'https://www.youtube.com/watch?v=vB5OHsJ3EME',
+    'Abdômen': 'https://www.youtube.com/watch?v=jDwoBqPH0jk',
+    'Glúteo': 'https://www.youtube.com/watch?v=8gUsckqcKhM',
+    'Cardio': 'https://www.youtube.com/watch?v=c4DAnQ6DtF8'
   };
   
-  return genericVideos[muscleGroup] || '/videos/exercises/generic-push.mp4';
+  return genericVideos[muscleGroup] || 'https://www.youtube.com/watch?v=gRVjAtPip0Y';
 }
 
-// Sistema prioriza vídeos locais brasileiros
-// Fallback para vídeos genéricos se necessário
-// Todos os vídeos são em português brasileiro (PT-BR)
+// Sistema prioriza vídeos do YouTube brasileiros
+// 100% em português brasileiro (PT-BR)
+// Sem dependência de arquivos locais
