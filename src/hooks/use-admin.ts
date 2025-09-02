@@ -11,6 +11,7 @@ export interface WorkoutPlan {
   observations: string;
   createdBy: string;
   createdAt: Date;
+  exerciseSettings?: Record<string, { sets: number; rest: number; weight: number }>;
 }
 
 export function useAdmin() {
@@ -62,7 +63,8 @@ export function useAdmin() {
     userId: string,
     name: string,
     exercises: string[],
-    observations: string
+    observations: string,
+    exerciseSettings?: Record<string, { sets: number; rest: number; weight: number }>
   ) => {
     if (!isAdmin || !user) return false;
     
@@ -86,7 +88,8 @@ export function useAdmin() {
           exercises,
           observations,
           createdBy: user.email || 'Admin',
-          createdAt: new Date()
+          createdAt: new Date(),
+          exerciseSettings: exerciseSettings || {}
         };
         const updatedPlans = [newPlan, ...workoutPlans];
         setWorkoutPlans(updatedPlans);
@@ -102,10 +105,12 @@ export function useAdmin() {
         exercises: data.exercises,
         observations: data.observations || '',
         createdBy: user.email || 'Admin',
-        createdAt: new Date(data.created_at)
+        createdAt: new Date(data.created_at),
+        exerciseSettings: exerciseSettings || {}
       };
       const updatedPlans = [newPlan, ...workoutPlans];
       setWorkoutPlans(updatedPlans);
+      await saveWorkoutPlans(updatedPlans);
       return true;
     } catch (error) {
       console.error('Error creating workout plan:', error);

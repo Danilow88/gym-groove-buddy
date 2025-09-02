@@ -28,6 +28,7 @@ const Admin = () => {
   const [observations, setObservations] = useState('');
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('Todos');
   const [adminPassword, setAdminPassword] = useState('');
+  const [exerciseSettings, setExerciseSettings] = useState<Record<string, { sets?: number; rest?: number; weight?: number }>>({});
 
   const handleAdminLogin = () => {
     const success = authenticateAdmin(adminPassword);
@@ -134,11 +135,19 @@ const Admin = () => {
     }
 
     try {
+      const filteredSettings = Object.fromEntries(
+        selectedExercises.map(id => [id, {
+          sets: Number(exerciseSettings[id]?.sets) || 0,
+          rest: Number(exerciseSettings[id]?.rest) || 0,
+          weight: Number(exerciseSettings[id]?.weight) || 0,
+        }])
+      );
       const success = await createWorkoutPlan(
         selectedUserId,
         workoutName,
         selectedExercises,
-        observations
+        observations,
+        filteredSettings
       );
 
       if (success) {
@@ -152,6 +161,7 @@ const Admin = () => {
         setWorkoutName('');
         setSelectedExercises([]);
         setObservations('');
+        setExerciseSettings({});
       }
     } catch (error) {
       toast({
@@ -168,6 +178,16 @@ const Admin = () => {
       if (exists) return prev.filter(id => id !== exerciseId);
       return [...prev, exerciseId];
     });
+  };
+
+  const updateExerciseSetting = (exerciseId: string, field: 'sets'|'rest'|'weight', value: number) => {
+    setExerciseSettings(prev => ({
+      ...prev,
+      [exerciseId]: {
+        ...prev[exerciseId],
+        [field]: value
+      }
+    }));
   };
 
   const getFilteredExercises = () => {
@@ -283,21 +303,21 @@ const Admin = () => {
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Exercícios Selecionados ({selectedExercises.length}) *
               </label>
-              <div className="max-h-60 overflow-y-auto bg-spotify-surface border border-border rounded-lg p-3 space-y-2">
+              <div className="max-h-96 overflow-y-auto bg-spotify-surface border border-border rounded-lg p-3 space-y-3">
                 {getFilteredExercises().map((exercise) => {
                   const isSelected = selectedExercises.includes(exercise.id);
                   return (
                     <div
                       key={exercise.id}
-                      className={`p-2 rounded cursor-pointer border transition-all ${
+                      className={`p-3 rounded cursor-pointer border transition-all ${
                         isSelected
                           ? 'border-spotify-green bg-spotify-green/10'
                           : 'border-border hover:border-spotify-green/50 hover:bg-spotify-green/5'
                       }`}
                       onClick={() => toggleExercise(exercise.id)}
                     >
-                      <div className="flex items-center justify-between">
-                        <div>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1">
                           <div className="flex items-center gap-2">
                             <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
                               isSelected ? 'border-spotify-green bg-spotify-green' : 'border-border'
@@ -312,6 +332,31 @@ const Admin = () => {
                             {exercise.muscle} • {exercise.description}
                           </p>
                         </div>
+                        {isSelected && (
+                          <div className="grid grid-cols-3 gap-2 w-full max-w-md" onClick={(e)=> e.stopPropagation()}>
+                            <input
+                              type="number"
+                              placeholder="Séries"
+                              className="rounded bg-background border border-border px-2 py-1 text-sm"
+                              value={exerciseSettings[exercise.id]?.sets ?? ''}
+                              onChange={(e)=> updateExerciseSetting(exercise.id, 'sets', Number(e.target.value)||0)}
+                            />
+                            <input
+                              type="number"
+                              placeholder="Descanso (s)"
+                              className="rounded bg-background border border-border px-2 py-1 text-sm"
+                              value={exerciseSettings[exercise.id]?.rest ?? ''}
+                              onChange={(e)=> updateExerciseSetting(exercise.id, 'rest', Number(e.target.value)||0)}
+                            />
+                            <input
+                              type="number"
+                              placeholder="Peso (kg)"
+                              className="rounded bg-background border border-border px-2 py-1 text-sm"
+                              value={exerciseSettings[exercise.id]?.weight ?? ''}
+                              onChange={(e)=> updateExerciseSetting(exercise.id, 'weight', Number(e.target.value)||0)}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
