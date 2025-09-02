@@ -18,7 +18,7 @@ function toLocalDateKey(date: Date | string) {
 }
 
 const Schedule = () => {
-  const { available, mine, loading, book, cancel, createSlot, approve } = useAppointments();
+  const { available, mine, loading, book, cancel, createSlot, approve, propose } = useAppointments();
   const { isAdminUser, isAdminAuthenticated } = useAdminAuth();
   const { user } = useAuth();
   const { toast } = useToast();
@@ -155,6 +155,26 @@ const Schedule = () => {
                 <div className="text-sm text-muted-foreground">Sem horários disponíveis</div>
               )}
             </div>
+          </Card>
+
+          {/* Usuário pode propor um horário quando não houver disponível */}
+          <Card className="p-4 md:col-span-3">
+            <h2 className="font-semibold mb-3">Sugerir horário ao administrador</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <Input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
+              <Input type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} />
+              <Button onClick={async () => {
+                if (!start || !end) return;
+                const { error } = await propose(new Date(start), new Date(end));
+                if (!error) {
+                  setStart(""); setEnd("");
+                  toast({ title: 'Pedido enviado', description: 'Aguarde aprovação do administrador.' });
+                } else {
+                  toast({ title: 'Erro', description: error, variant: 'destructive' });
+                }
+              }} disabled={!start || !end}>Enviar pedido</Button>
+            </div>
+            <div className="text-xs text-muted-foreground mt-2">O admin receberá e poderá aprovar seu pedido.</div>
           </Card>
 
           <Card className="p-4 md:col-span-3">

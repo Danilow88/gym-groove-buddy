@@ -102,6 +102,19 @@ export function useAppointments() {
     return { error: null };
   }, [user?.id, load]);
 
-  return { loading, error, available, mine, reload: load, book, cancel, createSlot, approve };
+  const propose = useCallback(async (start: Date, end: Date) => {
+    if (!user?.id) return { error: "not_auth" };
+    const { data: adminId, error: e1 } = await (supabase as any).rpc('get_default_admin_id');
+    if (e1) return { error: e1.message };
+    if (!adminId) return { error: 'no_admin' };
+    const { error } = await supabase.from('appointments').insert([
+      { admin_id: adminId as string, user_id: user.id, start_time: start.toISOString(), end_time: end.toISOString(), status: 'pending' }
+    ]);
+    if (error) return { error: error.message };
+    await load();
+    return { error: null };
+  }, [user?.id, load]);
+
+  return { loading, error, available, mine, reload: load, book, cancel, createSlot, approve, propose };
 }
 

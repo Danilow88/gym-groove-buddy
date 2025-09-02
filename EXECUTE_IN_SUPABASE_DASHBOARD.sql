@@ -289,6 +289,20 @@ WITH CHECK (
   )
 );
 
+-- Conteúdo inicial de mobilidade (vídeos YouTube PT-BR)
+INSERT INTO public.mobility_exercises (title, description, video_url, difficulty, created_by)
+SELECT * FROM (
+  VALUES
+    ('Mobilidade de Quadril - 5 minutos', 'Sequência rápida para soltar quadril e lombar.', 'https://www.youtube.com/watch?v=BkS1-El_WlE', 'easy'::TEXT),
+    ('Mobilidade de Ombros com Bastão', 'Melhora a amplitude e reduz rigidez em ombros.', 'https://www.youtube.com/watch?v=3sEeVJEXTfY', 'medium'::TEXT),
+    ('Alongamento Dinâmico de Pernas', 'Fluxo dinâmico para posterior, glúteos e panturrilhas.', 'https://www.youtube.com/watch?v=mhF3Z67f4xA', 'easy'::TEXT),
+    ('Thoracic Opener - Coluna Torácica', 'Mobilidade torácica para postura e supino.', 'https://www.youtube.com/watch?v=hxJdZrKk0nE', 'medium'::TEXT)
+) AS t(title, description, video_url, difficulty)
+CROSS JOIN LATERAL (
+  SELECT id FROM auth.users WHERE email = (SELECT admin_email FROM public.admin_configs WHERE is_active = true LIMIT 1)
+) admin(id)
+ON CONFLICT DO NOTHING;
+
 -- 22.2 Criar tabela appointments para agenda de aulas por videoconferência
 CREATE TABLE IF NOT EXISTS public.appointments (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -371,6 +385,18 @@ USING (
 WITH CHECK (
   status IN ('approved','cancelled')
 );
+
+-- Função para obter admin padrão (pela admin_configs)
+CREATE OR REPLACE FUNCTION public.get_default_admin_id()
+RETURNS UUID
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT id FROM auth.users WHERE email = (
+    SELECT admin_email FROM public.admin_configs WHERE is_active = true ORDER BY created_at ASC LIMIT 1
+  ) LIMIT 1;
+$$;
 
 -- Trigger para updated_at em appointments
 DROP TRIGGER IF EXISTS update_appointments_updated_at ON public.appointments;
