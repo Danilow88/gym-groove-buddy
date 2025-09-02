@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar as DayCalendar } from "@/components/ui/calendar";
@@ -45,6 +45,9 @@ const Workout = () => {
   const [savedPlanExercises, setSavedPlanExercises] = useState<string[]>([]);
   const [planInputs, setPlanInputs] = useState<Record<string, { sets?: number; weight?: number; rest?: number }>>({});
   const [planTimerVisible, setPlanTimerVisible] = useState<Record<string, boolean>>({});
+  const quickTimerIntervalsRef = useRef<Record<string, number>>({});
+  const [quickTimerRemaining, setQuickTimerRemaining] = useState<Record<string, number>>({});
+  const [quickTimerRunning, setQuickTimerRunning] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!planStorageKey) return;
@@ -67,6 +70,51 @@ const Workout = () => {
       setPlanInputs({});
     }
   }, [planStorageKey]);
+
+  useEffect(() => {
+    // cleanup intervals on unmount or when changing plan key
+    return () => {
+      Object.values(quickTimerIntervalsRef.current).forEach((id) => {
+        if (id) window.clearInterval(id);
+      });
+      quickTimerIntervalsRef.current = {};
+    };
+  }, [planStorageKey]);
+
+  const formatMMSS = (total: number) => {
+    const m = Math.floor(total / 60).toString().padStart(2, '0');
+    const s = (total % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
+
+  const startQuickTimer = (exerciseId: string) => {
+    const rest = (planInputs[exerciseId]?.rest && planInputs[exerciseId]?.rest! > 0) ? Number(planInputs[exerciseId]?.rest) : 60;
+    // initialize
+    setQuickTimerRunning(prev => ({ ...prev, [exerciseId]: true }));
+    setQuickTimerRemaining(prev => ({ ...prev, [exerciseId]: rest }));
+    // clear existing
+    const prevId = quickTimerIntervalsRef.current[exerciseId];
+    if (prevId) window.clearInterval(prevId);
+    const id = window.setInterval(() => {
+      setQuickTimerRemaining(prev => {
+        const current = prev[exerciseId] ?? rest;
+        const next = current - 1;
+        if (next <= 0) {
+          const resetTo = (planInputs[exerciseId]?.rest && planInputs[exerciseId]?.rest! > 0) ? Number(planInputs[exerciseId]?.rest) : 60;
+          return { ...prev, [exerciseId]: resetTo };
+        }
+        return { ...prev, [exerciseId]: next };
+      });
+    }, 1000);
+    quickTimerIntervalsRef.current[exerciseId] = id;
+  };
+
+  const stopQuickTimer = (exerciseId: string) => {
+    const prevId = quickTimerIntervalsRef.current[exerciseId];
+    if (prevId) window.clearInterval(prevId);
+    delete quickTimerIntervalsRef.current[exerciseId];
+    setQuickTimerRunning(prev => ({ ...prev, [exerciseId]: false }));
+  };
 
   const handleSavePlannedWorkout = () => {
     if (!planStorageKey || selectedExerciseIds.length === 0) return;
@@ -272,6 +320,12 @@ const Workout = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <Button size="sm" className="bg-spotify-green" onClick={()=> savePlanSettings(id)}>Salvar</Button>
+                            <Button size="sm" variant="outline" className="border-border" onClick={()=> startQuickTimer(id)}>
+                              ⏱️ Reloginho {typeof quickTimerRemaining[id] === 'number' ? `(${formatMMSS(quickTimerRemaining[id])})` : ''}
+                            </Button>
+                            {quickTimerRunning[id] && (
+                              <Button size="sm" variant="secondary" className="bg-spotify-surface" onClick={()=> stopQuickTimer(id)}>Parar</Button>
+                            )}
                           </div>
                           {planTimerVisible[id] && (
                             <div className="pt-2">
