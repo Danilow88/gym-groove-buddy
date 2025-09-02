@@ -9,6 +9,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useWorkout } from "@/hooks/use-workout";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
+import { ArrowLeft, Save } from "lucide-react";
 
 const Planner = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -17,6 +20,7 @@ const Planner = () => {
   const { exercises } = useWorkout();
   const { users: foundUsers, searchUsers, clearUsers } = useUserSearch();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(user?.id || null);
+  const { toast } = useToast();
   // Como não temos listagem de usuários aqui, usamos apenas o próprio usuário quando não admin
   const selectedUser = useMemo(() => ({ id: selectedUserId || user?.id || '', email: user?.email || 'Usuário' }), [selectedUserId, user]);
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
@@ -24,7 +28,19 @@ const Planner = () => {
 
   return (
     <div className="min-h-screen bg-background p-4">
-      <h1 className="text-2xl font-bold text-foreground mb-4">Planejar Treino</h1>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Link to="/workout"><Button variant="secondary" className="bg-spotify-surface"><ArrowLeft className="h-4 w-4 mr-1"/>Voltar</Button></Link>
+          <h1 className="text-2xl font-bold text-foreground">Planejar Treino</h1>
+        </div>
+        <Button onClick={() => {
+          if (!date || !selectedUser?.id) return;
+          const key = `plan_${selectedUser.id}_${date.toISOString().slice(0,10)}`;
+          const payload = { userId: selectedUser.id, date: date.toISOString(), notes: planNotes, exercises: selectedExerciseIds };
+          try { localStorage.setItem(key, JSON.stringify(payload)); } catch {}
+          toast({ title: 'Treino salvo', description: 'Seu plano do dia foi salvo.' });
+        }} className="bg-spotify-green hover:bg-spotify-green-hover"><Save className="h-4 w-4 mr-1"/>Salvar</Button>
+      </div>
       <div className="grid md:grid-cols-2 gap-4">
         <Card className="p-4 bg-spotify-card border-border">
           <h2 className="text-lg font-semibold mb-2 text-foreground">Calendário</h2>
