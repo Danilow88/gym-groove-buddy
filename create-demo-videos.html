@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Criar Vídeos de Demonstração</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a1a;
+            color: white;
+        }
+        .video-generator {
+            background: #2a2a2a;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        canvas {
+            border: 2px solid #1DB954;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        button {
+            background: #1DB954;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1ed760;
+        }
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .exercise-info {
+            background: #333;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 6px;
+            border-left: 4px solid #1DB954;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            background: #333;
+        }
+        .success { background: #1DB954 !important; }
+        .error { background: #e22e2e !important; }
+    </style>
+</head>
+<body>
+    <h1>🎥 Gerador de Vídeos de Demonstração para Exercícios</h1>
+    <p>Esta ferramenta cria vídeos de demonstração simples para os exercícios do Gym Groove Buddy.</p>
+    
+    <div class="exercise-info">
+        <h3>📋 Exercícios para criar vídeos:</h3>
+        <ul id="exerciseList"></ul>
+    </div>
+
+    <div class="video-generator">
+        <h3>🎬 Gerador de Vídeo</h3>
+        <div>
+            <label for="exerciseSelect">Exercício:</label>
+            <select id="exerciseSelect" style="padding: 8px; margin: 5px; background: #333; color: white; border: 1px solid #555;">
+            </select>
+        </div>
+        
+        <canvas id="videoCanvas" width="640" height="360"></canvas>
+        
+        <div>
+            <button onclick="generateVideo()">🎥 Gerar Vídeo</button>
+            <button onclick="downloadVideo()" id="downloadBtn" disabled>💾 Download</button>
+            <button onclick="previewVideo()">👁️ Preview</button>
+        </div>
+        
+        <div id="status" class="status">Pronto para gerar vídeos</div>
+    </div>
+
+    <div class="exercise-info">
+        <h3>📝 Instruções:</h3>
+        <ol>
+            <li>Selecione um exercício da lista</li>
+            <li>Clique em "Gerar Vídeo" para criar uma animação simples</li>
+            <li>Clique em "Download" para salvar o vídeo</li>
+            <li>Salve os vídeos na pasta <code>public/videos/exercises/</code></li>
+        </ol>
+        
+        <h4>💡 Dicas:</h4>
+        <ul>
+            <li>Os vídeos são animações simples que mostram o movimento básico</li>
+            <li>Use nomes de arquivo consistentes com o mapeamento</li>
+            <li>Teste sempre no app após adicionar novos vídeos</li>
+        </ul>
+    </div>
+
+    <script>
+        // Lista de exercícios do sistema
+        const exercises = [
+            { id: 'bench-press', name: 'Supino Reto', movement: 'push' },
+            { id: 'incline-bench-press', name: 'Supino Inclinado', movement: 'push' },
+            { id: 'pushup', name: 'Flexão de Braço', movement: 'push' },
+            { id: 'dumbbell-fly', name: 'Crucifixo', movement: 'fly' },
+            { id: 'bent-over-row', name: 'Remada Curvada', movement: 'pull' },
+            { id: 'lat-pulldown', name: 'Pull Down', movement: 'pull' },
+            { id: 'cable-row', name: 'Remada Baixa', movement: 'pull' },
+            { id: 'squat', name: 'Agachamento', movement: 'squat' },
+            { id: 'leg-press', name: 'Leg Press', movement: 'press' },
+            { id: 'shoulder-press', name: 'Desenvolvimento', movement: 'press' },
+            { id: 'lateral-raise', name: 'Elevação Lateral', movement: 'raise' },
+            { id: 'bicep-curl', name: 'Rosca Direta', movement: 'curl' },
+            { id: 'skull-crusher', name: 'Tríceps Testa', movement: 'extension' },
+            { id: 'crunch', name: 'Abdominal Reto', movement: 'crunch' },
+            { id: 'plank', name: 'Prancha', movement: 'plank' },
+            // Vídeos genéricos
+            { id: 'generic-push', name: 'Movimento de Empurrar (Genérico)', movement: 'push' },
+            { id: 'generic-pull', name: 'Movimento de Puxar (Genérico)', movement: 'pull' },
+            { id: 'generic-squat', name: 'Movimento de Agachamento (Genérico)', movement: 'squat' },
+            { id: 'generic-press', name: 'Movimento de Pressão (Genérico)', movement: 'press' },
+            { id: 'generic-curl', name: 'Movimento de Rosca (Genérico)', movement: 'curl' },
+            { id: 'generic-tricep', name: 'Exercício de Tríceps (Genérico)', movement: 'extension' },
+            { id: 'generic-abs', name: 'Exercício Abdominal (Genérico)', movement: 'crunch' },
+            { id: 'generic-cardio', name: 'Exercício Cardiovascular (Genérico)', movement: 'cardio' },
+            { id: 'generic-workout', name: 'Exercício Universal (Genérico)', movement: 'universal' }
+        ];
+
+        let mediaRecorder;
+        let recordedChunks = [];
+        let currentExercise = null;
+
+        // Inicializar página
+        function initializePage() {
+            const exerciseList = document.getElementById('exerciseList');
+            const exerciseSelect = document.getElementById('exerciseSelect');
+            
+            exercises.forEach(exercise => {
+                // Lista
+                const li = document.createElement('li');
+                li.textContent = `${exercise.name} (${exercise.id}.mp4)`;
+                exerciseList.appendChild(li);
+                
+                // Select
+                const option = document.createElement('option');
+                option.value = exercise.id;
+                option.textContent = exercise.name;
+                exerciseSelect.appendChild(option);
+            });
+        }
+
+        // Gerar animação baseada no tipo de movimento
+        function generateVideo() {
+            const canvas = document.getElementById('videoCanvas');
+            const ctx = canvas.getContext('2d');
+            const exerciseId = document.getElementById('exerciseSelect').value;
+            currentExercise = exercises.find(e => e.id === exerciseId);
+            
+            if (!currentExercise) return;
+            
+            updateStatus('Gerando vídeo...', 'info');
+            
+            // Configurar MediaRecorder
+            const stream = canvas.captureStream();
+            mediaRecorder = new MediaRecorder(stream);
+            recordedChunks = [];
+            
+            mediaRecorder.ondataavailable = event => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+            
+            mediaRecorder.onstop = () => {
+                updateStatus('Vídeo gerado com sucesso!', 'success');
+                document.getElementById('downloadBtn').disabled = false;
+            };
+            
+            // Iniciar gravação
+            mediaRecorder.start();
+            
+            // Animar baseado no tipo de movimento
+            animateExercise(ctx, currentExercise.movement, () => {
+                setTimeout(() => {
+                    mediaRecorder.stop();
+                }, 100);
+            });
+        }
+
+        // Função de animação
+        function animateExercise(ctx, movement, callback) {
+            const canvas = ctx.canvas;
+            let frame = 0;
+            const totalFrames = 60; // 2 segundos a 30fps
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // Background
+                ctx.fillStyle = '#1a1a1a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Título
+                ctx.fillStyle = '#1DB954';
+                ctx.font = 'bold 24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(currentExercise.name, canvas.width / 2, 40);
+                
+                // Animação específica do movimento
+                drawMovement(ctx, movement, frame, totalFrames);
+                
+                frame++;
+                if (frame < totalFrames) {
+                    requestAnimationFrame(animate);
+                } else {
+                    callback();
+                }
+            }
+            
+            animate();
+        }
+
+        // Desenhar movimento específico
+        function drawMovement(ctx, movement, frame, totalFrames) {
+            const centerX = ctx.canvas.width / 2;
+            const centerY = ctx.canvas.height / 2;
+            const progress = frame / totalFrames;
+            const oscillation = Math.sin(progress * Math.PI * 4) * 0.5 + 0.5;
+            
+            ctx.strokeStyle = '#1DB954';
+            ctx.lineWidth = 4;
+            ctx.fillStyle = '#1DB954';
+            
+            switch(movement) {
+                case 'push':
+                    // Movimento de empurrar
+                    const pushDistance = oscillation * 80;
+                    ctx.beginPath();
+                    ctx.arc(centerX - pushDistance, centerY, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX - pushDistance + 20, centerY);
+                    ctx.lineTo(centerX + 40, centerY);
+                    ctx.stroke();
+                    break;
+                    
+                case 'pull':
+                    // Movimento de puxar
+                    const pullDistance = (1 - oscillation) * 80;
+                    ctx.beginPath();
+                    ctx.arc(centerX + pullDistance, centerY, 20, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX + pullDistance - 20, centerY);
+                    ctx.lineTo(centerX - 40, centerY);
+                    ctx.stroke();
+                    break;
+                    
+                case 'squat':
+                    // Movimento de agachamento
+                    const squatHeight = oscillation * 60;
+                    ctx.fillRect(centerX - 20, centerY - 40 + squatHeight, 40, 80 - squatHeight);
+                    break;
+                    
+                case 'curl':
+                    // Movimento de rosca
+                    const curlAngle = oscillation * Math.PI;
+                    const armLength = 50;
+                    const endX = centerX + Math.cos(curlAngle) * armLength;
+                    const endY = centerY + Math.sin(curlAngle) * armLength;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, centerY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                    
+                    ctx.beginPath();
+                    ctx.arc(endX, endY, 10, 0, Math.PI * 2);
+                    ctx.fill();
+                    break;
+                    
+                default:
+                    // Movimento genérico
+                    const radius = 20 + oscillation * 10;
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+            }
+            
+            // Instruções
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Movimento demonstrativo', centerX, ctx.canvas.height - 40);
+        }
+
+        // Download do vídeo
+        function downloadVideo() {
+            if (recordedChunks.length === 0) {
+                updateStatus('Nenhum vídeo foi gerado ainda!', 'error');
+                return;
+            }
+            
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentExercise.id}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            updateStatus(`Vídeo ${currentExercise.id}.webm baixado!`, 'success');
+        }
+
+        // Preview do vídeo
+        function previewVideo() {
+            if (recordedChunks.length === 0) {
+                updateStatus('Nenhum vídeo foi gerado ainda!', 'error');
+                return;
+            }
+            
+            const blob = new Blob(recordedChunks, { type: 'video/webm' });
+            const url = URL.createObjectURL(blob);
+            
+            const video = document.createElement('video');
+            video.src = url;
+            video.controls = true;
+            video.style.width = '100%';
+            video.style.maxWidth = '640px';
+            video.style.marginTop = '20px';
+            
+            const existingVideo = document.querySelector('video');
+            if (existingVideo) {
+                existingVideo.remove();
+            }
+            
+            document.querySelector('.video-generator').appendChild(video);
+            updateStatus('Preview do vídeo adicionado abaixo', 'success');
+        }
+
+        // Atualizar status
+        function updateStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+        }
+
+        // Inicializar quando a página carregar
+        window.onload = initializePage;
+    </script>
+</body>
+</html>

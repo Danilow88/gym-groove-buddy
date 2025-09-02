@@ -1,0 +1,79 @@
+# Placeholder para vídeos de demonstração
+
+## Como adicionar vídeos reais:
+
+### Opção 1: Usar o Gerador HTML
+1. Abra o arquivo `create-demo-videos.html` no navegador
+2. Selecione um exercício
+3. Clique em "Gerar Vídeo"
+4. Faça download e renomeie para .mp4
+
+### Opção 2: Baixar vídeos do YouTube
+Use o youtube-dl ou similar para baixar os vídeos das URLs mapeadas:
+
+```bash
+# Exemplo para instalar youtube-dl
+pip install youtube-dl
+
+# Baixar vídeo específico
+youtube-dl -f mp4 "https://www.youtube.com/watch?v=esQi683XR44" -o "bench-press.%(ext)s"
+```
+
+### Opção 3: Criar vídeos com ffmpeg
+Se tiver ffmpeg instalado:
+
+```bash
+# Criar vídeo de placeholder colorido
+ffmpeg -f lavfi -i color=c=green:size=640x360:duration=10 -c:v libx264 -t 10 -pix_fmt yuv420p bench-press.mp4
+
+# Adicionar texto
+ffmpeg -f lavfi -i color=c=black:size=640x360:duration=10 -vf "drawtext=fontfile=/System/Library/Fonts/Arial.ttf:text='Supino Reto':fontcolor=white:fontsize=24:x=(w-text_w)/2:y=(h-text_h)/2" -c:v libx264 -t 10 -pix_fmt yuv420p bench-press.mp4
+```
+
+### Opção 4: Usar vídeos de stock
+Baixe vídeos gratuitos de exercícios de sites como:
+- Pexels Videos
+- Pixabay Videos  
+- Unsplash Videos
+
+### Estrutura de arquivos esperada:
+```
+public/videos/exercises/
+├── bench-press.mp4
+├── incline-bench-press.mp4
+├── pushup.mp4
+├── dumbbell-fly.mp4
+├── bent-over-row.mp4
+├── lat-pulldown.mp4
+├── cable-row.mp4
+├── squat.mp4
+├── leg-press.mp4
+├── shoulder-press.mp4
+├── lateral-raise.mp4
+├── bicep-curl.mp4
+├── skull-crusher.mp4
+├── crunch.mp4
+├── plank.mp4
+└── generic/
+    ├── generic-push.mp4
+    ├── generic-pull.mp4
+    ├── generic-squat.mp4
+    ├── generic-press.mp4
+    ├── generic-curl.mp4
+    ├── generic-tricep.mp4
+    ├── generic-abs.mp4
+    ├── generic-cardio.mp4
+    └── generic-workout.mp4
+```
+
+## Funcionalidades implementadas:
+
+✅ Sistema de fallback automático
+✅ Suporte a vídeos offline
+✅ Indicador visual de status online/offline
+✅ Tratamento de erros de vídeo
+✅ Suporte a múltiplos formatos (MP4, WebM, OGV)
+✅ Sistema de preview inteligente
+
+## Para testar sem vídeos:
+O sistema vai usar URLs do YouTube como fallback quando vídeos locais não estão disponíveis.

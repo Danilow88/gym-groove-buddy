@@ -7,6 +7,7 @@ import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { AddSetModal } from "@/components/workout/add-set-modal";
 import { RestTimer } from "@/components/workout/rest-timer";
+import { VideoModal } from "@/components/workout/video-modal";
 import { useWorkout } from "@/hooks/use-workout";
 import { Dumbbell, Calendar, Play, Target } from "lucide-react";
 
@@ -26,6 +27,8 @@ const Workout = () => {
   const [selectedExercise, setSelectedExercise] = useState<typeof exercises[0] | null>(null);
   const [showAddSetModal, setShowAddSetModal] = useState(false);
   const [showRestTimer, setShowRestTimer] = useState(false);
+  const [showVideoModal, setShowVideoModal] = useState(false);
+  const [videoExercise, setVideoExercise] = useState<typeof exercises[0] | null>(null);
   const [selectedWorkoutDays, setSelectedWorkoutDays] = useState<string[]>([]);
 
   // Verificação de loading/error
@@ -56,6 +59,14 @@ const Workout = () => {
   const handleFinishWorkout = async () => {
     await finishWorkout();
     setSelectedWorkoutDays([]);
+  };
+
+  const handlePlayVideo = (exerciseId: string) => {
+    const exercise = exercises.find(ex => ex.id === exerciseId);
+    if (exercise) {
+      setVideoExercise(exercise);
+      setShowVideoModal(true);
+    }
   };
 
   const getWorkoutSummary = () => {
@@ -160,6 +171,7 @@ const Workout = () => {
                 setSelectedExercise(exercise);
                 setShowAddSetModal(true);
               }}
+              onPlayVideo={handlePlayVideo}
               onRemoveSet={(setId) => removeSet(setId)}
             />
           ))}
@@ -203,6 +215,14 @@ const Workout = () => {
         isOpen={showRestTimer}
         onClose={() => setShowRestTimer(false)}
         exerciseName={selectedExercise?.name || ''}
+      />
+
+      <VideoModal
+        isOpen={showVideoModal}
+        onClose={() => setShowVideoModal(false)}
+        exerciseName={videoExercise?.name || ''}
+        exerciseId={videoExercise?.id || ''}
+        muscleGroup={videoExercise?.muscle}
       />
 
       <BottomNavigation />
