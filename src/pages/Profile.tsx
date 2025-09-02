@@ -8,11 +8,14 @@ import { useAdmin } from "@/hooks/use-admin";
 import { User, Trophy, Target, Calendar, LogOut, LogIn, Heart, Dumbbell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "react-router-dom";
+import { useTheme } from "next-themes";
+import { Switch } from "@/components/ui/switch";
 
 const Profile = () => {
   const { workoutHistory, exercises } = useWorkout();
   const { isAuthenticated, user, signOut } = useAuth();
   const { getWorkoutPlansForUser } = useAdmin();
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   const totalWorkouts = workoutHistory.length;
   const totalSets = workoutHistory.reduce((total, session) => total + session.sets.length, 0);
@@ -144,6 +147,21 @@ const Profile = () => {
         <Card className="bg-gradient-card border-border p-4">
           <h3 className="font-medium text-foreground mb-3">Configurações</h3>
           <div className="space-y-3">
+            <div className="flex items-center justify-between bg-spotify-surface rounded-md p-3 border border-border">
+              <div>
+                <p className="text-sm font-medium text-foreground">Tema</p>
+                <p className="text-xs text-muted-foreground">Claro ou escuro (segue o sistema por padrão)</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-muted-foreground">Claro</span>
+                <Switch
+                  checked={(theme ?? resolvedTheme) === 'dark'}
+                  onCheckedChange={(checked) => setTheme(checked ? 'dark' : 'light')}
+                  aria-label="Alternar tema escuro"
+                />
+                <span className="text-xs text-muted-foreground">Escuro</span>
+              </div>
+            </div>
             {/* Planner removido: planejamento agora é feito em Treino */}
             <Button variant="outline" className="w-full justify-start border-border hover:bg-spotify-surface">
               Configurações do App

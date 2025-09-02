@@ -8,7 +8,60 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Spotify-inspired dark theme design system */
+    /* Light theme */
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 134 61% 41%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 134 61% 41%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 134 61% 41%;
+
+    --radius: 0.75rem;
+
+    /* Tokens */
+    --spotify-green: 134 61% 41%;
+    --spotify-green-hover: 134 61% 35%;
+    --spotify-dark: 0 0% 98%;
+    --spotify-darker: 0 0% 96%;
+    --spotify-card: 0 0% 100%;
+    --spotify-surface: 210 40% 98%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--spotify-green)), hsl(134 61% 35%));
+    --gradient-card: linear-gradient(135deg, hsl(var(--spotify-card)), hsl(210 40% 96%));
+    --gradient-surface: linear-gradient(180deg, hsl(var(--spotify-surface)), hsl(var(--spotify-card)));
+    
+    /* Shadows */
+    --shadow-spotify: 0 8px 32px hsl(var(--spotify-green) / 0.1);
+    --shadow-card: 0 4px 16px hsl(0 0% 0% / 0.08);
+    
+    /* Animations */
+    --transition-spotify: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .dark {
+    /* Dark theme */
     --background: 200 20% 6%;
     --foreground: 0 0% 95%;
 
@@ -18,7 +71,6 @@ All colors MUST be HSL.
     --popover: 200 20% 8%;
     --popover-foreground: 0 0% 95%;
 
-    /* Spotify green as primary */
     --primary: 134 61% 41%;
     --primary-foreground: 0 0% 100%;
 
@@ -40,7 +92,7 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
 
-    /* Custom Spotify-style tokens */
+    /* Tokens */
     --spotify-green: 134 61% 41%;
     --spotify-green-hover: 134 61% 45%;
     --spotify-dark: 200 20% 6%;
