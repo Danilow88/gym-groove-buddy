@@ -246,6 +246,121 @@ CREATE TRIGGER update_admin_configs_updated_at
   EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ========================================
+-- NOVAS TABELAS: VIDEOS DE EXERCÍCIOS E AGENDA DE AULAS
+-- ========================================
+
+-- 22.1 Criar tabela exercise_videos para mapear vídeos por exercício
+CREATE TABLE IF NOT EXISTS public.exercise_videos (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  exercise_id TEXT NOT NULL UNIQUE, -- corresponde ao id do mock/local
+  video_url TEXT,                   -- URL externa (ex: YouTube ou público do Storage)
+  storage_path TEXT,                -- caminho do arquivo no Supabase Storage (bucket exercise-videos)
+  uploaded_by UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+-- Habilitar RLS
+ALTER TABLE public.exercise_videos ENABLE ROW LEVEL SECURITY;
+
+-- Políticas: qualquer usuário pode ler os vídeos (para exibição no app)
+DROP POLICY IF EXISTS "Anyone can view exercise videos" ON public.exercise_videos;
+CREATE POLICY "Anyone can view exercise videos"
+ON public.exercise_videos
+FOR SELECT
+USING (true);
+
+-- Apenas admins podem inserir/atualizar/deletar
+DROP POLICY IF EXISTS "Admins can manage exercise videos" ON public.exercise_videos;
+CREATE POLICY "Admins can manage exercise videos"
+ON public.exercise_videos
+FOR ALL
+USING (
+  EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+);
+
+-- 22.2 Criar tabela appointments para agenda de aulas por videoconferência
+CREATE TABLE IF NOT EXISTS public.appointments (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  admin_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  end_time TIMESTAMP WITH TIME ZONE NOT NULL,
+  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available','booked','cancelled')),
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  CHECK (end_time > start_time),
+  CHECK (end_time <= start_time + INTERVAL '60 minutes')
+);
+
+-- Evitar sobreposição de horários para o mesmo admin (slots não cancelados)
+CREATE EXTENSION IF NOT EXISTS btree_gist;
+DROP INDEX IF EXISTS appointments_no_overlap_idx;
+CREATE INDEX appointments_no_overlap_idx ON public.appointments USING gist (
+  admin_id,
+  tstzrange(start_time, end_time)
+);
+
+-- Habilitar RLS
+ALTER TABLE public.appointments ENABLE ROW LEVEL SECURITY;
+
+-- Qualquer usuário pode visualizar a agenda
+DROP POLICY IF EXISTS "Anyone can view appointments" ON public.appointments;
+CREATE POLICY "Anyone can view appointments"
+ON public.appointments
+FOR SELECT
+USING (true);
+
+-- Admin pode criar/atualizar/deletar seus próprios slots
+DROP POLICY IF EXISTS "Admin can manage own appointments" ON public.appointments;
+CREATE POLICY "Admin can manage own appointments"
+ON public.appointments
+FOR ALL
+USING (
+  admin_id = auth.uid() AND EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+)
+WITH CHECK (
+  admin_id = auth.uid() AND EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+);
+
+-- Usuário pode reservar um slot disponível, vinculando-se ao user_id
+DROP POLICY IF EXISTS "User can book available appointment" ON public.appointments;
+CREATE POLICY "User can book available appointment"
+ON public.appointments
+FOR UPDATE
+USING (
+  status = 'available'
+)
+WITH CHECK (
+  status = 'booked' AND user_id = auth.uid()
+);
+
+-- Trigger para updated_at em appointments
+DROP TRIGGER IF EXISTS update_appointments_updated_at ON public.appointments;
+CREATE TRIGGER update_appointments_updated_at
+  BEFORE UPDATE ON public.appointments
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ========================================
 -- FUNÇÕES UTILITÁRIAS
 -- ========================================
 
@@ -333,6 +448,12 @@ BEGIN
   
   IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'workout_sets') THEN
     RAISE EXCEPTION 'Tabela workout_sets não foi criada!';
+  END IF;
+  IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'exercise_videos') THEN
+    RAISE EXCEPTION 'Tabela exercise_videos não foi criada!';
+  END IF;
+  IF NOT EXISTS (SELECT FROM information_schema.tables WHERE table_name = 'appointments') THEN
+    RAISE EXCEPTION 'Tabela appointments não foi criada!';
   END IF;
   
   -- Verificar admin

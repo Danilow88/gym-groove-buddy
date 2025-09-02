@@ -38,6 +38,41 @@ export type Database = {
         }
         Relationships: []
       }
+      exercise_videos: {
+        Row: {
+          created_at: string
+          exercise_id: string
+          id: string
+          storage_path: string | null
+          uploaded_by: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          exercise_id: string
+          id?: string
+          storage_path?: string | null
+          uploaded_by: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          exercise_id?: string
+          id?: string
+          storage_path?: string | null
+          uploaded_by?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "exercise_videos_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -182,6 +217,54 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      appointments: {
+        Row: {
+          admin_id: string
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          status: "available" | "booked" | "cancelled"
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          admin_id: string
+          created_at?: string
+          end_time: string
+          id?: string
+          start_time: string
+          status?: "available" | "booked" | "cancelled"
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          admin_id?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          status?: "available" | "booked" | "cancelled"
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_admin_id_fkey"
+            columns: ["admin_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           }
         ]
