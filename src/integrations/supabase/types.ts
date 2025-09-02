@@ -69,8 +69,10 @@ export type Database = {
         Row: {
           created_at: string
           created_by: string
+          days_of_week: string[] | null
           exercises: Json
           id: string
+          is_weekly_plan: boolean | null
           name: string
           observations: string | null
           updated_at: string
@@ -79,8 +81,10 @@ export type Database = {
         Insert: {
           created_at?: string
           created_by: string
+          days_of_week?: string[] | null
           exercises?: Json
           id?: string
+          is_weekly_plan?: boolean | null
           name: string
           observations?: string | null
           updated_at?: string
@@ -89,8 +93,10 @@ export type Database = {
         Update: {
           created_at?: string
           created_by?: string
+          days_of_week?: string[] | null
           exercises?: Json
           id?: string
+          is_weekly_plan?: boolean | null
           name?: string
           observations?: string | null
           updated_at?: string
@@ -180,6 +186,50 @@ export type Database = {
           }
         ]
       }
+      weekly_workout_details: {
+        Row: {
+          created_at: string
+          day_name: string
+          day_of_week: string
+          exercises: Json
+          id: string
+          is_rest_day: boolean | null
+          notes: string | null
+          updated_at: string
+          workout_plan_id: string
+        }
+        Insert: {
+          created_at?: string
+          day_name: string
+          day_of_week: string
+          exercises?: Json
+          id?: string
+          is_rest_day?: boolean | null
+          notes?: string | null
+          updated_at?: string
+          workout_plan_id: string
+        }
+        Update: {
+          created_at?: string
+          day_name?: string
+          day_of_week?: string
+          exercises?: Json
+          id?: string
+          is_rest_day?: boolean | null
+          notes?: string | null
+          updated_at?: string
+          workout_plan_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "weekly_workout_details_workout_plan_id_fkey"
+            columns: ["workout_plan_id"]
+            isOneToOne: false
+            referencedRelation: "workout_plans"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -210,6 +260,41 @@ export type Database = {
           user_id?: string
         }
         Returns: boolean
+      }
+      get_user_weekly_plan: {
+        Args: {
+          user_id?: string
+        }
+        Returns: {
+          plan_id: string
+          plan_name: string
+          plan_observations: string | null
+          day_of_week: string
+          day_name: string
+          exercises: Json
+          notes: string | null
+          is_rest_day: boolean
+        }[]
+      }
+      get_today_workout: {
+        Args: {
+          user_id?: string
+        }
+        Returns: {
+          plan_name: string
+          exercises: Json
+          notes: string | null
+          is_rest_day: boolean
+        }[]
+      }
+      create_weekly_workout_plan: {
+        Args: {
+          target_user_id: string
+          plan_name: string
+          plan_observations?: string
+          weekly_schedule?: Json
+        }
+        Returns: string
       }
     }
     Enums: {

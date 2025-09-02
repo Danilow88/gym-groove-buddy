@@ -5,12 +5,13 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
+import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
 import { useAdmin } from "@/hooks/use-admin";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { useWorkout } from "@/hooks/use-workout";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, CheckCircle, X, Trash2, Settings } from "lucide-react";
+import { UserPlus, CheckCircle, X, Trash2, Settings, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
@@ -331,14 +332,21 @@ const Admin = () => {
               />
             </div>
 
-            <Button
-              onClick={handleCreatePlan}
-              className="w-full bg-spotify-green hover:bg-spotify-green-hover"
-              disabled={loading}
-            >
-              <CheckCircle className="h-4 w-4 mr-2" />
-              {loading ? 'Criando...' : 'Criar Plano de Treino'}
-            </Button>
+            <div className="flex gap-3">
+              <Button
+                onClick={handleCreatePlan}
+                className="flex-1 bg-spotify-green hover:bg-spotify-green-hover"
+                disabled={loading}
+              >
+                <CheckCircle className="h-4 w-4 mr-2" />
+                {loading ? 'Criando...' : 'Criar Plano Simples'}
+              </Button>
+              
+              <WeeklyAdminModal 
+                userId={selectedUserId} 
+                userName={selectedUserId.split('@')[0] || selectedUserId}
+              />
+            </div>
           </div>
         </Card>
 
