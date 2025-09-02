@@ -22,7 +22,7 @@ export function BottomNavigation() {
     : baseNavigationItems;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-spotify-card border-t border-border backdrop-blur-lg z-50">
+    <div className="fixed bottom-0 left-0 right-0 bg-spotify-card border-t border-border backdrop-blur-lg z-50" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0px)' }}>
       <div className="flex items-center justify-around py-2 px-4 max-w-md mx-auto">
         {navigationItems.map((item) => (
           <NavLink
