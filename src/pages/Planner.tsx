@@ -5,15 +5,20 @@ import { Calendar } from "@/components/ui/calendar";
 import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
 import { useAdmin } from "@/hooks/use-admin";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useWorkout } from "@/hooks/use-workout";
+import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 
 const Planner = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const { isAdmin } = useAdmin();
   const { user } = useAuth();
+  const { exercises } = useWorkout();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(user?.id || null);
   // Como não temos listagem de usuários aqui, usamos apenas o próprio usuário quando não admin
   const selectedUser = useMemo(() => ({ id: selectedUserId || user?.id || '', email: user?.email || 'Usuário' }), [selectedUserId, user]);
+  const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
+  const [planNotes, setPlanNotes] = useState("");
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -44,7 +49,55 @@ const Planner = () => {
             <WeeklyAdminModal userId={selectedUser.id} userName={selectedUser.email || "Usuário"} />
           )}
           {!isAdmin && (
-            <p className="text-xs text-muted-foreground">Peça a um administrador para montar seu plano.</p>
+            <div className="space-y-3">
+              <div>
+                <div className="text-sm font-medium text-foreground mb-2">Selecionar exercícios</div>
+                <div className="max-h-64 overflow-auto border border-border rounded p-2 bg-spotify-surface">
+                  {exercises.map(ex => (
+                    <label key={ex.id} className="flex items-center justify-between text-sm py-1">
+                      <span className="mr-2 truncate">{ex.name}</span>
+                      <input
+                        type="checkbox"
+                        checked={selectedExerciseIds.includes(ex.id)}
+                        onChange={(e) => setSelectedExerciseIds(prev => e.target.checked ? [...prev, ex.id] : prev.filter(id => id !== ex.id))}
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="text-sm font-medium text-foreground">Observações</div>
+                <Textarea value={planNotes} onChange={(e)=>setPlanNotes(e.target.value)} placeholder="Notas para o treino do dia" rows={3} />
+              </div>
+
+              <div className="flex gap-2">
+                <Button className="bg-spotify-green hover:bg-spotify-green-hover" disabled={!selectedExerciseIds.length}>Salvar treino do dia</Button>
+                <Link to="/workout">
+                  <Button variant="secondary" className="bg-spotify-surface">Abrir treino</Button>
+                </Link>
+              </div>
+
+              {/* Lista do treino (prévia) */}
+              {selectedExerciseIds.length > 0 && (
+                <div className="mt-3">
+                  <div className="text-sm font-medium text-foreground mb-1">Treino do dia</div>
+                  <ul className="space-y-1 text-sm">
+                    {selectedExerciseIds.map(id => {
+                      const ex = exercises.find(e=>e.id===id);
+                      return (
+                        <li key={id} className="flex items-center justify-between">
+                          <span>{ex?.name}</span>
+                          <Link to="/workout">
+                            <Button size="sm" className="bg-spotify-green">Abrir</Button>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
           )}
         </Card>
       </div>
