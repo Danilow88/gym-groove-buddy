@@ -4,14 +4,16 @@ import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
 import { useAdmin } from "@/hooks/use-admin";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 
 const Planner = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
-  const { isAdmin, users } = useAdmin();
+  const { isAdmin } = useAdmin();
   const { user } = useAuth();
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const selectedUser = useMemo(() => users.find(u => u.id === (selectedUserId || user?.id)), [users, selectedUserId, user]);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(user?.id || null);
+  // Como não temos listagem de usuários aqui, usamos apenas o próprio usuário quando não admin
+  const selectedUser = useMemo(() => ({ id: selectedUserId || user?.id || '', email: user?.email || 'Usuário' }), [selectedUserId, user]);
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -26,6 +28,18 @@ const Planner = () => {
           <p className="text-sm text-muted-foreground mb-4">
             Selecione uma data e monte o treino para o usuário.
           </p>
+          {isAdmin && (
+            <div className="mb-3">
+              <Select value={selectedUserId || undefined} onValueChange={(v) => setSelectedUserId(v)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Selecione um usuário" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={user?.id || ''}>{user?.email || 'Usuário'}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {isAdmin && selectedUser && (
             <WeeklyAdminModal userId={selectedUser.id} userName={selectedUser.email || "Usuário"} />
           )}
