@@ -16,7 +16,9 @@ type Appointment = {
   user_id: string | null;
   start_time: string;
   end_time: string;
-  status: 'available' | 'booked' | 'cancelled';
+  status: 'available' | 'requested' | 'approved' | 'cancelled';
+  meeting_url?: string | null;
+  notes?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -72,19 +74,19 @@ export default function Schedule() {
     }
   };
 
-  const book = async (id: string) => {
+  const request = async (id: string) => {
     if (!user) return;
     try {
       const { data, error } = await supabase
         .from('appointments')
-        .update({ status: 'booked', user_id: user.id })
+        .update({ status: 'requested', user_id: user.id })
         .eq('id', id)
         .eq('status', 'available')
         .select('*')
         .single();
       if (error) throw error;
       setAppointments(prev => prev.map(a => a.id === id ? (data as Appointment) : a));
-      toast({ title: 'Aula agendada', description: 'Você reservou este horário.' });
+      toast({ title: 'Solicitação enviada', description: 'Aguardando aprovação do admin.' });
     } catch (e) {
       toast({ title: 'Não foi possível reservar', description: 'Slot pode ter sido reservado por outra pessoa.', variant: 'destructive' });
     }
@@ -101,6 +103,21 @@ export default function Schedule() {
       if (error) throw error;
       setAppointments(prev => prev.map(a => a.id === id ? (data as Appointment) : a));
       toast({ title: 'Slot cancelado', description: 'Horário marcado como cancelado.' });
+    } catch {}
+  };
+
+  const approve = async (id: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('appointments')
+        .update({ status: 'approved' })
+        .eq('id', id)
+        .eq('status', 'requested')
+        .select('*')
+        .single();
+      if (error) throw error;
+      setAppointments(prev => prev.map(a => a.id === id ? (data as Appointment) : a));
+      toast({ title: 'Agendamento aprovado', description: 'O horário foi confirmado.' });
     } catch {}
   };
 
@@ -161,8 +178,13 @@ export default function Schedule() {
                   </div>
                   <div className="flex items-center gap-2">
                     {a.status === 'available' && user && (
-                      <Button size="sm" className="bg-spotify-green" onClick={()=> book(a.id)}>
-                        <Check className="h-4 w-4 mr-1"/> Agendar
+                      <Button size="sm" className="bg-spotify-green" onClick={()=> request(a.id)}>
+                        <Check className="h-4 w-4 mr-1"/> Solicitar
+                      </Button>
+                    )}
+                    {isAdminAuthenticated && a.status === 'requested' && (
+                      <Button size="sm" className="bg-spotify-green" onClick={()=> approve(a.id)}>
+                        <Check className="h-4 w-4 mr-1"/> Aprovar
                       </Button>
                     )}
                     {isAdminAuthenticated && a.status !== 'cancelled' && (

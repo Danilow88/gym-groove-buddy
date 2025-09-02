@@ -296,7 +296,9 @@ CREATE TABLE IF NOT EXISTS public.appointments (
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   start_time TIMESTAMP WITH TIME ZONE NOT NULL,
   end_time TIMESTAMP WITH TIME ZONE NOT NULL,
-  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available','booked','cancelled')),
+  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available','requested','approved','cancelled')),
+  meeting_url TEXT,
+  notes TEXT,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   CHECK (end_time > start_time),
@@ -342,15 +344,32 @@ WITH CHECK (
 );
 
 -- Usuário pode reservar um slot disponível, vinculando-se ao user_id
-DROP POLICY IF EXISTS "User can book available appointment" ON public.appointments;
-CREATE POLICY "User can book available appointment"
+-- Usuário pode solicitar um horário disponível
+DROP POLICY IF EXISTS "User can request available appointment" ON public.appointments;
+CREATE POLICY "User can request available appointment"
 ON public.appointments
 FOR UPDATE
 USING (
   status = 'available'
 )
 WITH CHECK (
-  status = 'booked' AND user_id = auth.uid()
+  status = 'requested' AND user_id = auth.uid()
+);
+
+-- Admin pode aprovar solicitação (requested -> approved), definir meeting_url/notes
+DROP POLICY IF EXISTS "Admin can approve requested appointment" ON public.appointments;
+CREATE POLICY "Admin can approve requested appointment"
+ON public.appointments
+FOR UPDATE
+USING (
+  admin_id = auth.uid() AND EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+)
+WITH CHECK (
+  admin_id = auth.uid()
 );
 
 -- Trigger para updated_at em appointments
@@ -359,6 +378,48 @@ CREATE TRIGGER update_appointments_updated_at
   BEFORE UPDATE ON public.appointments
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
+
+-- 22.3 Tabela de mensagens de chat
+CREATE TABLE IF NOT EXISTS public.chat_messages (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  recipient_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+
+-- Usuários veem suas conversas (onde são remetente ou destinatário)
+DROP POLICY IF EXISTS "Users can view own conversations" ON public.chat_messages;
+CREATE POLICY "Users can view own conversations"
+ON public.chat_messages
+FOR SELECT
+USING (
+  sender_id = auth.uid() OR recipient_id = auth.uid()
+);
+
+-- Qualquer usuário autenticado pode enviar novas mensagens (para admin aprovar ou responder); recipient_id pode ser nulo
+DROP POLICY IF EXISTS "Users can send messages" ON public.chat_messages;
+CREATE POLICY "Users can send messages"
+ON public.chat_messages
+FOR INSERT
+WITH CHECK (
+  sender_id = auth.uid()
+);
+
+-- Admin pode ver todas as mensagens
+DROP POLICY IF EXISTS "Admin can view all messages" ON public.chat_messages;
+CREATE POLICY "Admin can view all messages"
+ON public.chat_messages
+FOR SELECT
+USING (
+  EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+);
 
 -- ========================================
 -- FUNÇÕES UTILITÁRIAS

@@ -226,9 +226,11 @@ export type Database = {
           admin_id: string
           created_at: string
           end_time: string
+          meeting_url: string | null
+          notes: string | null
           id: string
           start_time: string
-          status: "available" | "booked" | "cancelled"
+          status: "available" | "requested" | "approved" | "cancelled"
           updated_at: string
           user_id: string | null
         }
@@ -236,9 +238,11 @@ export type Database = {
           admin_id: string
           created_at?: string
           end_time: string
+          meeting_url?: string | null
+          notes?: string | null
           id?: string
           start_time: string
-          status?: "available" | "booked" | "cancelled"
+          status?: "available" | "requested" | "approved" | "cancelled"
           updated_at?: string
           user_id?: string | null
         }
@@ -246,9 +250,11 @@ export type Database = {
           admin_id?: string
           created_at?: string
           end_time?: string
+          meeting_url?: string | null
+          notes?: string | null
           id?: string
           start_time?: string
-          status?: "available" | "booked" | "cancelled"
+          status?: "available" | "requested" | "approved" | "cancelled"
           updated_at?: string
           user_id?: string | null
         }
@@ -263,6 +269,45 @@ export type Database = {
           {
             foreignKeyName: "appointments_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          recipient_id: string | null
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          recipient_id?: string | null
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          recipient_id?: string | null
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_recipient_id_fkey"
+            columns: ["recipient_id"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
