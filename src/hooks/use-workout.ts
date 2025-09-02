@@ -29,6 +29,57 @@ export interface WorkoutSession {
 }
 
 const mockExercises: Exercise[] = [
+  // MOBILIDADE
+  {
+    id: 'M1',
+    name: 'Mobilidade de Quadril - 90/90',
+    muscle: 'Mobilidade',
+    description: 'Rotação de quadril controlada posição 90/90',
+    videoUrl: 'https://www.youtube.com/watch?v=7L6p3ebQUgU',
+    lastWeight: 0,
+    lastReps: 8,
+    lastSets: 2
+  },
+  {
+    id: 'M2',
+    name: 'Mobilidade Torácica - Cat Camel',
+    muscle: 'Mobilidade',
+    description: 'Flexão/extensão coluna torácica controlada',
+    videoUrl: 'https://www.youtube.com/watch?v=kqnua4rHVVA',
+    lastWeight: 0,
+    lastReps: 10,
+    lastSets: 2
+  },
+  {
+    id: 'M3',
+    name: 'Mobilidade de Tornozelo - Joelhos à Parede',
+    muscle: 'Mobilidade',
+    description: 'Avanço do joelho até a parede sem levantar o calcanhar',
+    videoUrl: 'https://www.youtube.com/watch?v=FSSDLDhbacc',
+    lastWeight: 0,
+    lastReps: 10,
+    lastSets: 2
+  },
+  {
+    id: 'M4',
+    name: 'Mobilidade de Ombros - Pass Through',
+    muscle: 'Mobilidade',
+    description: 'Passar o bastão por trás com braços estendidos',
+    videoUrl: 'https://www.youtube.com/watch?v=JX8TlwJBW_k',
+    lastWeight: 0,
+    lastReps: 10,
+    lastSets: 2
+  },
+  {
+    id: 'M5',
+    name: 'Mobilidade de Quadril - Pigeon Stretch Dinâmico',
+    muscle: 'Mobilidade',
+    description: 'Alongamento dinâmico estilo pombo',
+    videoUrl: 'https://www.youtube.com/watch?v=QAN6-0WjVb0',
+    lastWeight: 0,
+    lastReps: 8,
+    lastSets: 2
+  },
   // PEITO
   {
     id: '1',

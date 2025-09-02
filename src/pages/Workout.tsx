@@ -9,6 +9,7 @@ import { VideoModal } from "@/components/workout/video-modal";
 import { RestTimer } from "@/components/workout/rest-timer";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
+import { useExerciseVideos } from "@/hooks/use-exercise-videos";
 import { Play, Square, Filter, Timer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CountdownTimer } from "@/components/timer/countdown-timer";
@@ -35,6 +36,7 @@ const Workout = () => {
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { user } = useAuth();
+  const { getUrlForExercise } = useExerciseVideos();
 
   const planStorageKey = useMemo(() => {
     const uid = user?.id || 'guest';
@@ -450,7 +452,7 @@ const Workout = () => {
             isOpen={showVideoModal}
             onClose={() => setShowVideoModal(false)}
             exerciseName={selectedExerciseData.name}
-            videoUrl={selectedExerciseData.videoUrl || ''}
+            videoUrl={getUrlForExercise(selectedExerciseData.id, selectedExerciseData.videoUrl || '')}
             fallbackUrl={selectedFallbackUrl}
           />
         </>

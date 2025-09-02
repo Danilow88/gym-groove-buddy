@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
 import { useAdmin } from "@/hooks/use-admin";
+import { useExerciseVideos } from "@/hooks/use-exercise-videos";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { useWorkout } from "@/hooks/use-workout";
 import { useAuth } from "@/hooks/use-auth";
@@ -21,6 +22,7 @@ const Admin = () => {
   const { isAdmin, workoutPlans, loading, createWorkoutPlan, deleteWorkoutPlan } = useAdmin();
   const { exercises, getMuscleGroups } = useWorkout();
   const { toast } = useToast();
+  const { videos, setExternalUrl, uploadFile, removeVideo, getUrlForExercise } = useExerciseVideos();
 
   const [selectedUserId, setSelectedUserId] = useState('');
   const [workoutName, setWorkoutName] = useState('');
@@ -298,7 +300,7 @@ const Admin = () => {
               </Select>
             </div>
 
-            {/* Exercise Selection */}
+            {/* Exercise Selection + Video Management */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
                 Exercícios Selecionados ({selectedExercises.length}) *
@@ -331,6 +333,61 @@ const Admin = () => {
                           <p className="text-xs text-muted-foreground ml-6">
                             {exercise.muscle} • {exercise.description}
                           </p>
+                          <div className="ml-6 mt-2 space-y-2" onClick={(e)=> e.stopPropagation()}>
+                            <div className="text-xs text-muted-foreground">Vídeo atual: <span className="text-foreground break-all">{getUrlForExercise(exercise.id, exercise.videoUrl || '') || '—'}</span></div>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                placeholder="https://... (YouTube ou link público)"
+                                onKeyDown={async (e)=> {
+                                  if (e.key === 'Enter') {
+                                    const target = e.target as HTMLInputElement;
+                                    const url = target.value.trim();
+                                    if (!url) return;
+                                    try {
+                                      await setExternalUrl(exercise.id, url);
+                                      target.value = '';
+                                      toast({ title: 'Vídeo atualizado', description: 'URL externa salva para o exercício.' });
+                                    } catch (err) {
+                                      toast({ title: 'Erro ao salvar URL', description: 'Verifique permissões/URL.', variant: 'destructive' });
+                                    }
+                                  }
+                                }}
+                                className="bg-background border-border text-xs"
+                              />
+                              <input
+                                type="file"
+                                accept="video/*"
+                                className="text-xs"
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  try {
+                                    await uploadFile(exercise.id, file);
+                                    toast({ title: 'Vídeo enviado', description: 'Arquivo salvo no Storage.' });
+                                  } catch (err) {
+                                    toast({ title: 'Erro no upload', description: 'Falha ao enviar o arquivo.', variant: 'destructive' });
+                                  } finally {
+                                    e.currentTarget.value = '';
+                                  }
+                                }}
+                              />
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="border-border"
+                                onClick={async () => {
+                                  try {
+                                    await removeVideo(exercise.id);
+                                    toast({ title: 'Vídeo removido', description: 'Referência de vídeo excluída.' });
+                                  } catch (err) {
+                                    toast({ title: 'Erro ao remover', description: 'Tente novamente.', variant: 'destructive' });
+                                  }
+                                }}
+                              >
+                                Remover Vídeo
+                              </Button>
+                            </div>
+                          </div>
                         </div>
                         {isSelected && (
                           <div className="grid grid-cols-3 gap-2 w-full max-w-md" onClick={(e)=> e.stopPropagation()}>
