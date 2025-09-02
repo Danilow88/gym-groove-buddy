@@ -496,7 +496,10 @@ export function getExerciseVideo(exerciseId: string): ExerciseVideo | undefined 
 
 export function getVideoUrl(exerciseId: string): string | undefined {
   const video = getExerciseVideo(exerciseId);
-  return video?.localVideoPath || video?.youtubeUrl;
+  if (!video) return undefined;
+
+  // Prioridade: local (brasileiro) > youtube > fallback 
+  return video.localVideoPath || video.youtubeUrl || video.fallbackVideoPath;
 }
 
 export function isLocalVideo(videoUrl: string): boolean {
