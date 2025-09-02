@@ -416,6 +416,9 @@ USING (
   sender_id = auth.uid() OR recipient_id = auth.uid()
 );
 
+-- Garantir publicação realtime
+ALTER PUBLICATION supabase_realtime ADD TABLE public.chat_messages;
+
 -- Only the sender can insert messages
 DROP POLICY IF EXISTS "Sender can insert messages" ON public.chat_messages;
 CREATE POLICY "Sender can insert messages"
