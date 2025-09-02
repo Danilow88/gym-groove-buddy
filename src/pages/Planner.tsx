@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
 import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
 import { useAdmin } from "@/hooks/use-admin";
+import { useUserSearch } from "@/hooks/use-user-search";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useWorkout } from "@/hooks/use-workout";
 import { Textarea } from "@/components/ui/textarea";
@@ -14,6 +15,7 @@ const Planner = () => {
   const { isAdmin } = useAdmin();
   const { user } = useAuth();
   const { exercises } = useWorkout();
+  const { users: foundUsers, searchUsers, clearUsers } = useUserSearch();
   const [selectedUserId, setSelectedUserId] = useState<string | null>(user?.id || null);
   // Como não temos listagem de usuários aqui, usamos apenas o próprio usuário quando não admin
   const selectedUser = useMemo(() => ({ id: selectedUserId || user?.id || '', email: user?.email || 'Usuário' }), [selectedUserId, user]);
@@ -34,15 +36,20 @@ const Planner = () => {
             Selecione uma data e monte o treino para o usuário.
           </p>
           {isAdmin && (
-            <div className="mb-3">
-              <Select value={selectedUserId || undefined} onValueChange={(v) => setSelectedUserId(v)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Selecione um usuário" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={user?.id || ''}>{user?.email || 'Usuário'}</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="mb-3 space-y-2">
+              <div className="text-sm text-foreground">Selecionar usuário</div>
+              <input
+                className="w-full rounded border border-border bg-spotify-surface px-3 py-2 text-sm"
+                placeholder="Buscar por nome ou email..."
+                onChange={(e)=> searchUsers(e.target.value)}
+              />
+              <div className="max-h-40 overflow-auto border border-border rounded">
+                {(foundUsers.length ? foundUsers : [{ id: user?.id || '', email: user?.email || 'Usuário', full_name: user?.email || 'Usuário'}]).map(u => (
+                  <button key={u.id} className={`w-full text-left px-3 py-2 text-sm hover:bg-spotify-surface ${selectedUserId===u.id? 'bg-spotify-surface': ''}`} onClick={()=> setSelectedUserId(u.id)}>
+                    {u.full_name || u.email} ({u.email})
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           {isAdmin && selectedUser && (
