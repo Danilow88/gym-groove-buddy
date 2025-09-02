@@ -1,10 +1,17 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar } from "@/components/ui/calendar";
+import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
+import { useAdmin } from "@/hooks/use-admin";
+import { useAuth } from "@/hooks/use-auth";
 
 const Planner = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const { isAdmin, users } = useAdmin();
+  const { user } = useAuth();
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const selectedUser = useMemo(() => users.find(u => u.id === (selectedUserId || user?.id)), [users, selectedUserId, user]);
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -19,10 +26,12 @@ const Planner = () => {
           <p className="text-sm text-muted-foreground mb-4">
             Selecione uma data e monte o treino para o usuário.
           </p>
-          <div className="flex gap-2">
-            <Button className="bg-spotify-green hover:bg-spotify-green-hover">Adicionar Exercício</Button>
-            <Button variant="secondary" className="bg-spotify-surface">Salvar</Button>
-          </div>
+          {isAdmin && selectedUser && (
+            <WeeklyAdminModal userId={selectedUser.id} userName={selectedUser.email || "Usuário"} />
+          )}
+          {!isAdmin && (
+            <p className="text-xs text-muted-foreground">Peça a um administrador para montar seu plano.</p>
+          )}
         </Card>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { useWorkout } from "@/hooks/use-workout";
 import { useAdmin } from "@/hooks/use-admin";
 import { User, Trophy, Target, Calendar, LogOut, LogIn, Heart, Dumbbell } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { Link } from "react-router-dom";
 
 const Profile = () => {
   const { workoutHistory, exercises } = useWorkout();
@@ -143,9 +144,11 @@ const Profile = () => {
         <Card className="bg-gradient-card border-border p-4">
           <h3 className="font-medium text-foreground mb-3">Configurações</h3>
           <div className="space-y-3">
-            <Button variant="outline" className="w-full justify-start border-border hover:bg-spotify-surface">
-              Editar Perfil
-            </Button>
+            <Link to="/planner">
+              <Button className="w-full justify-start bg-spotify-green hover:bg-spotify-green-hover">
+                <Calendar className="h-4 w-4 mr-2" /> Abrir Planner de Treinos
+              </Button>
+            </Link>
             <Button variant="outline" className="w-full justify-start border-border hover:bg-spotify-surface">
               Configurações do App
             </Button>
