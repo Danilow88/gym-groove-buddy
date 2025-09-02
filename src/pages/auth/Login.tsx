@@ -14,6 +14,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isAuthenticated) {
@@ -30,10 +31,21 @@ export default function Login() {
 
   const onSignup = async () => {
     setIsSubmitting(true);
-    const { error } = await signUpWithEmailPassword(email, password);
+    setError(null);
+    setSuccess(null);
+    
+    const { error, message } = await signUpWithEmailPassword(email, password);
     setIsSubmitting(false);
-    if (error) setError(error);
-    else navigate(from, { replace: true });
+    
+    if (error) {
+      setError(error);
+    } else if (message) {
+      setSuccess(message);
+      setEmail("");
+      setPassword("");
+    } else {
+      navigate(from, { replace: true });
+    }
   };
 
   const onGoogle = async () => {
@@ -58,11 +70,12 @@ export default function Login() {
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           {error && <div className="text-sm text-destructive">{error}</div>}
+          {success && <div className="text-sm text-green-600 bg-green-50 p-2 rounded">{success}</div>}
           <Button className="w-full bg-gradient-primary" disabled={isSubmitting} onClick={onLogin}>
-            Entrar
+            {isSubmitting ? "Entrando..." : "Entrar"}
           </Button>
           <Button className="w-full" variant="secondary" disabled={isSubmitting} onClick={onSignup}>
-            Criar conta
+            {isSubmitting ? "Criando conta..." : "Criar conta"}
           </Button>
           <Button className="w-full" variant="outline" onClick={onGoogle} disabled={isSubmitting}>
             Entrar com Google

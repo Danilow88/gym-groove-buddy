@@ -9,7 +9,7 @@ interface AuthContextValue {
     email?: string;
   } | null;
   signInWithEmailPassword: (email: string, password: string) => Promise<{ error?: string }>;
-  signUpWithEmailPassword: (email: string, password: string) => Promise<{ error?: string }>;
+  signUpWithEmailPassword: (email: string, password: string) => Promise<{ error?: string; message?: string }>;
   signInWithGoogle: () => Promise<{ error?: string }>;
   signOut: () => Promise<void>;
 }
@@ -54,8 +54,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signUpWithEmailPassword = useCallback(async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      return { error: error?.message };
+      const { data, error } = await supabase.auth.signUp({ 
+        email, 
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+        }
+      });
+      
+      if (error) {
+        return { error: error.message };
+      }
+      
+      // Check if email confirmation is required
+      if (data.user && !data.session) {
+        return { 
+          error: null, 
+          message: "Conta criada! Se não foi redirecionado automaticamente, verifique seu email para confirmar a conta." 
+        };
+      }
+      
+      return { error: null };
     } catch (err) {
       return { error: (err as Error).message };
     }
