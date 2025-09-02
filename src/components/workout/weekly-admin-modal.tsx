@@ -17,7 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar, Plus, Trash2, Coffee } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { mockExercises } from "@/hooks/use-workout";
+import { useWorkout } from "@/hooks/use-workout";
 
 interface WeeklyPlan {
   [key: string]: {
@@ -37,12 +37,7 @@ const daysOfWeek = [
   { key: 'sunday', name: 'Domingo' }
 ];
 
-const exercisesByGroup = mockExercises.reduce((acc, exercise) => {
-  const group = exercise.muscleGroup;
-  if (!acc[group]) acc[group] = [];
-  acc[group].push(exercise);
-  return acc;
-}, {} as { [key: string]: typeof mockExercises });
+type ExerciseLite = { id: string; name: string; muscle: string };
 
 interface WeeklyAdminModalProps {
   userId: string;
@@ -52,6 +47,7 @@ interface WeeklyAdminModalProps {
 
 export function WeeklyAdminModal({ userId, userName, onSuccess }: WeeklyAdminModalProps) {
   const { user } = useAuth();
+  const { exercises } = useWorkout();
   const [open, setOpen] = useState(false);
   const [planName, setPlanName] = useState('');
   const [observations, setObservations] = useState('');
@@ -71,6 +67,13 @@ export function WeeklyAdminModal({ userId, userName, onSuccess }: WeeklyAdminMod
     });
     setWeeklyPlan(initialPlan);
   }, []);
+
+  const exercisesByGroup = (exercises as ExerciseLite[]).reduce((acc, exercise) => {
+    const group = exercise.muscle || 'Outros';
+    if (!acc[group]) acc[group] = [] as ExerciseLite[];
+    (acc[group] as ExerciseLite[]).push(exercise);
+    return acc;
+  }, {} as { [key: string]: ExerciseLite[] });
 
   const handleDayToggleRestDay = (dayKey: string, isRestDay: boolean) => {
     setWeeklyPlan(prev => ({
