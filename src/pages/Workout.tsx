@@ -71,6 +71,36 @@ const Workout = () => {
     }
   }, [planStorageKey]);
 
+  // Prefill per-exercise settings from latest admin plan for this user if available
+  useEffect(() => {
+    try {
+      const uid = user?.id || 'guest';
+      const raw = localStorage.getItem('admin_workout_plans');
+      if (!raw) return;
+      const plans = JSON.parse(raw) as Array<{ userId: string; createdAt: string | Date; exerciseSettings?: Record<string, { sets?: number; rest?: number; weight?: number }> }>;
+      const userPlans = plans.filter(p => p.userId === uid);
+      if (userPlans.length === 0) return;
+      userPlans.sort((a,b) => new Date(b.createdAt as any).getTime() - new Date(a.createdAt as any).getTime());
+      const latest = userPlans[0];
+      if (!latest.exerciseSettings) return;
+      // Merge defaults for current day selection
+      setPlanInputs(prev => {
+        const merged = { ...prev } as Record<string, { sets?: number; rest?: number; weight?: number }>;
+        savedPlanExercises.forEach(id => {
+          const adminSet = latest.exerciseSettings![id];
+          if (!adminSet) return;
+          const current = merged[id] || {};
+          merged[id] = {
+            sets: current.sets ?? (typeof adminSet.sets === 'number' ? adminSet.sets : undefined),
+            rest: current.rest ?? (typeof adminSet.rest === 'number' ? adminSet.rest : undefined),
+            weight: current.weight ?? (typeof adminSet.weight === 'number' ? adminSet.weight : undefined),
+          };
+        });
+        return merged;
+      });
+    } catch {}
+  }, [user?.id, savedPlanExercises]);
+
   useEffect(() => {
     // cleanup intervals on unmount or when changing plan key
     return () => {
