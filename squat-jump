@@ -1,0 +1,588 @@
+export interface ExerciseVideoInfo {
+  exerciseId: string;
+  name: string;
+  muscleGroup: string;
+  localUrl?: string;
+  youtubeUrl?: string;
+  fallbackUrl?: string;
+  description?: string;
+}
+
+export const VIDEO_MAP: { [key: string]: ExerciseVideoInfo } = {
+  "1": {
+    exerciseId: "1",
+    name: "Supino Reto",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/bench-press.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Supino Reto"
+  },
+  "2": {
+    exerciseId: "2",
+    name: "Supino Inclinado",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/incline-bench-press.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Supino Inclinado"
+  },
+  "3": {
+    exerciseId: "3",
+    name: "Flexão de Braço",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/pushup.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Flexão de Braço"
+  },
+  "4": {
+    exerciseId: "4",
+    name: "Crucifixo",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/dumbbell-fly.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Crucifixo"
+  },
+  "5": {
+    exerciseId: "5",
+    name: "Supino Declinado",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/supino-declinado.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Supino Declinado"
+  },
+  "6": {
+    exerciseId: "6",
+    name: "Crossover",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/crossover.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Crossover"
+  },
+  "7": {
+    exerciseId: "7",
+    name: "Flexão Diamante",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/flexao-diamante.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Flexão Diamante"
+  },
+  "8": {
+    exerciseId: "8",
+    name: "Pec Deck",
+    muscleGroup: "Peito",
+    localUrl: "/videos/exercises/pec-deck.mp4",
+    fallbackUrl: "/videos/exercises/generic-peito.mp4",
+    description: "Vídeo demonstrativo de Pec Deck"
+  },
+  "9": {
+    exerciseId: "9",
+    name: "Remada Curvada",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/bent-over-row.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Remada Curvada"
+  },
+  "10": {
+    exerciseId: "10",
+    name: "Pull Down",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/lat-pulldown.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Pull Down"
+  },
+  "11": {
+    exerciseId: "11",
+    name: "Remada Baixa",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/cable-row.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Remada Baixa"
+  },
+  "12": {
+    exerciseId: "12",
+    name: "Levantamento Terra",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/deadlift.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Levantamento Terra"
+  },
+  "13": {
+    exerciseId: "13",
+    name: "Barra Fixa",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/barra-fixa.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Barra Fixa"
+  },
+  "14": {
+    exerciseId: "14",
+    name: "Remada Unilateral",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/remada-unilateral.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Remada Unilateral"
+  },
+  "15": {
+    exerciseId: "15",
+    name: "Pull Down Pegada Neutra",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/pegada-neutra.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Pull Down Pegada Neutra"
+  },
+  "16": {
+    exerciseId: "16",
+    name: "Pulley Alto",
+    muscleGroup: "Costas",
+    localUrl: "/videos/exercises/pulley-alto.mp4",
+    fallbackUrl: "/videos/exercises/generic-costas.mp4",
+    description: "Vídeo demonstrativo de Pulley Alto"
+  },
+  "17": {
+    exerciseId: "17",
+    name: "Agachamento",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/squat.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Agachamento"
+  },
+  "18": {
+    exerciseId: "18",
+    name: "Leg Press",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/leg-press.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Leg Press"
+  },
+  "19": {
+    exerciseId: "19",
+    name: "Extensão de Pernas",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/leg-extension.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Extensão de Pernas"
+  },
+  "20": {
+    exerciseId: "20",
+    name: "Mesa Flexora",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/leg-curl.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Mesa Flexora"
+  },
+  "21": {
+    exerciseId: "21",
+    name: "Elevação Panturrilha",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/generic-squat.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Elevação Panturrilha"
+  },
+  "22": {
+    exerciseId: "22",
+    name: "Agachamento Frontal",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/agachamento-frontal.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Agachamento Frontal"
+  },
+  "23": {
+    exerciseId: "23",
+    name: "Stiff",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/stiff.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Stiff"
+  },
+  "24": {
+    exerciseId: "24",
+    name: "Afundo",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/afundo.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Afundo"
+  },
+  "25": {
+    exerciseId: "25",
+    name: "Hack Squat",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/hack-squat.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Hack Squat"
+  },
+  "26": {
+    exerciseId: "26",
+    name: "Passada",
+    muscleGroup: "Pernas",
+    localUrl: "/videos/exercises/passada.mp4",
+    fallbackUrl: "/videos/exercises/generic-pernas.mp4",
+    description: "Vídeo demonstrativo de Passada"
+  },
+  "27": {
+    exerciseId: "27",
+    name: "Desenvolvimento",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/shoulder-press.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Desenvolvimento"
+  },
+  "28": {
+    exerciseId: "28",
+    name: "Elevação Lateral",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/lateral-raise.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Elevação Lateral"
+  },
+  "29": {
+    exerciseId: "29",
+    name: "Elevação Frontal",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/front-raise.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Elevação Frontal"
+  },
+  "30": {
+    exerciseId: "30",
+    name: "Elevação Posterior",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/rear-delt-fly.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Elevação Posterior"
+  },
+  "31": {
+    exerciseId: "31",
+    name: "Desenvolvimento Arnold",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/desenvolvimento-arnold.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Desenvolvimento Arnold"
+  },
+  "32": {
+    exerciseId: "32",
+    name: "Remada Alta",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/remada-alta.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Remada Alta"
+  },
+  "33": {
+    exerciseId: "33",
+    name: "Face Pull",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/face-pull.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Face Pull"
+  },
+  "34": {
+    exerciseId: "34",
+    name: "Encolhimento",
+    muscleGroup: "Ombros",
+    localUrl: "/videos/exercises/encolhimento.mp4",
+    fallbackUrl: "/videos/exercises/generic-ombros.mp4",
+    description: "Vídeo demonstrativo de Encolhimento"
+  },
+  "35": {
+    exerciseId: "35",
+    name: "Rosca Direta",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/bicep-curl.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca Direta"
+  },
+  "36": {
+    exerciseId: "36",
+    name: "Rosca Martelo",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/hammer-curl.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca Martelo"
+  },
+  "37": {
+    exerciseId: "37",
+    name: "Rosca Scott",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/generic-pull.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca Scott"
+  },
+  "38": {
+    exerciseId: "38",
+    name: "Rosca Concentrada",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/rosca-concentrada.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca Concentrada"
+  },
+  "39": {
+    exerciseId: "39",
+    name: "Rosca 21",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/rosca-21.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca 21"
+  },
+  "40": {
+    exerciseId: "40",
+    name: "Rosca no Cabo",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/rosca-no-cabo.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca no Cabo"
+  },
+  "41": {
+    exerciseId: "41",
+    name: "Rosca Inversa",
+    muscleGroup: "Bíceps",
+    localUrl: "/videos/exercises/rosca-inversa.mp4",
+    fallbackUrl: "/videos/exercises/generic-bíceps.mp4",
+    description: "Vídeo demonstrativo de Rosca Inversa"
+  },
+  "42": {
+    exerciseId: "42",
+    name: "Tríceps Testa",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/skull-crusher.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Tríceps Testa"
+  },
+  "43": {
+    exerciseId: "43",
+    name: "Mergulho",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/tricep-dips.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Mergulho"
+  },
+  "44": {
+    exerciseId: "44",
+    name: "Tríceps Pulley",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/tricep-pushdown.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Tríceps Pulley"
+  },
+  "45": {
+    exerciseId: "45",
+    name: "Tríceps Francês",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/triceps-frances.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Tríceps Francês"
+  },
+  "46": {
+    exerciseId: "46",
+    name: "Flexão Fechada",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/flexao-fechada.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Flexão Fechada"
+  },
+  "47": {
+    exerciseId: "47",
+    name: "Tríceps Coice",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/triceps-coice.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Tríceps Coice"
+  },
+  "48": {
+    exerciseId: "48",
+    name: "Tríceps Corda",
+    muscleGroup: "Tríceps",
+    localUrl: "/videos/exercises/triceps-corda.mp4",
+    fallbackUrl: "/videos/exercises/generic-tríceps.mp4",
+    description: "Vídeo demonstrativo de Tríceps Corda"
+  },
+  "49": {
+    exerciseId: "49",
+    name: "Abdominal Reto",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/crunch.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Abdominal Reto"
+  },
+  "50": {
+    exerciseId: "50",
+    name: "Prancha",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/plank.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Prancha"
+  },
+  "51": {
+    exerciseId: "51",
+    name: "Abdominal Oblíquo",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/abdominal-obliquo.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Abdominal Oblíquo"
+  },
+  "52": {
+    exerciseId: "52",
+    name: "Russian Twist",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/russian-twist.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Russian Twist"
+  },
+  "53": {
+    exerciseId: "53",
+    name: "Mountain Climber",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/mountain-climber.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Mountain Climber"
+  },
+  "54": {
+    exerciseId: "54",
+    name: "Dead Bug",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/dead-bug.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Dead Bug"
+  },
+  "55": {
+    exerciseId: "55",
+    name: "Elevação de Pernas",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/elevacao-pernas.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Elevação de Pernas"
+  },
+  "56": {
+    exerciseId: "56",
+    name: "Bicicleta",
+    muscleGroup: "Abdômen",
+    localUrl: "/videos/exercises/bicicleta.mp4",
+    fallbackUrl: "/videos/exercises/generic-abdômen.mp4",
+    description: "Vídeo demonstrativo de Bicicleta"
+  },
+  "57": {
+    exerciseId: "57",
+    name: "Elevação Pélvica (Hip Thrust)",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/hip-thrust.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Elevação Pélvica (Hip Thrust)"
+  },
+  "58": {
+    exerciseId: "58",
+    name: "Glute Bridge",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/glute-bridge.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Glute Bridge"
+  },
+  "59": {
+    exerciseId: "59",
+    name: "Agachamento Búlgaro",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/bulgarian-split-squat.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Agachamento Búlgaro"
+  },
+  "60": {
+    exerciseId: "60",
+    name: "Coice na Polia (Cable Kickback)",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/generic-squat.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Coice na Polia (Cable Kickback)"
+  },
+  "61": {
+    exerciseId: "61",
+    name: "Abdução no Cabo",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/abducao-cabo.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Abdução no Cabo"
+  },
+  "62": {
+    exerciseId: "62",
+    name: "Clamshell",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/clamshell.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Clamshell"
+  },
+  "63": {
+    exerciseId: "63",
+    name: "Single Leg Glute Bridge",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/single-leg-glute-bridge.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Single Leg Glute Bridge"
+  },
+  "64": {
+    exerciseId: "64",
+    name: "Fire Hydrant",
+    muscleGroup: "Glúteos",
+    localUrl: "/videos/exercises/fire-hydrant.mp4",
+    fallbackUrl: "/videos/exercises/generic-glúteos.mp4",
+    description: "Vídeo demonstrativo de Fire Hydrant"
+  },
+  "65": {
+    exerciseId: "65",
+    name: "Burpee",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/generic-cardio.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Burpee"
+  },
+  "66": {
+    exerciseId: "66",
+    name: "Jumping Jacks",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/jumping-jacks.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Jumping Jacks"
+  },
+  "67": {
+    exerciseId: "67",
+    name: "High Knees",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/high-knees.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de High Knees"
+  },
+  "68": {
+    exerciseId: "68",
+    name: "Polichinelos",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/polichinelos.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Polichinelos"
+  },
+  "69": {
+    exerciseId: "69",
+    name: "Sprint no Lugar",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/sprint-no-lugar.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Sprint no Lugar"
+  },
+  "70": {
+    exerciseId: "70",
+    name: "Box Steps",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/box-steps.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Box Steps"
+  },
+  "71": {
+    exerciseId: "71",
+    name: "Corda (Simulação)",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/corda-simulacao.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Corda (Simulação)"
+  },
+  "72": {
+    exerciseId: "72",
+    name: "Squat Jump",
+    muscleGroup: "Cardio",
+    localUrl: "/videos/exercises/squat-jump.mp4",
+    fallbackUrl: "/videos/exercises/generic-cardio.mp4",
+    description: "Vídeo demonstrativo de Squat Jump"
+  },
+};
