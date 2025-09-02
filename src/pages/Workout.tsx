@@ -24,7 +24,7 @@ const Workout = () => {
     getMuscleGroups, 
     selectedMuscleGroup, 
     setSelectedMuscleGroup 
-  } = useWorkout();
+  , updateExercise, uploadExerciseVideo } = useWorkout();
   const { toast } = useToast();
   const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
   const [showAddSetModal, setShowAddSetModal] = useState(false);
@@ -403,6 +403,15 @@ const Workout = () => {
                 selected={selectedExerciseIds.includes(exercise.id)}
                 onToggleSelect={toggleSelectExercise}
               />
+              {/* Admin quick edit for name and video URL / upload */}
+              <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" defaultValue={exercise.name} onBlur={(e)=> updateExercise(exercise.id, { name: e.target.value })} />
+                <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" defaultValue={exercise.videoUrl} placeholder="URL do vídeo" onBlur={(e)=> updateExercise(exercise.id, { videoUrl: e.target.value })} />
+                <label className="text-xs text-foreground/80 inline-flex items-center gap-2">
+                  <span>Upload vídeo:</span>
+                  <input type="file" accept="video/*" onChange={async (e)=> { const f=e.target.files?.[0]; if (f) await uploadExerciseVideo(exercise.id, f); }} />
+                </label>
+              </div>
               
               {/* Current Sets */}
               {currentSets.length > 0 && (

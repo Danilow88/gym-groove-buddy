@@ -303,6 +303,21 @@ CROSS JOIN LATERAL (
 ) admin(id)
 ON CONFLICT DO NOTHING;
 
+-- Criar bucket de vídeos de exercícios (se não existir)
+INSERT INTO storage.buckets (id, name, public) VALUES ('exercise-videos','exercise-videos', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Política pública de leitura do bucket exercise-videos
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE schemaname = 'storage' AND tablename = 'objects' AND policyname = 'Public read exercise-videos'
+  ) THEN
+    CREATE POLICY "Public read exercise-videos" ON storage.objects
+    FOR SELECT TO public USING (bucket_id = 'exercise-videos');
+  END IF;
+END $$;
+
 -- 22.2 Criar tabela appointments para agenda de aulas por videoconferência
 CREATE TABLE IF NOT EXISTS public.appointments (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,

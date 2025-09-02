@@ -770,16 +770,35 @@ const mockExercises: Exercise[] = [
 
 export function useWorkout() {
   const { user } = useAuth();
-  const [exercises] = useState<Exercise[]>(mockExercises);
+  const [exercises, setExercises] = useState<Exercise[]>([]);
+  const [overrides, setOverrides] = useState<Record<string, Partial<Pick<Exercise, 'name' | 'videoUrl'>>>>({});
   const [currentSets, setCurrentSets] = useState<WorkoutSet[]>([]);
   const [workoutHistory, setWorkoutHistory] = useState<WorkoutSession[]>([]);
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState<string>('Todos');
   const [loading, setLoading] = useState(false);
 
-  // Load workout history from localStorage and potentially Supabase
+  // Load overrides and workout history from localStorage and potentially Supabase
   useEffect(() => {
+    try {
+      const raw = localStorage.getItem('exercise_overrides');
+      setOverrides(raw ? JSON.parse(raw) : {});
+    } catch { setOverrides({}); }
+    // apply on mount
+    setExercises(applyOverrides(mockExercises, overrides));
     loadWorkoutHistory();
   }, [user]);
+
+  useEffect(() => {
+    setExercises(applyOverrides(mockExercises, overrides));
+  }, [overrides]);
+
+  const applyOverrides = (base: Exercise[], ovr: Record<string, Partial<Pick<Exercise, 'name' | 'videoUrl'>>>) => {
+    return base.map(ex => ({
+      ...ex,
+      name: ovr[ex.id]?.name ?? ex.name,
+      videoUrl: ovr[ex.id]?.videoUrl ?? ex.videoUrl,
+    }));
+  };
 
   const loadWorkoutHistory = async () => {
     setLoading(true);
@@ -898,6 +917,48 @@ export function useWorkout() {
     return groups;
   }, [exercises]);
 
+  const updateExercise = useCallback(async (exerciseId: string, data: Partial<Pick<Exercise, 'name' | 'videoUrl'>>) => {
+    try {
+      const next = { ...overrides, [exerciseId]: { ...overrides[exerciseId], ...data } };
+      setOverrides(next);
+      localStorage.setItem('exercise_overrides', JSON.stringify(next));
+      setExercises(applyOverrides(mockExercises, next));
+      // Persist video url to Supabase table if provided and admin logged
+      if (data.videoUrl && user?.id) {
+        await supabase.from('exercise_videos').upsert({
+          exercise_id: exerciseId,
+          video_url: data.videoUrl,
+          uploaded_by: user.id
+        } as any, { onConflict: 'exercise_id' } as any);
+      }
+      return { error: null };
+    } catch (e: any) {
+      return { error: e.message as string };
+    }
+  }, [overrides, user?.id]);
+
+  const uploadExerciseVideo = useCallback(async (exerciseId: string, file: File) => {
+    try {
+      const path = `exercise_videos/${exerciseId}/${Date.now()}_${file.name}`;
+      const { error: upErr } = await supabase.storage.from('exercise-videos').upload(path, file, { upsert: true });
+      if (upErr) return { error: upErr.message };
+      const { data: pub } = supabase.storage.from('exercise-videos').getPublicUrl(path);
+      const publicUrl = pub?.publicUrl;
+      if (publicUrl) {
+        await updateExercise(exerciseId, { videoUrl: publicUrl });
+        await supabase.from('exercise_videos').upsert({
+          exercise_id: exerciseId,
+          storage_path: path,
+          video_url: publicUrl,
+          uploaded_by: user?.id
+        } as any, { onConflict: 'exercise_id' } as any);
+      }
+      return { error: null, url: publicUrl };
+    } catch (e: any) {
+      return { error: e.message as string };
+    }
+  }, [updateExercise, user?.id]);
+
   return {
     exercises,
     currentSets,
@@ -910,6 +971,8 @@ export function useWorkout() {
     getFilteredExercises,
     getMuscleGroups,
     setSelectedMuscleGroup,
-    loadWorkoutHistory
+    loadWorkoutHistory,
+    updateExercise,
+    uploadExerciseVideo
   };
 }
