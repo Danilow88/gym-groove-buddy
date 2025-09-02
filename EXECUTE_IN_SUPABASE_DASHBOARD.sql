@@ -296,7 +296,10 @@ CREATE TABLE IF NOT EXISTS public.appointments (
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   start_time TIMESTAMP WITH TIME ZONE NOT NULL,
   end_time TIMESTAMP WITH TIME ZONE NOT NULL,
-  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available','booked','cancelled')),
+  status TEXT NOT NULL DEFAULT 'available' CHECK (status IN ('available','pending','approved','cancelled')),
+  meeting_url TEXT,
+  approved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  approval_note TEXT,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   CHECK (end_time > start_time),
@@ -350,7 +353,23 @@ USING (
   status = 'available'
 )
 WITH CHECK (
-  status = 'booked' AND user_id = auth.uid()
+  status = 'pending' AND user_id = auth.uid()
+);
+
+-- Admin can approve or cancel appointments
+DROP POLICY IF EXISTS "Admin can approve appointments" ON public.appointments;
+CREATE POLICY "Admin can approve appointments"
+ON public.appointments
+FOR UPDATE
+USING (
+  EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+)
+WITH CHECK (
+  status IN ('approved','cancelled')
 );
 
 -- Trigger para updated_at em appointments
@@ -359,6 +378,143 @@ CREATE TRIGGER update_appointments_updated_at
   BEFORE UPDATE ON public.appointments
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
+
+-- Ensure appointments status constraint allows approval flow (idempotent)
+DO $$
+BEGIN
+  BEGIN
+    ALTER TABLE public.appointments DROP CONSTRAINT IF EXISTS appointments_status_check;
+  EXCEPTION WHEN undefined_object THEN
+    NULL;
+  END;
+  ALTER TABLE public.appointments ADD CONSTRAINT appointments_status_check CHECK (status IN ('available','pending','approved','cancelled'));
+EXCEPTION WHEN others THEN
+  NULL;
+END $$;
+
+-- ========================================
+-- CHAT ENTRE USUÁRIOS
+-- ========================================
+
+CREATE TABLE IF NOT EXISTS public.chat_messages (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  sender_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  recipient_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  content TEXT NOT NULL,
+  read_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
+
+-- Sender or recipient can view messages
+DROP POLICY IF EXISTS "Participants can view their messages" ON public.chat_messages;
+CREATE POLICY "Participants can view their messages"
+ON public.chat_messages
+FOR SELECT
+USING (
+  sender_id = auth.uid() OR recipient_id = auth.uid()
+);
+
+-- Only the sender can insert messages
+DROP POLICY IF EXISTS "Sender can insert messages" ON public.chat_messages;
+CREATE POLICY "Sender can insert messages"
+ON public.chat_messages
+FOR INSERT
+WITH CHECK (
+  sender_id = auth.uid()
+);
+
+-- Optional: sender can delete own messages
+DROP POLICY IF EXISTS "Sender can delete own messages" ON public.chat_messages;
+CREATE POLICY "Sender can delete own messages"
+ON public.chat_messages
+FOR DELETE
+USING (
+  sender_id = auth.uid()
+);
+
+-- ========================================
+-- MOBILIDADE: EXERCÍCIOS DE MOBILIDADE
+-- ========================================
+
+CREATE TABLE IF NOT EXISTS public.mobility_exercises (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT,
+  video_url TEXT,
+  difficulty TEXT CHECK (difficulty IN ('easy','medium','hard')),
+  created_by UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
+ALTER TABLE public.mobility_exercises ENABLE ROW LEVEL SECURITY;
+
+-- Anyone can view mobility exercises
+DROP POLICY IF EXISTS "Anyone can view mobility exercises" ON public.mobility_exercises;
+CREATE POLICY "Anyone can view mobility exercises"
+ON public.mobility_exercises
+FOR SELECT
+USING (true);
+
+-- Only admins can create/update/delete mobility exercises
+DROP POLICY IF EXISTS "Admins can manage mobility exercises" ON public.mobility_exercises;
+CREATE POLICY "Admins can manage mobility exercises"
+ON public.mobility_exercises
+FOR ALL
+USING (
+  EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.admin_configs ac 
+    WHERE ac.admin_email = (SELECT email FROM auth.users WHERE id = auth.uid())
+      AND ac.is_active = true
+  )
+);
+
+-- ========================================
+-- WORKOUT PLANS: TIPOS SEMANAL/MENSAL E PERÍODO
+-- ========================================
+
+-- Add plan_type and period to workout_plans
+ALTER TABLE public.workout_plans 
+  ADD COLUMN IF NOT EXISTS plan_type TEXT NOT NULL DEFAULT 'daily' CHECK (plan_type IN ('daily','weekly','monthly','custom')),
+  ADD COLUMN IF NOT EXISTS period_start_date DATE,
+  ADD COLUMN IF NOT EXISTS period_end_date DATE;
+
+-- Allow users to insert their own plans
+DROP POLICY IF EXISTS "Users can insert their own workout plans" ON public.workout_plans;
+CREATE POLICY "Users can insert their own workout plans"
+ON public.workout_plans
+FOR INSERT
+WITH CHECK (
+  auth.uid() = user_id
+);
+
+-- Allow users to manage (update/delete) plans they created themselves
+DROP POLICY IF EXISTS "Users can manage their created workout plans" ON public.workout_plans;
+CREATE POLICY "Users can manage their created workout plans"
+ON public.workout_plans
+FOR UPDATE
+USING (
+  created_by = auth.uid()
+)
+WITH CHECK (
+  created_by = auth.uid()
+);
+
+DROP POLICY IF EXISTS "Users can delete their created workout plans" ON public.workout_plans;
+CREATE POLICY "Users can delete their created workout plans"
+ON public.workout_plans
+FOR DELETE
+USING (
+  created_by = auth.uid()
+);
 
 -- ========================================
 -- FUNÇÕES UTILITÁRIAS

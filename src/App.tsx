@@ -10,6 +10,9 @@ import Profile from "./pages/Profile";
 import Timers from "./pages/Timers";
 import Admin from "./pages/Admin";
 import Login from "./pages/auth/Login";
+import Chat from "./pages/Chat";
+import Schedule from "./pages/Schedule";
+import Mobility from "./pages/Mobility";
 import { useAuth } from "@/hooks/use-auth";
 import NotFound from "./pages/NotFound";
 
@@ -35,6 +38,9 @@ const App = () => (
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/admin" element={<PrivateRoute><Admin /></PrivateRoute>} />
+          <Route path="/chat" element={<PrivateRoute><Chat /></PrivateRoute>} />
+          <Route path="/schedule" element={<PrivateRoute><Schedule /></PrivateRoute>} />
+          <Route path="/mobility" element={<PrivateRoute><Mobility /></PrivateRoute>} />
           {/* Planner removido: funcionalidade integrada na tela de Treino */}
           <Route path="/login" element={<Login />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
