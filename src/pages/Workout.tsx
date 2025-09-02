@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar as DayCalendar } from "@/components/ui/calendar";
@@ -13,6 +13,7 @@ import { useWorkout } from "@/hooks/use-workout";
 import { Play, Square, Filter, Timer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { CountdownTimer } from "@/components/timer/countdown-timer";
+import { useAuth } from "@/hooks/use-auth";
 
 const Workout = () => {
   const { 
@@ -34,6 +35,44 @@ const Workout = () => {
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { user } = useAuth();
+
+  const planStorageKey = useMemo(() => {
+    const uid = user?.id || 'guest';
+    const day = selectedDate ? selectedDate.toISOString().slice(0,10) : '';
+    return day ? `plan_${uid}_${day}` : '';
+  }, [user?.id, selectedDate]);
+
+  const [savedPlanExercises, setSavedPlanExercises] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!planStorageKey) return;
+    try {
+      const raw = localStorage.getItem(planStorageKey);
+      if (raw) {
+        const payload = JSON.parse(raw);
+        setSavedPlanExercises(Array.isArray(payload.exercises) ? payload.exercises : []);
+      } else {
+        setSavedPlanExercises([]);
+      }
+    } catch {
+      setSavedPlanExercises([]);
+    }
+  }, [planStorageKey]);
+
+  const handleSavePlannedWorkout = () => {
+    if (!planStorageKey || selectedExerciseIds.length === 0) return;
+    const payload = {
+      userId: user?.id || 'guest',
+      date: selectedDate?.toISOString() || new Date().toISOString(),
+      notes: '',
+      exercises: selectedExerciseIds,
+    };
+    try {
+      localStorage.setItem(planStorageKey, JSON.stringify(payload));
+      setSavedPlanExercises(selectedExerciseIds);
+    } catch {}
+  };
 
   const canStartWorkout = useMemo(() => selectedExerciseIds.length > 0 && selectedExerciseIds.length <= 15, [selectedExerciseIds]);
   const selectionCountLabel = useMemo(() => `${selectedExerciseIds.length} selecionado(s)`, [selectedExerciseIds]);
@@ -187,6 +226,21 @@ const Workout = () => {
               <Link to="/planner">
                 <Button className="bg-spotify-green hover:bg-spotify-green-hover">Montar treino para este dia</Button>
               </Link>
+              <div className="flex items-center gap-2 pt-2">
+                <Button onClick={handleSavePlannedWorkout} disabled={selectedExerciseIds.length === 0} size="sm" className="bg-spotify-green hover:bg-spotify-green-hover disabled:opacity-50">Salvar seleção do dia</Button>
+                <Button onClick={() => setSelectedExerciseIds(savedPlanExercises)} size="sm" variant="secondary" className="bg-spotify-surface">Carregar seleção salva</Button>
+              </div>
+              {savedPlanExercises.length > 0 && (
+                <div className="mt-2">
+                  <div className="text-sm font-medium text-foreground mb-1">Treino salvo para o dia</div>
+                  <ul className="list-disc pl-5 text-sm text-foreground/90">
+                    {savedPlanExercises.map(id => {
+                      const ex = exercises.find(e=>e.id===id);
+                      return <li key={id}>{ex?.name || id}</li>;
+                    })}
+                  </ul>
+                </div>
+              )}
             </div>
           </div>
         </Card>
