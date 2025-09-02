@@ -43,6 +43,8 @@ const Workout = () => {
   }, [user?.id, selectedDate]);
 
   const [savedPlanExercises, setSavedPlanExercises] = useState<string[]>([]);
+  const [planInputs, setPlanInputs] = useState<Record<string, { sets?: number; weight?: number; rest?: number }>>({});
+  const [planTimerVisible, setPlanTimerVisible] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     if (!planStorageKey) return;
@@ -57,6 +59,13 @@ const Workout = () => {
     } catch {
       setSavedPlanExercises([]);
     }
+    // load per-exercise settings
+    try {
+      const settingsRaw = localStorage.getItem(`${planStorageKey}_settings`);
+      setPlanInputs(settingsRaw ? JSON.parse(settingsRaw) : {});
+    } catch {
+      setPlanInputs({});
+    }
   }, [planStorageKey]);
 
   const handleSavePlannedWorkout = () => {
@@ -70,6 +79,22 @@ const Workout = () => {
     try {
       localStorage.setItem(planStorageKey, JSON.stringify(payload));
       setSavedPlanExercises(selectedExerciseIds);
+    } catch {}
+  };
+
+  const savePlanSettings = (exerciseId: string) => {
+    if (!planStorageKey) return;
+    try {
+      const key = `${planStorageKey}_settings`;
+      const existing = localStorage.getItem(key);
+      const settings = existing ? JSON.parse(existing) : {};
+      const current = planInputs[exerciseId] || {};
+      settings[exerciseId] = {
+        sets: Number(current.sets) || 0,
+        weight: Number(current.weight) || 0,
+        rest: Number(current.rest) || 0,
+      };
+      localStorage.setItem(key, JSON.stringify(settings));
     } catch {}
   };
 
@@ -225,13 +250,38 @@ const Workout = () => {
               </div>
               {savedPlanExercises.length > 0 && (
                 <div className="mt-2">
-                  <div className="text-sm font-medium text-foreground mb-1">Treino salvo para o dia</div>
-                  <ul className="list-disc pl-5 text-sm text-foreground/90">
+                  <div className="text-sm font-medium text-foreground mb-2">Treino salvo para o dia</div>
+                  <div className="space-y-2">
                     {savedPlanExercises.map(id => {
                       const ex = exercises.find(e=>e.id===id);
-                      return <li key={id}>{ex?.name || id}</li>;
+                      if (!ex) return null;
+                      const input = planInputs[id] || {};
+                      return (
+                        <div key={id} className="bg-spotify-surface border border-border rounded p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="font-medium text-foreground">{ex.name}</div>
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" className="bg-spotify-green hover:bg-spotify-green-hover" onClick={()=>{ setSelectedExercise(ex.id); setShowVideoModal(true); }}>Mostrar execução</Button>
+                              <Button size="sm" variant="secondary" className="bg-spotify-surface" onClick={()=> setPlanTimerVisible(prev=> ({ ...prev, [id]: !prev[id] }))}>Cronômetro pausa descanso</Button>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-3 gap-2 mb-2">
+                            <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" placeholder="Séries" type="number" value={input.sets ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [id]: { ...prev[id], sets: Number(e.target.value)||0 } }))} />
+                            <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" placeholder="Peso (kg)" type="number" value={input.weight ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [id]: { ...prev[id], weight: Number(e.target.value)||0 } }))} />
+                            <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" placeholder="Descanso (s)" type="number" value={input.rest ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [id]: { ...prev[id], rest: Number(e.target.value)||0 } }))} />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button size="sm" className="bg-spotify-green" onClick={()=> savePlanSettings(id)}>Salvar</Button>
+                          </div>
+                          {planTimerVisible[id] && (
+                            <div className="pt-2">
+                              <CountdownTimer label="Descanso" defaultSeconds={planInputs[id]?.rest || 60} minSeconds={15} maxSeconds={300} step={5} />
+                            </div>
+                          )}
+                        </div>
+                      );
                     })}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>
