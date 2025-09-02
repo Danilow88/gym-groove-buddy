@@ -87,7 +87,10 @@ const Profile = () => {
           </TabsContent>
 
           <TabsContent value="weekly">
-            <WeeklyPlanView />
+            <div className="text-center p-8">
+              <h3 className="text-lg font-semibold mb-2">Plano Semanal (Em manutenção)</h3>
+              <p className="text-muted-foreground">Funcionalidade temporariamente desabilitada</p>
+            </div>
           </TabsContent>
 
           <TabsContent value="plans">

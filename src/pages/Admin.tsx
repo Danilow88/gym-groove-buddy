@@ -342,10 +342,10 @@ const Admin = () => {
                 {loading ? 'Criando...' : 'Criar Plano Simples'}
               </Button>
               
-              <WeeklyAdminModal 
-                userId={selectedUserId} 
-                userName={selectedUserId.split('@')[0] || selectedUserId}
-              />
+              <Button variant="outline" size="sm" disabled>
+                <Calendar className="h-4 w-4 mr-2" />
+                Plano Semanal (Em manutenção)
+              </Button>
             </div>
           </div>
         </Card>

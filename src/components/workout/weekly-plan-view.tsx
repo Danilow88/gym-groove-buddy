@@ -262,7 +262,7 @@ export function WeeklyPlanView() {
                       )}
                       
                       {dayData.notes && (
-                        <p className="text-xs text-muted-foreground mt-2 line-clamp-2">
+                        <p className="text-xs text-muted-foreground mt-2 overflow-hidden">
                           📝 {dayData.notes}
                         </p>
                       )}
