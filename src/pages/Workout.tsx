@@ -1,5 +1,8 @@
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Calendar as DayCalendar } from "@/components/ui/calendar";
+import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { AddSetModal } from "@/components/workout/add-set-modal";
@@ -30,6 +33,7 @@ const Workout = () => {
   const [showRestTimer, setShowRestTimer] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
 
   const canStartWorkout = useMemo(() => selectedExerciseIds.length > 0 && selectedExerciseIds.length <= 15, [selectedExerciseIds]);
   const selectionCountLabel = useMemo(() => `${selectedExerciseIds.length} selecionado(s)`, [selectedExerciseIds]);
@@ -166,6 +170,26 @@ const Workout = () => {
 
       {/* Exercise List */}
       <div className="p-4 space-y-4">
+        {/* Planner Inline */}
+        <Card className="bg-gradient-card border-border p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-lg font-semibold text-foreground">Planejar Treino Semanal</h2>
+            <Link to="/planner">
+              <Button size="sm" className="bg-spotify-green hover:bg-spotify-green-hover">Abrir Planner</Button>
+            </Link>
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div>
+              <DayCalendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border border-border bg-spotify-surface" />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Selecione um dia no calendário e monte seu treino no Planner. Seus treinos planejados aparecerão aqui em breve.</p>
+              <Link to="/planner">
+                <Button className="bg-spotify-green hover:bg-spotify-green-hover">Montar treino para este dia</Button>
+              </Link>
+            </div>
+          </div>
+        </Card>
         {/* Rest Timer */}
         <div className="bg-spotify-surface rounded-lg p-3">
           <div className="flex items-center justify-between mb-2">
