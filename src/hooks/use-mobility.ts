@@ -19,6 +19,49 @@ export function useMobility() {
   const [items, setItems] = useState<MobilityExercise[]>([]);
   const [error, setError] = useState<string | null>(null);
 
+  const defaultExercises: MobilityExercise[] = [
+    {
+      id: 'local-hip-5min',
+      title: 'Mobilidade de Quadril (5 min)',
+      description: 'Sequência rápida para soltar quadril e lombar.',
+      video_url: 'https://www.youtube.com/watch?v=BkS1-El_WlE',
+      difficulty: 'easy',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'local-ombros-bastao',
+      title: 'Mobilidade de Ombros com Bastão',
+      description: 'Melhora a amplitude e reduz rigidez em ombros.',
+      video_url: 'https://www.youtube.com/watch?v=3sEeVJEXTfY',
+      difficulty: 'medium',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'local-posterior-dinamico',
+      title: 'Alongamento Dinâmico de Pernas',
+      description: 'Fluxo dinâmico para posterior, glúteos e panturrilhas.',
+      video_url: 'https://www.youtube.com/watch?v=mhF3Z67f4xA',
+      difficulty: 'easy',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'local-toracica',
+      title: 'Abertura de Coluna Torácica',
+      description: 'Mobilidade torácica para postura e supino.',
+      video_url: 'https://www.youtube.com/watch?v=hxJdZrKk0nE',
+      difficulty: 'medium',
+      created_at: new Date().toISOString(),
+    },
+    {
+      id: 'local-tornozelo',
+      title: 'Mobilidade de Tornozelo',
+      description: 'Melhora a dorsiflexão para agachamento.',
+      video_url: 'https://www.youtube.com/watch?v=K3VJ2UqoJbE',
+      difficulty: 'easy',
+      created_at: new Date().toISOString(),
+    },
+  ];
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -28,8 +71,15 @@ export function useMobility() {
         .select("id, title, description, video_url, difficulty, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
-      setItems(data as MobilityExercise[]);
+      const rows = (data as MobilityExercise[]) || [];
+      if (rows.length === 0) {
+        setItems(defaultExercises);
+      } else {
+        setItems(rows);
+      }
     } catch (err) {
+      // fallback para defaults se a tabela não existir ainda
+      setItems(defaultExercises);
       setError((err as Error).message);
     } finally {
       setLoading(false);
