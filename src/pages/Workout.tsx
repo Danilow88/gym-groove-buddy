@@ -321,7 +321,8 @@ const Workout = () => {
                           <div className="flex items-center gap-2">
                             <Button size="sm" className="bg-spotify-green" onClick={()=> savePlanSettings(id)}>Salvar</Button>
                             <Button size="sm" variant="outline" className="border-border" onClick={()=> startQuickTimer(id)}>
-                              ⏱️ Reloginho {typeof quickTimerRemaining[id] === 'number' ? `(${formatMMSS(quickTimerRemaining[id])})` : ''}
+                              <Timer className="h-4 w-4 mr-1 text-spotify-green" />
+                              Reloginho {typeof quickTimerRemaining[id] === 'number' ? `(${formatMMSS(quickTimerRemaining[id])})` : ''}
                             </Button>
                             {quickTimerRunning[id] && (
                               <Button size="sm" variant="secondary" className="bg-spotify-surface" onClick={()=> stopQuickTimer(id)}>Parar</Button>
