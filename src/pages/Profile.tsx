@@ -144,11 +144,7 @@ const Profile = () => {
         <Card className="bg-gradient-card border-border p-4">
           <h3 className="font-medium text-foreground mb-3">Configurações</h3>
           <div className="space-y-3">
-            <Link to="/planner">
-              <Button className="w-full justify-start bg-spotify-green hover:bg-spotify-green-hover">
-                <Calendar className="h-4 w-4 mr-2" /> Abrir Planner de Treinos
-              </Button>
-            </Link>
+            {/* Planner removido: planejamento agora é feito em Treino */}
             <Button variant="outline" className="w-full justify-start border-border hover:bg-spotify-surface">
               Configurações do App
             </Button>

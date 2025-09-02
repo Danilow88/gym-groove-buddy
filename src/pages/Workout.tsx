@@ -2,7 +2,6 @@ import { useMemo, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Calendar as DayCalendar } from "@/components/ui/calendar";
-import { Link } from "react-router-dom";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { AddSetModal } from "@/components/workout/add-set-modal";
@@ -209,24 +208,18 @@ const Workout = () => {
 
       {/* Exercise List */}
       <div className="p-4 space-y-4">
-        {/* Planner Inline */}
+        {/* Planejamento Inline (sem Planner dedicado) */}
         <Card className="bg-gradient-card border-border p-4">
-          <div className="flex items-center justify-between mb-3">
-            <h2 className="text-lg font-semibold text-foreground">Planejar Treino Semanal</h2>
-            <Link to="/planner">
-              <Button size="sm" className="bg-spotify-green hover:bg-spotify-green-hover">Abrir Planner</Button>
-            </Link>
+          <div className="mb-3">
+            <h2 className="text-lg font-semibold text-foreground">Treino por data</h2>
+            <p className="text-sm text-muted-foreground">Selecione um dia e salve a seleção de exercícios direto aqui.</p>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <DayCalendar mode="single" selected={selectedDate} onSelect={setSelectedDate} className="rounded-md border border-border bg-spotify-surface" />
             </div>
             <div className="space-y-2">
-              <p className="text-sm text-muted-foreground">Selecione um dia no calendário e monte seu treino no Planner. Seus treinos planejados aparecerão aqui em breve.</p>
-              <Link to="/planner">
-                <Button className="bg-spotify-green hover:bg-spotify-green-hover">Montar treino para este dia</Button>
-              </Link>
-              <div className="flex items-center gap-2 pt-2">
+              <div className="flex items-center gap-2">
                 <Button onClick={handleSavePlannedWorkout} disabled={selectedExerciseIds.length === 0} size="sm" className="bg-spotify-green hover:bg-spotify-green-hover disabled:opacity-50">Salvar seleção do dia</Button>
                 <Button onClick={() => setSelectedExerciseIds(savedPlanExercises)} size="sm" variant="secondary" className="bg-spotify-surface">Carregar seleção salva</Button>
               </div>
