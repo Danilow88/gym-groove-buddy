@@ -1,4 +1,4 @@
-// Mapeamento de vídeos locais para exercícios
+// Mapeamento de vídeos para exercícios
 // Para demonstração, usando vídeos genéricos que representam os movimentos
 
 export interface ExerciseVideo {
