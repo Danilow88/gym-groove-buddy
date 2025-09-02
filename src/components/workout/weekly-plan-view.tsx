@@ -13,14 +13,14 @@ interface WeeklyWorkoutDetail {
   plan_observations: string | null;
   day_of_week: string;
   day_name: string;
-  exercises: any[];
+  exercises: string[];
   notes: string | null;
   is_rest_day: boolean;
 }
 
 interface TodayWorkout {
   plan_name: string;
-  exercises: any[];
+  exercises: string[];
   notes: string | null;
   is_rest_day: boolean;
 }
@@ -61,7 +61,12 @@ export function WeeklyPlanView() {
       if (error) {
         console.error('Erro ao carregar plano semanal:', error);
       } else {
-        setWeeklyPlan(data || []);
+        const processedData = (data || []).map((item: any) => ({
+          ...item,
+          exercises: Array.isArray(item.exercises) ? item.exercises : 
+                     typeof item.exercises === 'string' ? JSON.parse(item.exercises) : []
+        }));
+        setWeeklyPlan(processedData);
       }
     } catch (error) {
       console.error('Erro ao carregar plano semanal:', error);
@@ -81,7 +86,16 @@ export function WeeklyPlanView() {
       if (error) {
         console.error('Erro ao carregar treino de hoje:', error);
       } else {
-        setTodayWorkout(data?.[0] || null);
+        const todayData = data?.[0];
+        if (todayData) {
+          setTodayWorkout({
+            ...todayData,
+            exercises: Array.isArray(todayData.exercises) ? todayData.exercises : 
+                      typeof todayData.exercises === 'string' ? JSON.parse(todayData.exercises) : []
+          });
+        } else {
+          setTodayWorkout(null);
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar treino de hoje:', error);
@@ -156,12 +170,12 @@ export function WeeklyPlanView() {
               </div>
             ) : (
               <div className="space-y-3">
-                {todayWorkout.exercises?.map((exercise: any, index: number) => (
+                {todayWorkout.exercises?.map((exercise: string, index: number) => (
                   <div key={index} className="flex items-center justify-between p-2 bg-background/50 rounded">
-                    <span className="font-medium">{exercise.name || exercise}</span>
+                    <span className="font-medium">{exercise}</span>
                     <Badge variant="outline" className="text-xs">
                       <Dumbbell className="h-3 w-3 mr-1" />
-                      {exercise.sets || 'N/A'} séries
+                      3 séries
                     </Badge>
                   </div>
                 ))}
@@ -248,9 +262,9 @@ export function WeeklyPlanView() {
                         </div>
                       ) : (
                         <div className="space-y-1">
-                          {dayData.exercises?.slice(0, 2).map((exercise: any, index: number) => (
+                          {dayData.exercises?.slice(0, 2).map((exercise: string, index: number) => (
                             <p key={index} className="text-xs font-medium truncate">
-                              {exercise.name || exercise}
+                              {exercise}
                             </p>
                           ))}
                           {dayData.exercises?.length > 2 && (

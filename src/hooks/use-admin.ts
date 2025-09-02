@@ -99,7 +99,7 @@ export function useAdmin() {
         id: data.id,
         userId: data.user_id,
         name: data.name,
-        exercises: data.exercises,
+        exercises: Array.isArray(data.exercises) ? data.exercises.map((ex: any) => String(ex)) : [],
         observations: data.observations || '',
         createdBy: user.email || 'Admin',
         createdAt: new Date(data.created_at)
