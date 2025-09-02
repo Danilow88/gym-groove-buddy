@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export interface UserProfile {
   id: string;
-  email: string;
+  email?: string;
   full_name: string | null;
 }
 
@@ -19,7 +19,7 @@ export function useUserSearch() {
 
     setLoading(true);
     try {
-      // Search in profiles table
+      // Search in profiles table for real users and use user_id as the chat peer id
       const { data: profiles, error } = await supabase
         .from('profiles')
         .select('id, user_id, full_name')
@@ -28,30 +28,19 @@ export function useUserSearch() {
 
       if (error) {
         console.error('Error searching users:', error);
+        setUsers([]);
         return;
       }
 
-      // Get user emails from auth.users (this might not work due to RLS)
-      // For now, we'll create mock users based on the search
-      const mockUsers: UserProfile[] = [
-        {
-          id: 'user-1',
-          email: query.includes('@') ? query : `${query}@exemplo.com`,
-          full_name: query
-        }
-      ];
+      const mapped: UserProfile[] = (profiles ?? [])
+        .map((p: any) => ({ id: p.user_id, full_name: p.full_name ?? null }))
+        // Filter out any entries missing a valid user_id
+        .filter((u) => Boolean(u.id));
 
-      setUsers(mockUsers);
+      setUsers(mapped);
     } catch (error) {
       console.error('Error searching users:', error);
-      // Fallback: create a mock user based on the search query
-      setUsers([
-        {
-          id: `user-${Date.now()}`,
-          email: query.includes('@') ? query : `${query}@exemplo.com`,
-          full_name: query
-        }
-      ]);
+      setUsers([]);
     } finally {
       setLoading(false);
     }

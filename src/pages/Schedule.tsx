@@ -12,6 +12,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { useNavigate } from "react-router-dom";
 
+function toLocalDateKey(date: Date | string) {
+  const d = typeof date === 'string' ? new Date(date) : date;
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate()).toISOString().slice(0, 10);
+}
+
 const Schedule = () => {
   const { available, mine, loading, book, cancel, createSlot, approve } = useAppointments();
   const { isAdminUser, isAdminAuthenticated } = useAdminAuth();
@@ -29,7 +34,7 @@ const Schedule = () => {
   const availableByDate = useMemo(() => {
     const map = new Map<string, typeof available>();
     for (const slot of available) {
-      const key = new Date(slot.start_time).toISOString().slice(0, 10);
+      const key = toLocalDateKey(slot.start_time);
       const list = map.get(key) || [];
       list.push(slot);
       map.set(key, list);
@@ -39,7 +44,7 @@ const Schedule = () => {
 
   const filteredAvailable = useMemo(() => {
     if (!selectedDate) return available;
-    const key = new Date(selectedDate).toISOString().slice(0, 10);
+    const key = toLocalDateKey(selectedDate);
     return availableByDate.get(key) || [];
   }, [selectedDate, available, availableByDate]);
 
@@ -105,7 +110,7 @@ const Schedule = () => {
               onSelect={setSelectedDate}
               modifiers={{
                 available: (day: Date) => {
-                  const key = day.toISOString().slice(0, 10);
+                  const key = toLocalDateKey(day);
                   return availableByDate.has(key);
                 },
               }}
@@ -143,7 +148,7 @@ const Schedule = () => {
                   <div className="text-sm">
                     {new Date(slot.start_time).toLocaleString()} - {new Date(slot.end_time).toLocaleTimeString()}
                   </div>
-                  <Button size="sm" onClick={() => book(slot.id)} disabled={loading}>Reservar</Button>
+                  <Button size="sm" onClick={() => book(slot.id)} disabled={loading}>Agendar</Button>
                 </div>
               ))}
               {filteredAvailable.length === 0 && (

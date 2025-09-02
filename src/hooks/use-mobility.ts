@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAdminAuth } from "./use-admin-auth";
+import { useAuth } from "./use-auth";
 
 export interface MobilityExercise {
   id: string;
@@ -13,6 +14,7 @@ export interface MobilityExercise {
 
 export function useMobility() {
   const { isAdminAuthenticated } = useAdminAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<MobilityExercise[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -37,12 +39,14 @@ export function useMobility() {
   useEffect(() => { load(); }, [load]);
 
   const create = useCallback(async (payload: { title: string; description?: string; video_url?: string; difficulty?: MobilityExercise["difficulty"] }) => {
-    if (!isAdminAuthenticated) return { error: "not_admin" };
-    const { error } = await supabase.from("mobility_exercises").insert([payload]);
+    if (!isAdminAuthenticated || !user?.id) return { error: "not_admin" };
+    const { error } = await supabase.from("mobility_exercises").insert([
+      { ...payload, created_by: user.id }
+    ] as any);
     if (error) return { error: error.message };
     await load();
     return { error: null };
-  }, [isAdminAuthenticated, load]);
+  }, [isAdminAuthenticated, user?.id, load]);
 
   const remove = useCallback(async (id: string) => {
     if (!isAdminAuthenticated) return { error: "not_admin" };
