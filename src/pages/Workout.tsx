@@ -1,241 +1,209 @@
-import { useMemo, useState } from "react";
+import React, { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { DaySelector } from "@/components/ui/day-selector";
+import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { ExerciseCard } from "@/components/workout/exercise-card";
 import { AddSetModal } from "@/components/workout/add-set-modal";
-import { VideoModal } from "@/components/workout/video-modal";
 import { RestTimer } from "@/components/workout/rest-timer";
-import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
-import { Play, Square, Filter, Timer } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { CountdownTimer } from "@/components/timer/countdown-timer";
+import { Dumbbell, Calendar, Play, Target } from "lucide-react";
 
 const Workout = () => {
   const { 
     exercises, 
+    currentSets, 
     addSet, 
-    finishWorkout, 
-    getCurrentSetsForExercise, 
-    getFilteredExercises, 
+    removeSet, 
     getMuscleGroups, 
-    selectedMuscleGroup, 
+    getFilteredExercises, 
+    finishWorkout,
+    workoutStartTime,
+    selectedMuscleGroup,
     setSelectedMuscleGroup 
   } = useWorkout();
-  const { toast } = useToast();
-  const [selectedExercise, setSelectedExercise] = useState<string | null>(null);
+  const [selectedExercise, setSelectedExercise] = useState<typeof exercises[0] | null>(null);
   const [showAddSetModal, setShowAddSetModal] = useState(false);
-  const [showVideoModal, setShowVideoModal] = useState(false);
-  const [isWorkoutActive, setIsWorkoutActive] = useState(false);
   const [showRestTimer, setShowRestTimer] = useState(false);
-  const [isSelecting, setIsSelecting] = useState(false);
-  const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
+  const [selectedWorkoutDays, setSelectedWorkoutDays] = useState<string[]>([]);
 
-  const canStartWorkout = useMemo(() => selectedExerciseIds.length > 0 && selectedExerciseIds.length <= 15, [selectedExerciseIds]);
-  const selectionCountLabel = useMemo(() => `${selectedExerciseIds.length} selecionado(s)`, [selectedExerciseIds]);
+  // Verificação de loading/error
+  if (!exercises || exercises.length === 0) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center pb-20">
+        <Card className="p-8 text-center">
+          <Dumbbell className="h-12 w-12 text-spotify-green mx-auto mb-4" />
+          <h2 className="text-xl font-semibold mb-2">Carregando exercícios...</h2>
+          <p className="text-muted-foreground">Aguarde um momento</p>
+        </Card>
+        <BottomNavigation />
+      </div>
+    );
+  }
 
-  const handleAddSet = (exerciseId: string) => {
-    setSelectedExercise(exerciseId);
-    setShowAddSetModal(true);
-  };
+  const filteredExercises = getFilteredExercises();
+  const hasCurrentWorkout = currentSets && currentSets.length > 0;
 
-  const handlePlayVideo = (exerciseId: string) => {
-    setSelectedExercise(exerciseId);
-    setShowVideoModal(true);
-  };
-
-  const handleSetSubmit = (data: { weight: number; reps: number }) => {
+  const handleAddSet = (weight: number, reps: number) => {
     if (selectedExercise) {
-      addSet(selectedExercise, data.weight, data.reps);
-      setIsWorkoutActive(true);
-      toast({
-        title: "Série adicionada!",
-        description: `${data.weight}kg x ${data.reps} reps`,
-      });
+      addSet(selectedExercise.id, weight, reps);
+      setShowAddSetModal(false);
+      setShowRestTimer(true);
     }
   };
 
-  const toggleSelectExercise = (exerciseId: string) => {
-    setSelectedExerciseIds(prev => {
-      const exists = prev.includes(exerciseId);
-      if (exists) return prev.filter(id => id !== exerciseId);
-      if (prev.length >= 15) {
-        toast({ title: "Limite atingido", description: "Você pode escolher até 15 exercícios." });
-        return prev;
-      }
-      return [...prev, exerciseId];
-    });
+  const handleFinishWorkout = async () => {
+    await finishWorkout();
+    setSelectedWorkoutDays([]);
   };
 
-  const handleStartWorkout = () => {
-    if (!canStartWorkout) return;
-    setIsSelecting(false);
-    setIsWorkoutActive(true);
-    toast({ title: "Treino iniciado", description: selectionCountLabel });
+  const getWorkoutSummary = () => {
+    const totalSets = currentSets ? currentSets.length : 0;
+    const uniqueExercises = currentSets ? new Set(currentSets.map(set => set.exerciseId)).size : 0;
+    const duration = workoutStartTime ? Math.floor((Date.now() - workoutStartTime) / 1000 / 60) : 0;
+    
+    return { totalSets, uniqueExercises, duration };
   };
 
-  const handleFinishWorkout = () => {
-    finishWorkout();
-    setIsWorkoutActive(false);
-    setSelectedExerciseIds([]);
-    toast({
-      title: "Treino finalizado!",
-      description: "Parabéns! Seu treino foi salvo no histórico.",
-    });
-  };
-
-  const selectedExerciseData = exercises.find(e => e.id === selectedExercise);
+  const { totalSets, uniqueExercises, duration } = getWorkoutSummary();
 
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Header */}
       <div className="bg-gradient-card border-b border-border p-4">
-        <div className="flex items-center justify-between">
-          <div>
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-spotify-green/20 rounded-full flex items-center justify-center">
+            <Dumbbell className="h-6 w-6 text-spotify-green" />
+          </div>
+          <div className="flex-1">
             <h1 className="text-2xl font-bold text-foreground">Treino</h1>
             <p className="text-sm text-muted-foreground">
-              {isWorkoutActive ? "Treino em andamento" : "Selecione os exercícios"}
+              Monte seu treino personalizado
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {!isWorkoutActive && (
-              <>
-                {!isSelecting ? (
-                  <Button onClick={() => setIsSelecting(true)} size="sm" className="bg-spotify-green hover:bg-spotify-green-hover">
-                    Selecionar exercícios
-                  </Button>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">{selectionCountLabel}</span>
-                    <Button onClick={() => setIsSelecting(false)} variant="secondary" size="sm" className="bg-spotify-surface">
-                      Cancelar
-                    </Button>
-                    <Button onClick={handleStartWorkout} disabled={!canStartWorkout} size="sm" className="bg-spotify-green hover:bg-spotify-green-hover disabled:opacity-50">
-                      <Play className="h-4 w-4 mr-2" /> Iniciar treino
-                    </Button>
-                  </div>
-                )}
-              </>
+        </div>
+
+        {/* Workout Summary */}
+        {hasCurrentWorkout && (
+          <div className="mt-4 flex items-center gap-4">
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Target className="h-3 w-3" />
+              {totalSets} séries
+            </Badge>
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Dumbbell className="h-3 w-3" />
+              {uniqueExercises} exercícios
+            </Badge>
+            {duration > 0 && (
+              <Badge variant="outline">
+                {duration}min
+              </Badge>
             )}
-          {isWorkoutActive && (
-            <Button
-              onClick={handleFinishWorkout}
-              variant="destructive"
-              size="sm"
-              className="bg-destructive hover:bg-destructive/90"
-            >
-              <Square className="h-4 w-4 mr-2" />
-              Finalizar
-            </Button>
-          )}
           </div>
-        </div>
-        
-        {/* Filter */}
-        <div className="mt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Filter className="h-4 w-4 text-spotify-green" />
-            <span className="text-sm font-medium text-foreground">Filtrar por grupo muscular:</span>
-          </div>
-          <Select value={selectedMuscleGroup} onValueChange={setSelectedMuscleGroup}>
-            <SelectTrigger className="w-full bg-spotify-surface border-border">
-              <SelectValue placeholder="Selecione um grupo muscular" />
-            </SelectTrigger>
-            <SelectContent className="bg-spotify-card border-border">
-              {getMuscleGroups().map((group) => (
-                <SelectItem key={group} value={group} className="text-foreground hover:bg-spotify-surface">
-                  {group}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        )}
       </div>
 
-      {/* Exercise List */}
-      <div className="p-4 space-y-4">
-        {/* Rest Timer */}
-        <div className="bg-spotify-surface rounded-lg p-3">
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <Timer className="h-4 w-4 text-spotify-green" />
-              <span className="text-sm font-medium text-foreground">Cronômetro de Descanso</span>
+      <div className="p-4 space-y-6">
+        {!hasCurrentWorkout && (
+          <Card className="p-4 border-spotify-green bg-spotify-green/5">
+            <div className="flex items-start gap-3">
+              <Calendar className="h-5 w-5 text-spotify-green mt-0.5" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-foreground mb-2">
+                  Para quais dias você quer treinar?
+                </h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Selecione os dias da semana que você pretende fazer este treino
+                </p>
+                <DaySelector
+                  selectedDays={selectedWorkoutDays}
+                  onDaysChange={setSelectedWorkoutDays}
+                  multiple={true}
+                  showBadges={true}
+                />
+              </div>
             </div>
-            <button
-              className="text-xs text-spotify-green hover:text-spotify-green-hover"
-              onClick={() => setShowRestTimer((v) => !v)}
-            >
-              {showRestTimer ? "Esconder" : "Mostrar"}
-            </button>
+          </Card>
+        )}
+
+        {/* Muscle Group Filter */}
+        <Card className="p-4">
+          <h3 className="font-semibold text-foreground mb-3">Grupo Muscular</h3>
+          <div className="flex flex-wrap gap-2">
+            {getMuscleGroups().map((group) => (
+              <Button
+                key={group}
+                variant={selectedMuscleGroup === group ? "default" : "outline"}
+                size="sm"
+                onClick={() => setSelectedMuscleGroup(group)}
+                className={
+                  selectedMuscleGroup === group 
+                    ? "bg-spotify-green hover:bg-spotify-green/90" 
+                    : ""
+                }
+              >
+                {group}
+              </Button>
+            ))}
           </div>
-          {showRestTimer && (
-            <CountdownTimer label="Descanso" defaultSeconds={60} minSeconds={15} maxSeconds={240} step={5} />
-          )}
+        </Card>
+
+        {/* Exercise List */}
+        <div className="space-y-3">
+          {filteredExercises && filteredExercises.map((exercise) => (
+            <ExerciseCard
+              key={exercise.id}
+              exercise={exercise}
+              sets={currentSets ? currentSets.filter(set => set.exerciseId === exercise.id) : []}
+              onAddSet={() => {
+                setSelectedExercise(exercise);
+                setShowAddSetModal(true);
+              }}
+              onRemoveSet={(setId) => removeSet(setId)}
+            />
+          ))}
         </div>
 
-        {getFilteredExercises().map((exercise) => {
-          const currentSets = getCurrentSetsForExercise(exercise.id);
-          return (
-            <div key={exercise.id}>
-              <ExerciseCard
-                exercise={exercise}
-                onAddSet={handleAddSet}
-                onPlayVideo={handlePlayVideo}
-                selectable={isSelecting}
-                selected={selectedExerciseIds.includes(exercise.id)}
-                onToggleSelect={toggleSelectExercise}
-              />
-              
-              {/* Current Sets */}
-              {currentSets.length > 0 && (
-                <div className="mt-3 bg-spotify-surface rounded-lg p-3">
-                  <h4 className="text-sm font-medium text-spotify-green mb-2">
-                    Séries de hoje ({currentSets.length})
-                  </h4>
-                  <div className="space-y-1">
-                    {currentSets.map((set, index) => (
-                      <div key={set.id} className="flex justify-between text-sm">
-                        <span className="text-muted-foreground">
-                          Série {index + 1}
-                        </span>
-                        <span className="text-foreground">
-                          {set.weight}kg × {set.reps} reps
-                        </span>
-                      </div>
-                    ))}
-                  </div>
+        {/* Finish Workout Button */}
+        {hasCurrentWorkout && (
+          <div className="pt-4">
+            <Card className="p-4 bg-gradient-to-r from-spotify-green/10 to-transparent border-spotify-green/20">
+              <div className="text-center space-y-3">
+                <div>
+                  <h3 className="font-semibold text-foreground">
+                    Finalizar Treino
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {totalSets} séries • {uniqueExercises} exercícios • {duration}min
+                  </p>
                 </div>
-              )}
-            </div>
-          );
-        })}
+                <Button 
+                  onClick={handleFinishWorkout}
+                  className="w-full bg-spotify-green hover:bg-spotify-green/90"
+                >
+                  <Play className="h-4 w-4 mr-2" />
+                  Concluir Treino
+                </Button>
+              </div>
+            </Card>
+          </div>
+        )}
       </div>
-
-      {/* Rest Timer */}
-      {isWorkoutActive && (
-        <div className="px-4">
-          <RestTimer defaultSeconds={60} />
-        </div>
-      )}
 
       {/* Modals */}
-      {selectedExerciseData && (
-        <>
-          <AddSetModal
-            isOpen={showAddSetModal}
-            onClose={() => setShowAddSetModal(false)}
-            exerciseName={selectedExerciseData.name}
-            onAddSet={handleSetSubmit}
-          />
-          
-          <VideoModal
-            isOpen={showVideoModal}
-            onClose={() => setShowVideoModal(false)}
-            exerciseName={selectedExerciseData.name}
-            videoUrl={selectedExerciseData.videoUrl || ''}
-          />
-        </>
-      )}
+      <AddSetModal
+        isOpen={showAddSetModal}
+        onClose={() => setShowAddSetModal(false)}
+        onAddSet={handleAddSet}
+        exerciseName={selectedExercise?.name || ''}
+      />
+
+      <RestTimer
+        isOpen={showRestTimer}
+        onClose={() => setShowRestTimer(false)}
+        exerciseName={selectedExercise?.name || ''}
+      />
 
       <BottomNavigation />
     </div>

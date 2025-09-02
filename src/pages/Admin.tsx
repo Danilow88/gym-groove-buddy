@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { WeeklyAdminModal } from "@/components/workout/weekly-admin-modal";
@@ -13,6 +14,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { UserPlus, CheckCircle, X, Trash2, Settings, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { DaySelector } from "@/components/ui/day-selector";
 
 const Admin = () => {
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ const Admin = () => {
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [observations, setObservations] = useState('');
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('Todos');
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [adminPassword, setAdminPassword] = useState('');
 
   const handleAdminLogin = () => {
@@ -124,10 +127,10 @@ const Admin = () => {
   }
 
   const handleCreatePlan = async () => {
-    if (!workoutName.trim() || selectedExercises.length === 0 || !selectedUserId.trim()) {
+    if (!workoutName.trim() || selectedExercises.length === 0 || !selectedUserId.trim() || selectedDays.length === 0) {
       toast({
         title: "Erro",
-        description: "Preencha todos os campos obrigatórios.",
+        description: "Preencha todos os campos obrigatórios, incluindo os dias da semana.",
         variant: "destructive"
       });
       return;
@@ -138,7 +141,8 @@ const Admin = () => {
         selectedUserId,
         workoutName,
         selectedExercises,
-        observations
+        observations,
+        selectedDays
       );
 
       if (success) {
@@ -152,6 +156,7 @@ const Admin = () => {
         setWorkoutName('');
         setSelectedExercises([]);
         setObservations('');
+        setSelectedDays([]);
       }
     } catch (error) {
       toast({
@@ -319,6 +324,17 @@ const Admin = () => {
               </div>
             </div>
 
+            {/* Day Selector */}
+            <div>
+              <DaySelector
+                selectedDays={selectedDays}
+                onDaysChange={setSelectedDays}
+                multiple={true}
+                showBadges={true}
+                disabled={loading}
+              />
+            </div>
+
             {/* Observations */}
             <div>
               <label className="text-sm font-medium text-foreground mb-2 block">
@@ -342,10 +358,10 @@ const Admin = () => {
                 {loading ? 'Criando...' : 'Criar Plano Simples'}
               </Button>
               
-              <Button variant="outline" size="sm" disabled>
-                <Calendar className="h-4 w-4 mr-2" />
-                Plano Semanal (Em manutenção)
-              </Button>
+              <WeeklyAdminModal 
+                userId={selectedUserId} 
+                userName={selectedUserId.split('@')[0] || selectedUserId}
+              />
             </div>
           </div>
         </Card>
@@ -375,6 +391,23 @@ const Admin = () => {
                       <p className="text-sm text-muted-foreground mb-2">
                         Usuário: {plan.userId} • {plan.exercises.length} exercícios
                       </p>
+                      
+                      {/* Mostrar dias da semana se disponível */}
+                      {plan.daysOfWeek && plan.daysOfWeek.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {plan.daysOfWeek.map(day => {
+                            const dayNames = {
+                              monday: 'Seg', tuesday: 'Ter', wednesday: 'Qua',
+                              thursday: 'Qui', friday: 'Sex', saturday: 'Sáb', sunday: 'Dom'
+                            };
+                            return (
+                              <span key={day} className="inline-block border border-border rounded px-2 py-0.5 text-xs">
+                                {dayNames[day as keyof typeof dayNames]}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
                       <div className="text-xs text-muted-foreground mb-2">
                         Exercícios: {plan.exercises.map(id => getExerciseName(id)).join(', ')}
                       </div>

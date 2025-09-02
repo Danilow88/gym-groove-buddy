@@ -11,6 +11,7 @@ export interface WorkoutPlan {
   observations: string;
   createdBy: string;
   createdAt: Date;
+  daysOfWeek?: string[]; // Dias da semana selecionados
 }
 
 export function useAdmin() {
@@ -62,7 +63,8 @@ export function useAdmin() {
     userId: string,
     name: string,
     exercises: string[],
-    observations: string
+    observations: string,
+    daysOfWeek: string[] = []
   ) => {
     if (!isAdmin || !user) return false;
     
@@ -73,7 +75,9 @@ export function useAdmin() {
         name,
         exercises,
         observations,
-        created_by: user.id
+        created_by: user.id,
+        days_of_week: daysOfWeek,
+        is_weekly_plan: false // Para planos simples com dias específicos
       }]).select().single();
 
       if (error) {
@@ -86,7 +90,8 @@ export function useAdmin() {
           exercises,
           observations,
           createdBy: user.email || 'Admin',
-          createdAt: new Date()
+          createdAt: new Date(),
+          daysOfWeek
         };
         const updatedPlans = [newPlan, ...workoutPlans];
         setWorkoutPlans(updatedPlans);
@@ -99,10 +104,11 @@ export function useAdmin() {
         id: data.id,
         userId: data.user_id,
         name: data.name,
-        exercises: data.exercises,
+        exercises: Array.isArray(data.exercises) ? data.exercises.map((ex: any) => String(ex)) : [],
         observations: data.observations || '',
         createdBy: user.email || 'Admin',
-        createdAt: new Date(data.created_at)
+        createdAt: new Date(data.created_at),
+        daysOfWeek: data.days_of_week || []
       };
       const updatedPlans = [newPlan, ...workoutPlans];
       setWorkoutPlans(updatedPlans);

@@ -1,6 +1,7 @@
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { WeeklyPlanView } from "@/components/workout/weekly-plan-view";
 import { useWorkout } from "@/hooks/use-workout";
@@ -87,10 +88,7 @@ const Profile = () => {
           </TabsContent>
 
           <TabsContent value="weekly">
-            <div className="text-center p-8">
-              <h3 className="text-lg font-semibold mb-2">Plano Semanal (Em manutenção)</h3>
-              <p className="text-muted-foreground">Funcionalidade temporariamente desabilitada</p>
-            </div>
+            <WeeklyPlanView />
           </TabsContent>
 
           <TabsContent value="plans">
@@ -109,6 +107,24 @@ const Profile = () => {
                     <div className="text-sm text-muted-foreground mb-2">
                       {plan.exercises.length} exercícios
                     </div>
+                    
+                    {/* Mostrar dias da semana se disponível */}
+                    {plan.daysOfWeek && plan.daysOfWeek.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {plan.daysOfWeek.map(day => {
+                          const dayNames = {
+                            monday: 'Seg', tuesday: 'Ter', wednesday: 'Qua',
+                            thursday: 'Qui', friday: 'Sex', saturday: 'Sáb', sunday: 'Dom'
+                          };
+                          return (
+                            <span key={day} className="border border-border rounded px-2 py-0.5 text-xs">
+                              {dayNames[day as keyof typeof dayNames]}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                    
                     <div className="text-xs text-muted-foreground mb-2">
                       {plan.exercises.map(id => getExerciseName(id)).slice(0, 3).join(', ')}
                       {plan.exercises.length > 3 && `, +${plan.exercises.length - 3} outros`}
