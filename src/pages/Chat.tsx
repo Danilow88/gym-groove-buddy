@@ -7,6 +7,7 @@ import { useChat } from "@/hooks/use-chat";
 import { useUserSearch } from "@/hooks/use-user-search";
 import { useAuth } from "@/hooks/use-auth";
 import { Send, MessageCircle } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Chat = () => {
   const { user } = useAuth();
@@ -15,6 +16,7 @@ const Chat = () => {
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const { toast } = useToast();
 
   const conversation = useMemo(() => (selectedPeerId ? getConversation(selectedPeerId) : []), [selectedPeerId, getConversation]);
 
@@ -24,7 +26,11 @@ const Chat = () => {
 
   const handleSend = async () => {
     if (!selectedPeerId || !message.trim()) return;
-    await sendMessage(selectedPeerId, message.trim());
+    const { error } = await sendMessage(selectedPeerId, message.trim());
+    if (error) {
+      toast({ title: "Falha ao enviar", description: error, variant: "destructive" });
+      return;
+    }
     setMessage("");
   };
 
