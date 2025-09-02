@@ -1,13 +1,27 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useEffect, useMemo, useState } from "react";
 
 interface VideoModalProps {
   isOpen: boolean;
   onClose: () => void;
   exerciseName: string;
   videoUrl: string;
+  fallbackUrl?: string;
 }
 
-export function VideoModal({ isOpen, onClose, exerciseName, videoUrl }: VideoModalProps) {
+export function VideoModal({ isOpen, onClose, exerciseName, videoUrl, fallbackUrl }: VideoModalProps) {
+  const [currentUrl, setCurrentUrl] = useState<string>(videoUrl);
+  const isYouTube = useMemo(() => currentUrl.includes('youtube.com') || currentUrl.includes('youtu.be'), [currentUrl]);
+
+  useEffect(() => {
+    setCurrentUrl(videoUrl);
+  }, [videoUrl]);
+
+  const onPlayerError = () => {
+    if (fallbackUrl && fallbackUrl !== currentUrl) {
+      setCurrentUrl(fallbackUrl);
+    }
+  };
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="bg-spotify-card border-border max-w-md mx-auto">
@@ -17,20 +31,22 @@ export function VideoModal({ isOpen, onClose, exerciseName, videoUrl }: VideoMod
         
         <div className="space-y-4">
           <div className="aspect-video bg-spotify-darker rounded-lg overflow-hidden">
-            {videoUrl.includes('youtube.com') ? (
+            {isYouTube ? (
               <iframe
-                src={videoUrl.replace('watch?v=', 'embed/')}
+                src={currentUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
                 className="w-full h-full"
                 frameBorder="0"
                 allowFullScreen
                 title={exerciseName}
+                onError={onPlayerError}
               />
             ) : (
               <video
-                src={videoUrl}
+                src={currentUrl}
                 controls
                 className="w-full h-full object-cover"
                 autoPlay
+                onError={onPlayerError}
               />
             )}
           </div>

@@ -85,6 +85,18 @@ const Workout = () => {
   };
 
   const selectedExerciseData = exercises.find(e => e.id === selectedExercise);
+  const genericFallbackByMuscle: Record<string, string> = {
+    Peito: 'https://www.youtube.com/watch?v=gRVjAtPip0Y',
+    Costas: 'https://www.youtube.com/watch?v=FWJR5Ve8bnQ',
+    Pernas: 'https://www.youtube.com/watch?v=C_VtOYc6j5c',
+    Ombros: 'https://www.youtube.com/watch?v=qEwKCR5JCog',
+    Bíceps: 'https://www.youtube.com/watch?v=kwG2ipFRgfo',
+    Tríceps: 'https://www.youtube.com/watch?v=vB5OHsJ3EME',
+    Abdômen: 'https://www.youtube.com/watch?v=jDwoBqPH0jk',
+    Glúteo: 'https://www.youtube.com/watch?v=8gUsckqcKhM',
+    Cardio: 'https://www.youtube.com/watch?v=c4DAnQ6DtF8',
+  };
+  const selectedFallbackUrl = selectedExerciseData ? genericFallbackByMuscle[selectedExerciseData.muscle] : undefined;
 
   return (
     <div className="min-h-screen bg-background pb-20">
@@ -233,6 +245,7 @@ const Workout = () => {
             onClose={() => setShowVideoModal(false)}
             exerciseName={selectedExerciseData.name}
             videoUrl={selectedExerciseData.videoUrl || ''}
+            fallbackUrl={selectedFallbackUrl}
           />
         </>
       )}
