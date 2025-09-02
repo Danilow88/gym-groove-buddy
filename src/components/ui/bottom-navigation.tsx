@@ -1,4 +1,4 @@
-import { Home, Dumbbell, History, User, Timer, Settings } from "lucide-react";
+import { Home, Dumbbell, History, User, Timer, Settings, MessageCircle, Calendar, StretchHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NavLink } from "react-router-dom";
 import { useAdminAuth } from "@/hooks/use-admin-auth";
@@ -6,6 +6,9 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 const baseNavigationItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Dumbbell, label: "Treino", path: "/workout" },
+  { icon: Calendar, label: "Agenda", path: "/schedule" },
+  { icon: MessageCircle, label: "Chat", path: "/chat" },
+  { icon: StretchHorizontal, label: "Mobilidade", path: "/mobility" },
   { icon: Timer, label: "Cronômetros", path: "/timers" },
   { icon: History, label: "Histórico", path: "/history" },
   { icon: User, label: "Perfil", path: "/profile" },

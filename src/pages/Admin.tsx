@@ -29,6 +29,9 @@ const Admin = () => {
   const [selectedMuscleGroup, setSelectedMuscleGroup] = useState('Todos');
   const [adminPassword, setAdminPassword] = useState('');
   const [exerciseSettings, setExerciseSettings] = useState<Record<string, { sets?: number; rest?: number; weight?: number }>>({});
+  const [planType, setPlanType] = useState<'daily'|'weekly'|'monthly'|'custom'>('daily');
+  const [periodStart, setPeriodStart] = useState('');
+  const [periodEnd, setPeriodEnd] = useState('');
 
   const handleAdminLogin = () => {
     const success = authenticateAdmin(adminPassword);
@@ -147,7 +150,8 @@ const Admin = () => {
         workoutName,
         selectedExercises,
         observations,
-        filteredSettings
+        filteredSettings,
+        { planType, periodStartDate: periodStart || undefined, periodEndDate: periodEnd || undefined }
       );
 
       if (success) {
@@ -162,6 +166,9 @@ const Admin = () => {
         setSelectedExercises([]);
         setObservations('');
         setExerciseSettings({});
+        setPlanType('daily');
+        setPeriodStart('');
+        setPeriodEnd('');
       }
     } catch (error) {
       toast({
@@ -277,6 +284,32 @@ const Admin = () => {
                 onChange={(e) => setWorkoutName(e.target.value)}
                 className="bg-spotify-surface border-border"
               />
+            </div>
+
+            {/* Plan Type and Period */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Tipo do Plano</label>
+                <Select value={planType} onValueChange={(v)=> setPlanType(v as any)}>
+                  <SelectTrigger className="bg-spotify-surface border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="bg-spotify-card border-border">
+                    <SelectItem value="daily">Diário</SelectItem>
+                    <SelectItem value="weekly">Semanal</SelectItem>
+                    <SelectItem value="monthly">Mensal</SelectItem>
+                    <SelectItem value="custom">Personalizado</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Início</label>
+                <input type="date" className="bg-spotify-surface border border-border rounded px-3 py-2 w-full" value={periodStart} onChange={(e)=> setPeriodStart(e.target.value)} />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-foreground mb-2 block">Fim</label>
+                <input type="date" className="bg-spotify-surface border border-border rounded px-3 py-2 w-full" value={periodEnd} onChange={(e)=> setPeriodEnd(e.target.value)} />
+              </div>
             </div>
 
             {/* Muscle Group Filter */}

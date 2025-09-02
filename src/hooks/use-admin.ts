@@ -12,6 +12,9 @@ export interface WorkoutPlan {
   createdBy: string;
   createdAt: Date;
   exerciseSettings?: Record<string, { sets: number; rest: number; weight: number }>;
+  planType?: 'daily' | 'weekly' | 'monthly' | 'custom';
+  periodStartDate?: string | null;
+  periodEndDate?: string | null;
 }
 
 export function useAdmin() {
@@ -64,7 +67,8 @@ export function useAdmin() {
     name: string,
     exercises: string[],
     observations: string,
-    exerciseSettings?: Record<string, { sets: number; rest: number; weight: number }>
+    exerciseSettings?: Record<string, { sets: number; rest: number; weight: number }>,
+    options?: { planType?: 'daily' | 'weekly' | 'monthly' | 'custom'; periodStartDate?: string; periodEndDate?: string }
   ) => {
     if (!isAdmin || !user) return false;
     
@@ -75,7 +79,10 @@ export function useAdmin() {
         name,
         exercises,
         observations,
-        created_by: user.id
+        created_by: user.id,
+        plan_type: options?.planType || 'daily',
+        period_start_date: options?.periodStartDate || null,
+        period_end_date: options?.periodEndDate || null
       }]).select().single();
 
       if (error) {
@@ -89,7 +96,10 @@ export function useAdmin() {
           observations,
           createdBy: user.email || 'Admin',
           createdAt: new Date(),
-          exerciseSettings: exerciseSettings || {}
+          exerciseSettings: exerciseSettings || {},
+          planType: options?.planType || 'daily',
+          periodStartDate: options?.periodStartDate || null,
+          periodEndDate: options?.periodEndDate || null
         };
         const updatedPlans = [newPlan, ...workoutPlans];
         setWorkoutPlans(updatedPlans);
@@ -106,7 +116,10 @@ export function useAdmin() {
         observations: data.observations || '',
         createdBy: user.email || 'Admin',
         createdAt: new Date(data.created_at),
-        exerciseSettings: exerciseSettings || {}
+        exerciseSettings: exerciseSettings || {},
+        planType: data.plan_type,
+        periodStartDate: data.period_start_date,
+        periodEndDate: data.period_end_date
       };
       const updatedPlans = [newPlan, ...workoutPlans];
       setWorkoutPlans(updatedPlans);
