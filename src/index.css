@@ -121,5 +121,13 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    margin: 0;
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
+
+/* Util classes mobile-friendly */
+.safe-bottom { padding-bottom: max(env(safe-area-inset-bottom), 16px); }
+.safe-top { padding-top: max(env(safe-area-inset-top), 0px); }
+.app-container { max-width: 640px; margin: 0 auto; }
