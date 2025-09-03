@@ -10,7 +10,8 @@ import { RestTimer } from "@/components/workout/rest-timer";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
 import { Play, Square, Filter, Timer, Download } from "lucide-react";
-import { downloadJson } from "@/lib/utils";
+import { downloadJson, downloadCsv } from "@/lib/utils";
+import { useAdmin } from "@/hooks/use-admin";
 import { useToast } from "@/hooks/use-toast";
 import { CountdownTimer } from "@/components/timer/countdown-timer";
 import { useAuth } from "@/hooks/use-auth";
@@ -37,6 +38,8 @@ const Workout = () => {
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { user } = useAuth();
+  const { getWorkoutPlansForUser } = useAdmin();
+  const [adminPlanForDay, setAdminPlanForDay] = useState<{ id: string; name: string; exercises: string[] } | null>(null);
   const { isAdminUser } = useAdminAuth();
   const canManage = isAdminUser;
 
@@ -74,6 +77,28 @@ const Workout = () => {
       setPlanInputs({});
     }
   }, [planStorageKey]);
+
+  // Load admin plan for the selected day (if exists by period) and prefill
+  useEffect(() => {
+    try {
+      if (!user?.id || !selectedDate) { setAdminPlanForDay(null); return; }
+      const plans = getWorkoutPlansForUser(user.id);
+      const day = selectedDate.toISOString().slice(0,10);
+      const match = plans.find(p => {
+        if (p.periodStartDate && p.periodEndDate) {
+          return day >= p.periodStartDate && day <= p.periodEndDate;
+        }
+        return true; // daily/custom
+      });
+      if (match) {
+        setAdminPlanForDay({ id: match.id, name: match.name, exercises: match.exercises });
+        // If user hasn't saved a plan for the day, show admin exercises as suggestion
+        if (savedPlanExercises.length === 0) setSavedPlanExercises(match.exercises);
+      } else {
+        setAdminPlanForDay(null);
+      }
+    } catch {}
+  }, [user?.id, selectedDate, getWorkoutPlansForUser]);
 
   // Prefill per-exercise settings from latest admin plan for this user if available
   useEffect(() => {
@@ -296,6 +321,29 @@ const Workout = () => {
               }}
             >
               <Download className="h-4 w-4 mr-1" /> Exportar
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-border"
+              onClick={() => {
+                const day = selectedDate ? selectedDate.toISOString().slice(0,10) : 'hoje';
+                const rows = (savedPlanExercises.length ? savedPlanExercises : selectedExerciseIds).map(id => {
+                  const ex = exercises.find(e=>e.id===id);
+                  const s = planInputs[id] || {};
+                  return {
+                    data: day,
+                    exercicio: ex?.name || id,
+                    musculo: ex?.muscle || '',
+                    series: s.sets ?? '',
+                    peso: s.weight ?? '',
+                    descanso_s: s.rest ?? '',
+                  };
+                });
+                downloadCsv(`treino-${day}.csv`, rows);
+              }}
+            >
+              <Download className="h-4 w-4 mr-1" /> CSV
             </Button>
           {isWorkoutActive && (
             <Button
