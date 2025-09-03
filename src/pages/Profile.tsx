@@ -261,6 +261,7 @@ const Profile = () => {
         </Card>
       </div>
 
+      <VideoModal isOpen={videoState.open} onClose={()=> setVideoState({ open: false, name: '', url: '' })} exerciseName={videoState.name} videoUrl={videoState.url} />
       <BottomNavigation />
     </div>
   );
