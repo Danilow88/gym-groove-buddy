@@ -106,6 +106,41 @@ export function useMobility() {
     return { error: null };
   }, [isAdminAuthenticated, load]);
 
-  return { loading, error, items, reload: load, create, remove };
+  const update = useCallback(async (id: string, payload: { title?: string; video_url?: string; description?: string }) => {
+    try {
+      if (isAdminAuthenticated) {
+        const { error } = await supabase.from('mobility_exercises').update(payload as any).eq('id', id);
+        if (error) throw error;
+        await load();
+        return { error: null };
+      }
+      // fallback local
+      setItems(prev => prev.map(i => i.id === id ? { ...i, ...payload } : i));
+      return { error: null };
+    } catch (e: any) {
+      // fallback local em caso de erro
+      setItems(prev => prev.map(i => i.id === id ? { ...i, ...payload } : i));
+      return { error: e.message as string };
+    }
+  }, [isAdminAuthenticated, load]);
+
+  const upload = useCallback(async (id: string, file: File) => {
+    try {
+      if (!user?.id) return { error: 'not_auth' };
+      const path = `mobility_videos/${id}/${Date.now()}_${file.name}`;
+      const { error: upErr } = await supabase.storage.from('exercise-videos').upload(path, file, { upsert: true });
+      if (upErr) return { error: upErr.message };
+      const { data: pub } = supabase.storage.from('exercise-videos').getPublicUrl(path);
+      const publicUrl = pub?.publicUrl;
+      if (publicUrl) {
+        await update(id, { video_url: publicUrl });
+      }
+      return { error: null, url: publicUrl };
+    } catch (e: any) {
+      return { error: e.message as string };
+    }
+  }, [user?.id, update]);
+
+  return { loading, error, items, reload: load, create, remove, update, upload };
 }
 

@@ -9,10 +9,12 @@ import { VideoModal } from "@/components/workout/video-modal";
 import { RestTimer } from "@/components/workout/rest-timer";
 import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useWorkout } from "@/hooks/use-workout";
-import { Play, Square, Filter, Timer } from "lucide-react";
+import { Play, Square, Filter, Timer, Download } from "lucide-react";
+import { downloadJson } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { CountdownTimer } from "@/components/timer/countdown-timer";
 import { useAuth } from "@/hooks/use-auth";
+import { useAdminAuth } from "@/hooks/use-admin-auth";
 
 const Workout = () => {
   const { 
@@ -35,6 +37,8 @@ const Workout = () => {
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { user } = useAuth();
+  const { isAdminUser, isAdminAuthenticated } = useAdminAuth();
+  const canManage = isAdminUser && isAdminAuthenticated;
 
   const planStorageKey = useMemo(() => {
     const uid = user?.id || 'guest';
@@ -274,6 +278,25 @@ const Workout = () => {
                 )}
               </>
             )}
+            {/* Exportar treino do dia (seleção salva + ajustes) */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-border"
+              onClick={() => {
+                const day = selectedDate ? selectedDate.toISOString().slice(0,10) : 'hoje';
+                const payload = {
+                  date: day,
+                  selectedExercises: selectedExerciseIds,
+                  savedPlanExercises,
+                  planSettings: planInputs,
+                  muscleGroup: selectedMuscleGroup,
+                };
+                downloadJson(`treino-${day}.json`, payload);
+              }}
+            >
+              <Download className="h-4 w-4 mr-1" /> Exportar
+            </Button>
           {isWorkoutActive && (
             <Button
               onClick={handleFinishWorkout}
@@ -287,7 +310,7 @@ const Workout = () => {
           )}
           </div>
         </div>
-        
+
         {/* Filter */}
         <div className="mt-4">
           <div className="flex items-center gap-2 mb-2">
@@ -395,8 +418,8 @@ const Workout = () => {
           const currentSets = getCurrentSetsForExercise(exercise.id);
           return (
             <div key={exercise.id}>
-              <ExerciseCard
-                exercise={exercise}
+            <ExerciseCard
+              exercise={exercise}
                 onAddSet={handleAddSet}
                 onPlayVideo={handlePlayVideo}
                 selectable={isSelecting}
@@ -404,14 +427,16 @@ const Workout = () => {
                 onToggleSelect={toggleSelectExercise}
               />
               {/* Admin quick edit for name and video URL / upload */}
-              <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
-                <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" defaultValue={exercise.name} onBlur={(e)=> updateExercise(exercise.id, { name: e.target.value })} />
-                <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" defaultValue={exercise.videoUrl} placeholder="URL do vídeo" onBlur={(e)=> updateExercise(exercise.id, { videoUrl: e.target.value })} />
-                <label className="text-xs text-foreground/80 inline-flex items-center gap-2">
-                  <span>Upload vídeo:</span>
-                  <input type="file" accept="video/*" onChange={async (e)=> { const f=e.target.files?.[0]; if (f) await uploadExerciseVideo(exercise.id, f); }} />
-                </label>
-              </div>
+              {canManage && (
+                <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" defaultValue={exercise.name} onBlur={(e)=> updateExercise(exercise.id, { name: e.target.value })} />
+                  <input className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm" defaultValue={exercise.videoUrl} placeholder="URL do vídeo" onBlur={(e)=> updateExercise(exercise.id, { videoUrl: e.target.value })} />
+                  <label className="text-xs text-foreground/80 inline-flex items-center gap-2">
+                    <span>Upload vídeo:</span>
+                    <input type="file" accept="video/*" onChange={async (e)=> { const f=e.target.files?.[0]; if (f) await uploadExerciseVideo(exercise.id, f); }} />
+                  </label>
+                </div>
+              )}
               
               {/* Current Sets */}
               {currentSets.length > 0 && (
@@ -429,11 +454,11 @@ const Workout = () => {
                           {set.weight}kg × {set.reps} reps
                         </span>
                       </div>
-                    ))}
-                  </div>
+          ))}
+        </div>
                 </div>
               )}
-            </div>
+              </div>
           );
         })}
       </div>
@@ -448,9 +473,9 @@ const Workout = () => {
       {/* Modals */}
       {selectedExerciseData && (
         <>
-          <AddSetModal
-            isOpen={showAddSetModal}
-            onClose={() => setShowAddSetModal(false)}
+      <AddSetModal
+        isOpen={showAddSetModal}
+        onClose={() => setShowAddSetModal(false)}
             exerciseName={selectedExerciseData.name}
             onAddSet={handleSetSubmit}
           />

@@ -2,6 +2,7 @@ import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWorkout } from "@/hooks/use-workout";
+import { useAdmin } from "@/hooks/use-admin";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import { Calendar, Dumbbell, Play } from "lucide-react";
@@ -12,8 +13,10 @@ import { CountdownTimer } from "@/components/timer/countdown-timer";
 
 const History = () => {
   const { workoutHistory, exercises } = useWorkout();
+  const { getWorkoutPlansForUser } = useAdmin();
   const { user } = useAuth();
   const [planned, setPlanned] = useState<Array<{ key: string; date: string; exerciseIds: string[]; notes?: string }>>([]);
+  const [adminPlans, setAdminPlans] = useState<Array<{ id: string; name: string; exercises: string[]; createdAt: Date }>>([]);
   const [videoState, setVideoState] = useState<{ open: boolean; name: string; url: string }>({ open: false, name: '', url: '' });
   const [inputs, setInputs] = useState<Record<string, { weight?: number; reps?: number; rest?: number }>>({});
   const [restVisible, setRestVisible] = useState<Record<string, boolean>>({});
@@ -50,6 +53,16 @@ const History = () => {
       // sort by date desc
       items.sort((a, b) => (new Date(b.date).getTime() - new Date(a.date).getTime()));
       setPlanned(items);
+    } catch {}
+    // Load admin-created plans for current user
+    try {
+      const uid = user?.id;
+      if (uid) {
+        const list = getWorkoutPlansForUser(uid) || [];
+        setAdminPlans(list.map(p => ({ id: p.id, name: p.name, exercises: p.exercises, createdAt: p.createdAt })));
+      } else {
+        setAdminPlans([]);
+      }
     } catch {}
   }, [user?.id]);
 
@@ -150,6 +163,25 @@ const History = () => {
               </Card>
             );
           })
+        )}
+
+        {adminPlans.length > 0 && (
+          <>
+            <h2 className="text-lg font-semibold text-foreground mt-6">Meus treinos montados pela Prof(a)</h2>
+            {adminPlans.map(plan => (
+              <Card key={plan.id} className="bg-gradient-card border-border p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <div className="font-medium text-foreground">{plan.name}</div>
+                    <div className="text-xs text-muted-foreground">{plan.exercises.length} exercícios • {plan.createdAt.toLocaleDateString('pt-BR')}</div>
+                  </div>
+                </div>
+                <div className="text-sm text-foreground/90">
+                  {plan.exercises.map(id => getExerciseName(id)).join(', ')}
+                </div>
+              </Card>
+            ))}
+          </>
         )}
 
         {/* Planned sessions from Planner */}

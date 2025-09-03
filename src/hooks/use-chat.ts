@@ -75,27 +75,24 @@ export function useChat() {
   useEffect(() => {
     if (!userId) return;
     loadMessages();
-    // subscribe to realtime changes
+    // subscribe to realtime INSERTs and append locally (menos latência)
     const channel = supabase.channel("chat_messages_changes");
     channel.on(
       "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "chat_messages",
-        filter: `sender_id=eq.${userId}`,
-      },
-      () => loadMessages()
-    );
-    channel.on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "chat_messages",
-        filter: `recipient_id=eq.${userId}`,
-      },
-      () => loadMessages()
+      { event: "INSERT", schema: "public", table: "chat_messages" },
+      (payload: any) => {
+        const m = payload?.new as ChatMessage | undefined;
+        if (!m) return;
+        if (m.sender_id === userId || m.recipient_id === userId) {
+          setMessages((prev) => {
+            // evitar duplicata: se já existir id, retorna prev
+            if (prev.some((p) => p.id === m.id)) return prev;
+            const next = [...prev, m];
+            next.sort((a, b) => a.created_at.localeCompare(b.created_at));
+            return next;
+          });
+        }
+      }
     );
     channel.subscribe();
     channelRef.current = channel;

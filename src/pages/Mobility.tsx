@@ -12,7 +12,7 @@ import { VideoModal } from "@/components/workout/video-modal";
 import { CountdownTimer } from "@/components/timer/countdown-timer";
 
 const Mobility = () => {
-  const { items, loading, create, remove } = useMobility();
+  const { items, loading, create, remove, update, upload } = useMobility();
   const { isAdminUser, isAdminAuthenticated } = useAdminAuth();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -72,7 +72,17 @@ const Mobility = () => {
             <Card key={ex.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-semibold">{ex.title}</div>
+                  <div className="font-semibold">
+                    {canManage ? (
+                      <input
+                        className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm w-full"
+                        defaultValue={ex.title}
+                        onBlur={(e)=> update(ex.id, { title: e.target.value })}
+                      />
+                    ) : (
+                      ex.title
+                    )}
+                  </div>
                   {ex.difficulty && (
                     <div className="text-xs text-muted-foreground capitalize">{ex.difficulty}</div>
                   )}
@@ -94,6 +104,20 @@ const Mobility = () => {
                 </div>
               </div>
               {ex.description && <div className="text-sm text-muted-foreground mt-2 whitespace-pre-wrap">{ex.description}</div>}
+              {canManage && (
+                <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <input
+                    className="rounded bg-spotify-surface border border-border px-2 py-1 text-sm"
+                    placeholder="URL do vídeo"
+                    defaultValue={ex.video_url || ''}
+                    onBlur={(e)=> update(ex.id, { video_url: e.target.value })}
+                  />
+                  <label className="text-xs text-foreground/80 inline-flex items-center gap-2">
+                    <span>Upload vídeo:</span>
+                    <input type="file" accept="video/*" onChange={async (e)=> { const f=e.target.files?.[0]; if (f) await upload(ex.id, f); }} />
+                  </label>
+                </div>
+              )}
               <div className="mt-3">
                 <CountdownTimer label="Cronômetro de mobilidade" defaultSeconds={60} minSeconds={15} maxSeconds={300} step={5} />
               </div>

@@ -11,7 +11,8 @@ import { useAdminAuth } from "@/hooks/use-admin-auth";
 import { useWorkout } from "@/hooks/use-workout";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
-import { UserPlus, CheckCircle, X, Trash2, Settings, Calendar } from "lucide-react";
+import { UserPlus, CheckCircle, X, Trash2, Settings, Calendar, Download } from "lucide-react";
+import { downloadJson } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
@@ -423,6 +424,26 @@ const Admin = () => {
               <Button variant="outline" size="sm" disabled>
                 <Calendar className="h-4 w-4 mr-2" />
                 Plano Semanal (Em manutenção)
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-border"
+                onClick={() => {
+                  const payload = {
+                    userId: selectedUserId,
+                    workoutName,
+                    observations,
+                    selectedExercises,
+                    exerciseSettings,
+                    planType,
+                    periodStart,
+                    periodEnd,
+                  };
+                  downloadJson(`plano-admin-${Date.now()}.json`, payload);
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" /> Exportar Plano
               </Button>
             </div>
           </div>

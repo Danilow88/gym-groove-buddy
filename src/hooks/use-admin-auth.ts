@@ -4,53 +4,39 @@ import { supabase } from '@/integrations/supabase/client';
 
 export function useAdminAuth() {
   const { user } = useAuth();
-  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(
-    () => {
-      // Verifica se já está autenticado no localStorage
-      const stored = localStorage.getItem('admin_authenticated');
-      return stored === 'true';
-    }
-  );
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
   const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
 
   const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'yaraka78@gmail.com';
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'dedunha571';
 
-  // Check if user is admin by checking against Supabase or fallback to env
+  // Check if user is admin and restore per-user admin session
   useEffect(() => {
-    const checkAdminStatus = async () => {
-      if (!user?.email) {
-        setIsAdminUser(false);
-        return;
-      }
-
-      try {
-        // Try to check admin status in Supabase profile or use email check
-        const isAdmin = user.email === adminEmail;
-        setIsAdminUser(isAdmin);
-      } catch (error) {
-        console.error('Error checking admin status:', error);
-        // Fallback to email check
-        setIsAdminUser(user.email === adminEmail);
-      }
-    };
-
-    checkAdminStatus();
+    if (!user?.email) {
+      setIsAdminUser(false);
+      setIsAdminAuthenticated(false);
+      return;
+    }
+    const isAdmin = user.email === adminEmail;
+    setIsAdminUser(isAdmin);
+    // Namespaced key by email to avoid leaking admin across accounts
+    const stored = localStorage.getItem(`admin_authenticated:${user.email}`);
+    setIsAdminAuthenticated(isAdmin && stored === 'true');
   }, [user?.email, adminEmail]);
 
   const authenticateAdmin = useCallback((password: string): boolean => {
-    if (password === adminPassword && isAdminUser) {
+    if (password === adminPassword && isAdminUser && user?.email) {
       setIsAdminAuthenticated(true);
-      localStorage.setItem('admin_authenticated', 'true');
+      localStorage.setItem(`admin_authenticated:${user.email}`, 'true');
       return true;
     }
     return false;
-  }, [adminPassword, isAdminUser]);
+  }, [adminPassword, isAdminUser, user?.email]);
 
   const logoutAdmin = useCallback(() => {
     setIsAdminAuthenticated(false);
-    localStorage.removeItem('admin_authenticated');
-  }, []);
+    if (user?.email) localStorage.removeItem(`admin_authenticated:${user.email}`);
+  }, [user?.email]);
 
   return {
     isAdminUser,
