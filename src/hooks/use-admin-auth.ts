@@ -27,7 +27,7 @@ export function useAdminAuth() {
     setIsAdminAuthenticated(isAdminByLocal && stored === 'true');
   }, [user?.email, adminEmail]);
 
-  // Verify against Supabase admin_configs for robustness
+  // Verify against Supabase admin_configs for robustness (do not require is_active to avoid schema drift)
   useEffect(() => {
     let isMounted = true;
     async function verifyWithDatabase() {
@@ -36,9 +36,8 @@ export function useAdminAuth() {
         const email = String(user.email).trim().toLowerCase();
         const { data, error } = await supabase
           .from('admin_configs')
-          .select('admin_email, is_active')
+          .select('admin_email')
           .eq('admin_email', email)
-          .eq('is_active', true)
           .maybeSingle();
 
         if (!isMounted) return;

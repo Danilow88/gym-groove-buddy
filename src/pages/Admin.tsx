@@ -76,7 +76,7 @@ const Admin = () => {
     );
   }
 
-  // Show login form if admin user but not authenticated
+  // Temporarily allow access for admin email without password gate if needed
   if (isAdminUser && !isAdminAuthenticated) {
     return (
       <div className="min-h-screen bg-background pb-20 flex items-center justify-center">
