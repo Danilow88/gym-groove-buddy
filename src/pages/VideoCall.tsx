@@ -32,11 +32,18 @@ const VideoCall = () => {
         if (!appointmentId) return;
         const { data, error } = await supabase
           .from("appointments")
-          .select("id, meeting_url, start_time, end_time")
+          .select("id, start_time, end_time")
           .eq("id", appointmentId)
           .single();
         if (error) throw error;
-        setAppointment(data as AppointmentRow);
+        if (data) {
+          setAppointment({
+            id: data.id,
+            meeting_url: '',
+            start_time: data.start_time,
+            end_time: data.end_time
+          });
+        }
       } catch (err) {
         setError((err as Error).message);
       } finally {

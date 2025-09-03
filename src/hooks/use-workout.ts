@@ -824,11 +824,17 @@ export function useWorkout() {
           .eq('user_id', user.id)
           .order('date', { ascending: false });
         if (data && !error) {
-          const transformedHistory = data.map(session => ({
+          const transformedHistory = data.map((session: any) => ({
             id: session.id,
             date: new Date(session.date),
             duration: session.duration || 0,
-            sets: session.workout_sets || []
+            sets: (session.workout_sets || []).map((set: any) => ({
+              id: set.id,
+              exerciseId: set.exercise_id,
+              reps: set.reps,
+              weight: set.weight,
+              timestamp: set.timestamp
+            }))
           }));
           setWorkoutHistory(transformedHistory);
         }

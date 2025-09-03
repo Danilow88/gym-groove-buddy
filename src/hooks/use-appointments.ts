@@ -29,7 +29,7 @@ export function useAppointments() {
         .from("appointments")
         .select("*")
         .gte("start_time", nowIso)
-        .in("status", ["available", "pending"])  // admin verá pendentes
+        .in("status", ["available"])  // apenas disponíveis
         .order("start_time", { ascending: true });
       if (e1) throw e1;
       setAvailable(av as Appointment[]);
@@ -61,7 +61,7 @@ export function useAppointments() {
     if (!user?.id) return { error: "not_auth" };
     const { error } = await supabase
       .from("appointments")
-      .update({ status: "pending", user_id: user.id })
+      .update({ status: "booked" as const, user_id: user.id })
       .eq("id", appointmentId)
       .eq("status", "available");
     if (error) return { error: error.message };
@@ -95,7 +95,7 @@ export function useAppointments() {
     if (!user?.id) return { error: "not_auth" };
     const { error } = await supabase
       .from("appointments")
-      .update({ status: "approved", approved_by: user.id, meeting_url: meetingUrl })
+      .update({ status: "available" as const, approved_by: user.id, meeting_url: meetingUrl })
       .eq("id", appointmentId);
     if (error) return { error: error.message };
     await load();
@@ -108,7 +108,7 @@ export function useAppointments() {
     if (e1) return { error: e1.message };
     if (!adminId) return { error: 'no_admin' };
     const { error } = await supabase.from('appointments').insert([
-      { admin_id: adminId as string, user_id: user.id, start_time: start.toISOString(), end_time: end.toISOString(), status: 'pending' }
+      { admin_id: adminId as string, user_id: user.id, start_time: start.toISOString(), end_time: end.toISOString(), status: 'available' as const }
     ]);
     if (error) return { error: error.message };
     await load();

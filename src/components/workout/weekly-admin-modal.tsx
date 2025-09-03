@@ -87,7 +87,7 @@ export function WeeklyAdminModal({ userId, userName, onSuccess }: WeeklyAdminMod
   };
 
   const handleAddExercise = (dayKey: string, exerciseId: string) => {
-    const exercise = mockExercises.find(ex => ex.id === exerciseId);
+    const exercise = exercises.find(ex => ex.id === exerciseId);
     if (!exercise) return;
 
     setWeeklyPlan(prev => ({

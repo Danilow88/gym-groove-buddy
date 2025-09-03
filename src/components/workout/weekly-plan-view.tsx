@@ -61,7 +61,10 @@ export function WeeklyPlanView() {
       if (error) {
         console.error('Erro ao carregar plano semanal:', error);
       } else {
-        setWeeklyPlan(data || []);
+        setWeeklyPlan((data || []).map(item => ({
+          ...item,
+          exercises: Array.isArray(item.exercises) ? item.exercises : []
+        })));
       }
     } catch (error) {
       console.error('Erro ao carregar plano semanal:', error);
@@ -81,7 +84,10 @@ export function WeeklyPlanView() {
       if (error) {
         console.error('Erro ao carregar treino de hoje:', error);
       } else {
-        setTodayWorkout(data?.[0] || null);
+        setTodayWorkout(data?.[0] ? {
+          ...data[0],
+          exercises: Array.isArray(data[0].exercises) ? data[0].exercises : []
+        } : null);
       }
     } catch (error) {
       console.error('Erro ao carregar treino de hoje:', error);
