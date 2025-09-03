@@ -129,7 +129,7 @@ const Profile = () => {
                     )}
                     <p className="text-xs text-muted-foreground mt-3 flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      Criado em: {plan.createdAt.toLocaleDateString('pt-BR')}
+                      Criado em: {plan.createdAt instanceof Date ? plan.createdAt.toLocaleDateString('pt-BR') : new Date(plan.createdAt).toLocaleDateString('pt-BR')}
                     </p>
                   </Card>
                 ))}

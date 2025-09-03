@@ -40,13 +40,13 @@ export function useAdmin() {
           id: row.id,
           userId: row.user_id,
           name: row.name,
-          exercises: row.exercises ?? [],
+          exercises: Array.isArray(row.exercises) ? row.exercises.map(String) : [],
           observations: row.observations ?? '',
           createdBy: row.created_by,
           createdAt: new Date(row.created_at),
-          planType: row.plan_type,
-          periodStartDate: row.period_start_date,
-          periodEndDate: row.period_end_date,
+          planType: 'daily',
+          periodStartDate: null,
+          periodEndDate: null,
         }));
         setWorkoutPlans(mapped);
         await saveWorkoutPlans(mapped);
@@ -89,10 +89,7 @@ export function useAdmin() {
           name,
           exercises,
           observations,
-          created_by: user.id,
-          plan_type: options?.planType || 'daily',
-          period_start_date: options?.periodStartDate || null,
-          period_end_date: options?.periodEndDate || null
+          created_by: user.id
         }]).select().single();
 
         if (!error && data) {
@@ -100,14 +97,14 @@ export function useAdmin() {
             id: data.id,
             userId: data.user_id,
             name: data.name,
-            exercises: data.exercises,
+            exercises: Array.isArray(data.exercises) ? data.exercises.map(String) : [],
             observations: data.observations || '',
             createdBy: user.email || 'Admin',
             createdAt: new Date(data.created_at),
             exerciseSettings: exerciseSettings || {},
-            planType: data.plan_type,
-            periodStartDate: data.period_start_date,
-            periodEndDate: data.period_end_date
+            planType: 'daily',
+            periodStartDate: null,
+            periodEndDate: null
           };
           const updatedPlans = [newPlan, ...workoutPlans];
           setWorkoutPlans(updatedPlans);

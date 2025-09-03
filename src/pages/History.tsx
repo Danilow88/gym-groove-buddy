@@ -173,7 +173,7 @@ const History = () => {
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <div className="font-medium text-foreground">{plan.name}</div>
-                    <div className="text-xs text-muted-foreground">{plan.exercises.length} exercícios • {plan.createdAt.toLocaleDateString('pt-BR')}</div>
+                    <div className="text-xs text-muted-foreground">{plan.exercises.length} exercícios • {plan.createdAt instanceof Date ? plan.createdAt.toLocaleDateString('pt-BR') : new Date(plan.createdAt).toLocaleDateString('pt-BR')}</div>
                   </div>
                 </div>
                 <div className="text-sm text-foreground/90">

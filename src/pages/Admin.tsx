@@ -483,7 +483,7 @@ const Admin = () => {
                         </p>
                       )}
                       <p className="text-xs text-muted-foreground mt-2">
-                        Criado em: {plan.createdAt.toLocaleDateString('pt-BR')}
+                        Criado em: {plan.createdAt instanceof Date ? plan.createdAt.toLocaleDateString('pt-BR') : new Date(plan.createdAt).toLocaleDateString('pt-BR')}
                       </p>
                     </div>
                     <Button
