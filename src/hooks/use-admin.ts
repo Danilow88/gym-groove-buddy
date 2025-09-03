@@ -44,9 +44,10 @@ export function useAdmin() {
           observations: row.observations ?? '',
           createdBy: row.created_by,
           createdAt: new Date(row.created_at),
-          planType: 'daily',
-          periodStartDate: null,
-          periodEndDate: null,
+          planType: row.plan_type || 'daily',
+          periodStartDate: row.period_start_date || null,
+          periodEndDate: row.period_end_date || null,
+          exerciseSettings: row.exercise_settings || undefined,
         }));
         setWorkoutPlans(mapped);
         await saveWorkoutPlans(mapped);
@@ -104,7 +105,8 @@ export function useAdmin() {
           created_by: user.id,
           plan_type: options?.planType || 'daily',
           period_start_date: options?.periodStartDate || null,
-          period_end_date: options?.periodEndDate || null
+          period_end_date: options?.periodEndDate || null,
+          exercise_settings: exerciseSettings || null
         }]).select().single();
 
         if (!error && data) {

@@ -146,6 +146,7 @@ const Profile = () => {
                         const ex = getExercise(id);
                         const key = `${plan.id}_${id}`;
                         const inp = planInputs[key] || {};
+                        const adminDefaults = (plan as any).exerciseSettings?.[id] || {};
                         return (
                           <div key={id} className="bg-spotify-surface border border-border rounded p-3">
                             <div className="flex items-center justify-between">
@@ -157,9 +158,23 @@ const Profile = () => {
                               )}
                             </div>
                             <div className="grid grid-cols-3 gap-2 mt-2">
-                              <input className="rounded bg-background border border-border px-2 py-1 text-sm" placeholder="Séries" type="number" value={inp.sets ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [key]: { ...prev[key], sets: Number(e.target.value)||0 } }))} />
-                              <input className="rounded bg-background border border-border px-2 py-1 text-sm" placeholder="Peso (kg)" type="number" value={inp.weight ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [key]: { ...prev[key], weight: Number(e.target.value)||0 } }))} />
-                              <input className="rounded bg-background border border-border px-2 py-1 text-sm" placeholder="Descanso (s)" type="number" value={inp.rest ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [key]: { ...prev[key], rest: Number(e.target.value)||0 } }))} />
+                              <div>
+                                <div className="text-[10px] text-muted-foreground mb-1">Admin (séries)</div>
+                                <input disabled className="w-full rounded bg-spotify-surface border border-border px-2 py-1 text-xs" value={adminDefaults.sets ?? ''} />
+                              </div>
+                              <div>
+                                <div className="text-[10px] text-muted-foreground mb-1">Admin (peso)</div>
+                                <input disabled className="w-full rounded bg-spotify-surface border border-border px-2 py-1 text-xs" value={adminDefaults.weight ?? ''} />
+                              </div>
+                              <div>
+                                <div className="text-[10px] text-muted-foreground mb-1">Admin (descanso s)</div>
+                                <input disabled className="w-full rounded bg-spotify-surface border border-border px-2 py-1 text-xs" value={adminDefaults.rest ?? ''} />
+                              </div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-2 mt-2">
+                              <input className="rounded bg-background border border-border px-2 py-1 text-sm" placeholder="Minhas Séries" type="number" value={inp.sets ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [key]: { ...prev[key], sets: Number(e.target.value)||0 } }))} />
+                              <input className="rounded bg-background border border-border px-2 py-1 text-sm" placeholder="Meu Peso (kg)" type="number" value={inp.weight ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [key]: { ...prev[key], weight: Number(e.target.value)||0 } }))} />
+                              <input className="rounded bg-background border border-border px-2 py-1 text-sm" placeholder="Meu Descanso (s)" type="number" value={inp.rest ?? ''} onChange={(e)=> setPlanInputs(prev=> ({ ...prev, [key]: { ...prev[key], rest: Number(e.target.value)||0 } }))} />
                             </div>
                             <div className="flex items-center gap-2 mt-2">
                               <Button size="sm" className="bg-spotify-green" onClick={()=> savePlanSettings(plan.id, id)}>
