@@ -33,11 +33,27 @@ export function useAdmin() {
   const loadWorkoutPlans = async () => {
     setLoading(true);
     try {
-      // For now, we'll use localStorage as a fallback since we can't access the DB directly
-      const stored = localStorage.getItem('admin_workout_plans');
-      if (stored) {
-        const plans = JSON.parse(stored);
-        setWorkoutPlans(plans);
+      // Try fetch from Supabase first
+      const { data, error } = await supabase.from('workout_plans').select('*').order('created_at', { ascending: false });
+      if (!error && data) {
+        const mapped: WorkoutPlan[] = data.map((row: any) => ({
+          id: row.id,
+          userId: row.user_id,
+          name: row.name,
+          exercises: row.exercises ?? [],
+          observations: row.observations ?? '',
+          createdBy: row.created_by,
+          createdAt: new Date(row.created_at),
+          planType: row.plan_type,
+          periodStartDate: row.period_start_date,
+          periodEndDate: row.period_end_date,
+        }));
+        setWorkoutPlans(mapped);
+        await saveWorkoutPlans(mapped);
+      } else {
+        // Fallback local
+        const stored = localStorage.getItem('admin_workout_plans');
+        if (stored) setWorkoutPlans(JSON.parse(stored));
       }
     } catch (error) {
       console.error('Error loading workout plans:', error);

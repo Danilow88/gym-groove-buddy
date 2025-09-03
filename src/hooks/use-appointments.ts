@@ -29,7 +29,7 @@ export function useAppointments() {
         .from("appointments")
         .select("*")
         .gte("start_time", nowIso)
-        .eq("status", "available")
+        .in("status", ["available", "pending"])  // admin verá pendentes
         .order("start_time", { ascending: true });
       if (e1) throw e1;
       setAvailable(av as Appointment[]);

@@ -19,6 +19,7 @@ export function useChat() {
   const [error, setError] = useState<string | null>(null);
   const [selectedPeerId, setSelectedPeerId] = useState<string | null>(null);
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
+  const [userIdToEmail, setUserIdToEmail] = useState<Record<string, string>>({});
 
   const peers = useMemo(() => {
     const unique = new Map<string, { peerId: string; lastMessageAt: string; lastMessage: string }>();
@@ -29,7 +30,32 @@ export function useChat() {
         unique.set(peerId, { peerId, lastMessageAt: m.created_at, lastMessage: m.content });
       }
     }
-    return Array.from(unique.values()).sort((a, b) => b.lastMessageAt.localeCompare(a.lastMessageAt));
+    const arr = Array.from(unique.values()).sort((a, b) => b.lastMessageAt.localeCompare(a.lastMessageAt));
+    return arr.map((p) => ({ ...p, email: userIdToEmail[p.peerId] } as any));
+  }, [messages, userId, userIdToEmail]);
+
+  // Load emails for peers
+  useEffect(() => {
+    const ids = Array.from(
+      new Set(
+        messages
+          .map((m) => (m.sender_id === userId ? m.recipient_id : m.sender_id))
+          .filter(Boolean)
+      )
+    );
+    if (ids.length === 0) return;
+    (async () => {
+      try {
+        const { data, error } = await (supabase as any)
+          .from('auth.users')
+          .select('id, email')
+          .in('id', ids);
+        if (error) return;
+        const map: Record<string, string> = {};
+        for (const u of data || []) map[u.id] = u.email;
+        setUserIdToEmail((prev) => ({ ...prev, ...map }));
+      } catch {}
+    })();
   }, [messages, userId]);
 
   const loadMessages = useCallback(async () => {
@@ -112,6 +138,7 @@ export function useChat() {
     getConversation,
     sendMessage,
     reload: loadMessages,
+    userIdToEmail,
   };
 }
 

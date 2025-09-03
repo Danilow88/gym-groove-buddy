@@ -80,13 +80,13 @@ const Chat = () => {
           <Card className="p-4 md:col-span-1">
             <h2 className="font-semibold mb-3">Conversas</h2>
             <div className="space-y-1 max-h-80 overflow-auto">
-              {peers.map((p) => (
+              {peers.map((p: any) => (
                 <button
                   key={p.peerId}
                   className={`w-full text-left p-2 rounded-md hover:bg-spotify-surface ${selectedPeerId === p.peerId ? "bg-spotify-surface" : ""}`}
                   onClick={() => setSelectedPeerId(p.peerId)}
                 >
-                  <div className="text-sm font-medium">{p.peerId}</div>
+                  <div className="text-sm font-medium">{p.email || p.peerId}</div>
                   <div className="text-xs text-muted-foreground truncate">{p.lastMessage}</div>
                 </button>
               ))}
