@@ -23,14 +23,14 @@ export function BottomNavigation() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-spotify-card border-t border-border backdrop-blur-lg z-50 safe-bottom">
-      <div className="flex items-center justify-around py-2 px-4 app-container">
+      <div className="app-container py-2 px-2 grid grid-cols-5 gap-1 items-center justify-items-center md:flex md:items-center md:justify-around md:px-4">
         {navigationItems.map((item) => (
           <NavLink
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
               cn(
-                "flex flex-col items-center py-2 px-3 rounded-lg transition-all duration-300",
+                "flex flex-col items-center py-1 px-2 md:py-2 md:px-3 rounded-lg transition-all duration-300",
                 "hover:bg-spotify-surface",
                 isActive
                   ? "text-spotify-green scale-105"
@@ -38,8 +38,8 @@ export function BottomNavigation() {
               )
             }
           >
-            <item.icon className="h-5 w-5 mb-1" />
-            <span className="text-xs font-medium">{item.label}</span>
+            <item.icon className="h-5 w-5 mb-0.5 md:mb-1" />
+            <span className="text-[10px] md:text-xs font-medium">{item.label}</span>
           </NavLink>
         ))}
       </div>
