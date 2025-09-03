@@ -152,22 +152,22 @@ const Profile = () => {
                             <div className="flex items-center justify-between">
                               <div className="font-medium text-foreground">{ex?.name || id}</div>
                               {ex?.videoUrl && (
-                                <Button size="sm" className="bg-spotify-green" onClick={()=> setVideoState({ open: true, name: ex?.name || '', url: ex?.videoUrl || '' })}>
+                                <Button size="sm" className="bg-spotify-green" onClick={(e)=> { e.preventDefault(); setVideoState({ open: true, name: ex?.name || '', url: ex?.videoUrl || '' }); }}>
                                   <Play className="h-4 w-4 mr-1" /> Vídeo
                                 </Button>
                               )}
                             </div>
                             <div className="grid grid-cols-3 gap-2 mt-2">
                               <div>
-                                <div className="text-[10px] text-muted-foreground mb-1">Admin (séries)</div>
+                                <div className="text-[10px] text-muted-foreground mb-1">Personal (séries)</div>
                                 <input disabled className="w-full rounded bg-spotify-surface border border-border px-2 py-1 text-xs" value={adminDefaults.sets ?? ''} />
                               </div>
                               <div>
-                                <div className="text-[10px] text-muted-foreground mb-1">Admin (peso)</div>
+                                <div className="text-[10px] text-muted-foreground mb-1">Personal (peso)</div>
                                 <input disabled className="w-full rounded bg-spotify-surface border border-border px-2 py-1 text-xs" value={adminDefaults.weight ?? ''} />
                               </div>
                               <div>
-                                <div className="text-[10px] text-muted-foreground mb-1">Admin (descanso s)</div>
+                                <div className="text-[10px] text-muted-foreground mb-1">Personal (descanso s)</div>
                                 <input disabled className="w-full rounded bg-spotify-surface border border-border px-2 py-1 text-xs" value={adminDefaults.rest ?? ''} />
                               </div>
                             </div>
@@ -185,7 +185,14 @@ const Profile = () => {
                               </Button>
                             </div>
                             {restVisible[key] && (
-                              <div className="pt-2"><CountdownTimer label="Descanso" defaultSeconds={planInputs[key]?.rest || 60} minSeconds={15} maxSeconds={300} step={5} /></div>
+                              <div className="pt-2">
+                                <CountdownTimer label="Descanso" defaultSeconds={planInputs[key]?.rest || 60} minSeconds={15} maxSeconds={300} step={5} onFinish={()=> {
+                                  try {
+                                    const audio = new Audio('/alarm.mp3');
+                                    audio.play().catch(()=>{});
+                                  } catch {}
+                                }} />
+                              </div>
                             )}
                           </div>
                         );

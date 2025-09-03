@@ -10,6 +10,7 @@ interface CountdownTimerProps {
   minSeconds?: number;
   maxSeconds?: number;
   step?: number;
+  onFinish?: () => void;
 }
 
 export function CountdownTimer({
@@ -18,6 +19,7 @@ export function CountdownTimer({
   minSeconds = 10,
   maxSeconds = 600,
   step = 5,
+  onFinish,
 }: CountdownTimerProps) {
   const [duration, setDuration] = useState<number>(defaultSeconds);
   const [remaining, setRemaining] = useState<number>(defaultSeconds);
@@ -34,6 +36,7 @@ export function CountdownTimer({
       if (nextRemaining === 0) {
         setIsRunning(false);
         if (intervalRef.current) window.clearInterval(intervalRef.current);
+        try { onFinish && onFinish(); } catch {}
       }
     };
     intervalRef.current = window.setInterval(tick, 250);
