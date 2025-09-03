@@ -479,6 +479,64 @@ USING (
 );
 
 -- ========================================
+-- FUNÇÕES DE SUPORTE AO CHAT E ADMIN (RPC)
+-- ========================================
+
+-- Função segura para buscar usuários por nome/email
+-- Evita erro de permissão usando SECURITY DEFINER
+CREATE OR REPLACE FUNCTION public.search_users(search_term text)
+RETURNS TABLE(id uuid, email text, full_name text)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT 
+    au.id,
+    au.email,
+    p.full_name
+  FROM auth.users au
+  LEFT JOIN public.profiles p ON au.id = p.user_id
+  WHERE 
+    au.email ILIKE '%' || search_term || '%' OR
+    p.full_name ILIKE '%' || search_term || '%'
+  LIMIT 10;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.search_users(text) TO anon, authenticated;
+
+-- Função segura para obter emails a partir de uma lista de IDs
+CREATE OR REPLACE FUNCTION public.get_user_emails(user_ids uuid[])
+RETURNS TABLE(id uuid, email text, full_name text)
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT 
+    au.id,
+    au.email,
+    p.full_name
+  FROM auth.users au
+  LEFT JOIN public.profiles p ON au.id = p.user_id
+  WHERE au.id = ANY(user_ids);
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_user_emails(uuid[]) TO anon, authenticated;
+
+-- Recriar get_default_admin_id com SECURITY DEFINER explícito e grant
+CREATE OR REPLACE FUNCTION public.get_default_admin_id()
+RETURNS UUID
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT id FROM auth.users WHERE email = (
+    SELECT admin_email FROM public.admin_configs WHERE is_active = true ORDER BY created_at ASC LIMIT 1
+  ) LIMIT 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_default_admin_id() TO anon, authenticated;
+
+-- ========================================
 -- MOBILIDADE: EXERCÍCIOS DE MOBILIDADE
 -- ========================================
 
