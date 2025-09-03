@@ -7,7 +7,7 @@ export function useAdminAuth() {
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(false);
   const [isAdminUser, setIsAdminUser] = useState<boolean>(false);
 
-  const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'yaraka78@gmail.com';
+  const adminEmail = (import.meta.env.VITE_ADMIN_EMAIL || 'yaraka78@gmail.com');
   const adminPassword = import.meta.env.VITE_ADMIN_PASSWORD || 'dedunha571';
 
   // Check if user is admin and restore per-user admin session
@@ -17,19 +17,47 @@ export function useAdminAuth() {
       setIsAdminAuthenticated(false);
       return;
     }
-    const forced = localStorage.getItem(`force_admin:${user.email}`) === 'true';
-    const isAdmin = forced || user.email === adminEmail;
-    setIsAdminUser(isAdmin);
-    // Namespaced key by email to avoid leaking admin across accounts
-    const stored = localStorage.getItem(`admin_authenticated:${user.email}`);
-    setIsAdminAuthenticated(isAdmin && stored === 'true');
+    const normalizedUserEmail = String(user.email).trim().toLowerCase();
+    const normalizedAdminEmail = String(adminEmail).trim().toLowerCase();
+    const forced = localStorage.getItem(`force_admin:${normalizedUserEmail}`) === 'true';
+    const isEmailMatchAdmin = normalizedUserEmail === normalizedAdminEmail;
+    const isAdminByLocal = forced || isEmailMatchAdmin;
+    setIsAdminUser(isAdminByLocal);
+    const stored = localStorage.getItem(`admin_authenticated:${normalizedUserEmail}`);
+    setIsAdminAuthenticated(isAdminByLocal && stored === 'true');
   }, [user?.email, adminEmail]);
+
+  // Verify against Supabase admin_configs for robustness
+  useEffect(() => {
+    let isMounted = true;
+    async function verifyWithDatabase() {
+      if (!user?.email) return;
+      try {
+        const email = String(user.email).trim().toLowerCase();
+        const { data, error } = await supabase
+          .from('admin_configs')
+          .select('admin_email, is_active')
+          .eq('admin_email', email)
+          .eq('is_active', true)
+          .maybeSingle();
+
+        if (!isMounted) return;
+        if (!error && data) {
+          setIsAdminUser(true);
+        }
+      } catch {
+        // No-op: fall back to local checks above
+      }
+    }
+    verifyWithDatabase();
+    return () => { isMounted = false; };
+  }, [user?.email]);
 
   const authenticateAdmin = useCallback((password: string): boolean => {
     if (password === adminPassword && user?.email) {
-      // Permitir promover o usuário atual a admin localmente
-      localStorage.setItem(`force_admin:${user.email}`, 'true');
-      localStorage.setItem(`admin_authenticated:${user.email}`, 'true');
+      const emailKey = String(user.email).trim().toLowerCase();
+      localStorage.setItem(`force_admin:${emailKey}`, 'true');
+      localStorage.setItem(`admin_authenticated:${emailKey}`, 'true');
       setIsAdminUser(true);
       setIsAdminAuthenticated(true);
       return true;
@@ -40,8 +68,9 @@ export function useAdminAuth() {
   const logoutAdmin = useCallback(() => {
     setIsAdminAuthenticated(false);
     if (user?.email) {
-      localStorage.removeItem(`admin_authenticated:${user.email}`);
-      localStorage.removeItem(`force_admin:${user.email}`);
+      const emailKey = String(user.email).trim().toLowerCase();
+      localStorage.removeItem(`admin_authenticated:${emailKey}`);
+      localStorage.removeItem(`force_admin:${emailKey}`);
     }
   }, [user?.email]);
 
