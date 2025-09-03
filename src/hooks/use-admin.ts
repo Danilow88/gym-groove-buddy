@@ -142,7 +142,50 @@ export function useAdmin() {
     return workoutPlans.filter(plan => plan.userId === userId);
   }, [workoutPlans]);
   
-    const deleteWorkoutPlan = useCallback(async (planId: string) => {
+  const updateWorkoutPlan = useCallback(async (
+    planId: string,
+    fields: Partial<{
+      name: string;
+      exercises: string[];
+      observations: string;
+      planType: 'daily' | 'weekly' | 'monthly' | 'custom';
+      periodStartDate: string | null;
+      periodEndDate: string | null;
+    }>
+  ) => {
+    try {
+      const payload: any = {};
+      if (fields.name !== undefined) payload.name = fields.name;
+      if (fields.exercises !== undefined) payload.exercises = fields.exercises;
+      if (fields.observations !== undefined) payload.observations = fields.observations;
+      if (fields.planType !== undefined) payload.plan_type = fields.planType;
+      if (fields.periodStartDate !== undefined) payload.period_start_date = fields.periodStartDate;
+      if (fields.periodEndDate !== undefined) payload.period_end_date = fields.periodEndDate;
+
+      if (Object.keys(payload).length > 0) {
+        const { error } = await supabase.from('workout_plans').update(payload).eq('id', planId);
+        if (error) console.error('Supabase update failed, applying local fallback:', error);
+      }
+
+      const updated = workoutPlans.map(p => p.id === planId ? {
+        ...p,
+        name: fields.name ?? p.name,
+        exercises: fields.exercises ?? p.exercises,
+        observations: fields.observations ?? p.observations,
+        planType: (fields.planType ?? p.planType) as any,
+        periodStartDate: fields.periodStartDate ?? p.periodStartDate ?? null,
+        periodEndDate: fields.periodEndDate ?? p.periodEndDate ?? null,
+      } : p);
+      setWorkoutPlans(updated);
+      await saveWorkoutPlans(updated);
+      return true;
+    } catch (e) {
+      console.error('Error updating workout plan:', e);
+      return false;
+    }
+  }, [workoutPlans]);
+
+  const deleteWorkoutPlan = useCallback(async (planId: string) => {
     if (!isAdmin) return false;
 
     try {
@@ -170,6 +213,7 @@ export function useAdmin() {
     workoutPlans,
     loading,
     createWorkoutPlan,
+    updateWorkoutPlan,
     getWorkoutPlansForUser,
     deleteWorkoutPlan,
     loadWorkoutPlans
