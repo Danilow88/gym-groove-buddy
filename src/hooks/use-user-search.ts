@@ -19,40 +19,24 @@ export function useUserSearch() {
 
     setLoading(true);
     try {
-      // Search in profiles table for real users and use user_id as the chat peer id
-      // Try auth.users by email prefix
-      const { data: byEmail, error: e1 } = await (supabase as any)
-        .from('auth.users')
-        .select('id, email')
-        .ilike('email', `${query}%`)
-        .limit(10);
-
-      // Then profiles by name
+      // Search only in profiles table since we can't access auth.users directly
       const { data: profiles, error: e2 } = await supabase
         .from('profiles')
         .select('user_id, full_name')
-        .ilike('full_name', `%${query}%`)
+        .or(`full_name.ilike.%${query}%`)
         .limit(10);
 
-      if (e1 && e2) {
-        console.error('Error searching users:', e1 || e2);
+      if (e2) {
+        console.error('Error searching users:', e2);
         setUsers([]);
         return;
       }
 
-      const emailMapped: UserProfile[] = (byEmail ?? []).map((u: any) => ({ id: u.id, email: u.email, full_name: null }));
       const profileMapped: UserProfile[] = (profiles ?? [])
         .map((p: any) => ({ id: p.user_id, full_name: p.full_name ?? null }))
         .filter((u) => Boolean(u.id));
 
-      // Merge unique by id, prioritize email if present
-      const map = new Map<string, UserProfile>();
-      for (const u of [...emailMapped, ...profileMapped]) {
-        map.set(u.id, { ...map.get(u.id), ...u } as UserProfile);
-      }
-      const mapped = Array.from(map.values());
-
-      setUsers(mapped);
+      setUsers(profileMapped);
     } catch (error) {
       console.error('Error searching users:', error);
       setUsers([]);

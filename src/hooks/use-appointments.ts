@@ -8,9 +8,10 @@ export interface Appointment {
   user_id: string | null;
   start_time: string;
   end_time: string;
-  status: "available" | "pending" | "approved" | "cancelled";
+  status: "available" | "booked" | "cancelled";
   meeting_url?: string | null;
-  approved_by?: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export function useAppointments() {
@@ -95,7 +96,7 @@ export function useAppointments() {
     if (!user?.id) return { error: "not_auth" };
     const { error } = await supabase
       .from("appointments")
-      .update({ status: "available" as const, approved_by: user.id, meeting_url: meetingUrl })
+      .update({ meeting_url: meetingUrl })
       .eq("id", appointmentId);
     if (error) return { error: error.message };
     await load();
@@ -108,7 +109,7 @@ export function useAppointments() {
     if (e1) return { error: e1.message };
     if (!adminId) return { error: 'no_admin' };
     const { error } = await supabase.from('appointments').insert([
-      { admin_id: adminId as string, user_id: user.id, start_time: start.toISOString(), end_time: end.toISOString(), status: 'available' as const }
+      { admin_id: adminId as string, user_id: user.id, start_time: start.toISOString(), end_time: end.toISOString(), status: 'booked' as const }
     ]);
     if (error) return { error: error.message };
     await load();

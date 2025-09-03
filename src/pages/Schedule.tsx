@@ -28,8 +28,8 @@ const Schedule = () => {
   const [meetingUrl, setMeetingUrl] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
-  const pending = useMemo(() => mine.filter((a) => a.status === "pending"), [mine]);
-  const approved = useMemo(() => mine.filter((a) => a.status === "approved"), [mine]);
+  const pending = useMemo(() => mine.filter((a) => a.status === "booked"), [mine]);
+  const approved = useMemo(() => mine.filter((a) => a.status === "available" && a.meeting_url), [mine]);
 
   const availableByDate = useMemo(() => {
     const map = new Map<string, typeof available>();

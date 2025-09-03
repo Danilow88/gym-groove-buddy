@@ -38,40 +38,71 @@ export type Database = {
         }
         Relationships: []
       }
-      exercise_videos: {
+      appointments: {
         Row: {
+          admin_id: string
           created_at: string
-          exercise_id: string
+          end_time: string
           id: string
-          storage_path: string | null
-          uploaded_by: string
-          video_url: string | null
+          meeting_url: string | null
+          start_time: string
+          status: string
+          updated_at: string
+          user_id: string | null
         }
         Insert: {
+          admin_id: string
           created_at?: string
-          exercise_id: string
+          end_time: string
           id?: string
-          storage_path?: string | null
-          uploaded_by: string
-          video_url?: string | null
+          meeting_url?: string | null
+          start_time: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Update: {
+          admin_id?: string
           created_at?: string
-          exercise_id?: string
+          end_time?: string
           id?: string
-          storage_path?: string | null
-          uploaded_by?: string
-          video_url?: string | null
+          meeting_url?: string | null
+          start_time?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "exercise_videos_uploaded_by_fkey"
-            columns: ["uploaded_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: number
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: never
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: never
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       profiles: {
         Row: {
@@ -99,175 +130,6 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
-      }
-      workout_plans: {
-        Row: {
-          created_at: string
-          created_by: string
-          days_of_week: string[] | null
-          exercises: Json
-          id: string
-          is_weekly_plan: boolean | null
-          name: string
-          observations: string | null
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          created_by: string
-          days_of_week?: string[] | null
-          exercises?: Json
-          id?: string
-          is_weekly_plan?: boolean | null
-          name: string
-          observations?: string | null
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          created_by?: string
-          days_of_week?: string[] | null
-          exercises?: Json
-          id?: string
-          is_weekly_plan?: boolean | null
-          name?: string
-          observations?: string | null
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workout_plans_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "workout_plans_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      workout_sessions: {
-        Row: {
-          created_at: string
-          date: string
-          duration: number | null
-          id: string
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          date?: string
-          duration?: number | null
-          id?: string
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          date?: string
-          duration?: number | null
-          id?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workout_sessions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      workout_sets: {
-        Row: {
-          exercise_id: string
-          id: string
-          reps: number
-          session_id: string
-          timestamp: string
-          weight: number
-        }
-        Insert: {
-          exercise_id: string
-          id?: string
-          reps?: number
-          session_id: string
-          timestamp?: string
-          weight?: number
-        }
-        Update: {
-          exercise_id?: string
-          id?: string
-          reps?: number
-          session_id?: string
-          timestamp?: string
-          weight?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "workout_sets_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "workout_sessions"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      appointments: {
-        Row: {
-          admin_id: string
-          created_at: string
-          end_time: string
-          id: string
-          start_time: string
-          status: "available" | "booked" | "cancelled"
-          updated_at: string
-          user_id: string | null
-        }
-        Insert: {
-          admin_id: string
-          created_at?: string
-          end_time: string
-          id?: string
-          start_time: string
-          status?: "available" | "booked" | "cancelled"
-          updated_at?: string
-          user_id?: string | null
-        }
-        Update: {
-          admin_id?: string
-          created_at?: string
-          end_time?: string
-          id?: string
-          start_time?: string
-          status?: "available" | "booked" | "cancelled"
-          updated_at?: string
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "appointments_admin_id_fkey"
-            columns: ["admin_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "appointments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
       }
       weekly_workout_details: {
         Row: {
@@ -310,7 +172,105 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "workout_plans"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      workout_plans: {
+        Row: {
+          created_at: string
+          created_by: string
+          days_of_week: string[] | null
+          exercises: Json
+          id: string
+          is_weekly_plan: boolean | null
+          name: string
+          observations: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          days_of_week?: string[] | null
+          exercises?: Json
+          id?: string
+          is_weekly_plan?: boolean | null
+          name: string
+          observations?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          days_of_week?: string[] | null
+          exercises?: Json
+          id?: string
+          is_weekly_plan?: boolean | null
+          name?: string
+          observations?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workout_sessions: {
+        Row: {
+          created_at: string
+          date: string
+          duration: number | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          duration?: number | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          duration?: number | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      workout_sets: {
+        Row: {
+          exercise_id: string
+          id: string
+          reps: number
+          session_id: string
+          timestamp: string
+          weight: number
+        }
+        Insert: {
+          exercise_id: string
+          id?: string
+          reps?: number
+          session_id: string
+          timestamp?: string
+          weight?: number
+        }
+        Update: {
+          exercise_id?: string
+          id?: string
+          reps?: number
+          session_id?: string
+          timestamp?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_sets_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "workout_sessions"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -318,66 +278,60 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_user_workout_plans: {
+      create_weekly_workout_plan: {
         Args: {
+          plan_name: string
+          plan_observations?: string
           target_user_id: string
+          weekly_schedule?: Json
         }
+        Returns: string
+      }
+      get_default_admin_id: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      get_today_workout: {
+        Args: { user_id?: string }
         Returns: {
+          exercises: Json
+          is_rest_day: boolean
+          notes: string
+          plan_name: string
+        }[]
+      }
+      get_user_weekly_plan: {
+        Args: { user_id?: string }
+        Returns: {
+          day_name: string
+          day_of_week: string
+          exercises: Json
+          is_rest_day: boolean
+          notes: string
+          plan_id: string
+          plan_name: string
+          plan_observations: string
+        }[]
+      }
+      get_user_workout_plans: {
+        Args: { target_user_id: string }
+        Returns: {
+          created_at: string
+          created_by: string
+          exercises: Json
           id: string
           name: string
-          exercises: Json
-          observations: string | null
-          created_by: string
-          created_at: string
+          observations: string
           updated_at: string
         }[]
       }
       is_admin: {
-        Args: {
-          user_email?: string
-        }
+        Args: { user_email?: string }
         Returns: boolean
       }
       is_email_verified: {
-        Args: {
-          user_id?: string
-        }
+        Args: { user_id?: string }
         Returns: boolean
-      }
-      get_user_weekly_plan: {
-        Args: {
-          user_id?: string
-        }
-        Returns: {
-          plan_id: string
-          plan_name: string
-          plan_observations: string | null
-          day_of_week: string
-          day_name: string
-          exercises: Json
-          notes: string | null
-          is_rest_day: boolean
-        }[]
-      }
-      get_today_workout: {
-        Args: {
-          user_id?: string
-        }
-        Returns: {
-          plan_name: string
-          exercises: Json
-          notes: string | null
-          is_rest_day: boolean
-        }[]
-      }
-      create_weekly_workout_plan: {
-        Args: {
-          target_user_id: string
-          plan_name: string
-          plan_observations?: string
-          weekly_schedule?: Json
-        }
-        Returns: string
       }
     }
     Enums: {

@@ -46,13 +46,13 @@ export function useChat() {
     if (ids.length === 0) return;
     (async () => {
       try {
-        const { data, error } = await (supabase as any)
-          .from('auth.users')
-          .select('id, email')
-          .in('id', ids);
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('user_id, full_name')
+          .in('user_id', ids);
         if (error) return;
         const map: Record<string, string> = {};
-        for (const u of data || []) map[u.id] = u.email;
+        for (const u of data || []) map[u.user_id] = u.full_name || 'Usuário';
         setUserIdToEmail((prev) => ({ ...prev, ...map }));
       } catch {}
     })();
@@ -63,13 +63,13 @@ export function useChat() {
     setLoading(true);
     setError(null);
     try {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from("chat_messages")
         .select("id, sender_id, recipient_id, content, created_at, read_at")
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: true });
       if (error) throw error;
-      setMessages(data as ChatMessage[]);
+      setMessages(data ? data.map(d => ({ ...d, id: String(d.id) })) : []);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -89,7 +89,7 @@ export function useChat() {
   const sendMessage = useCallback(
     async (recipientId: string, content: string) => {
       if (!userId || !content.trim()) return { error: "missing" };
-      const { error } = await (supabase as any).from("chat_messages").insert([
+      const { error } = await supabase.from("chat_messages").insert([
         { sender_id: userId, recipient_id: recipientId, content }
       ]);
       if (error) return { error: error.message };
