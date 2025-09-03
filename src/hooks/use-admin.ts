@@ -75,7 +75,7 @@ export function useAdmin() {
   };
   
   const createWorkoutPlan = useCallback(async (
-    userId: string,
+    userIdInput: string,
     name: string,
     exercises: string[],
     observations: string,
@@ -83,6 +83,18 @@ export function useAdmin() {
     options?: { planType?: 'daily' | 'weekly' | 'monthly' | 'custom'; periodStartDate?: string; periodEndDate?: string }
   ) => {
     try {
+      // Resolve user id quando o admin digita email em vez do UUID
+      let userId = userIdInput;
+      if (userIdInput.includes('@')) {
+        try {
+          const { data } = await (supabase as any).rpc('search_users', { search_term: userIdInput });
+          const match = (data || []).find((u: any) => u.email === userIdInput);
+          if (match?.id) userId = match.id;
+        } catch (e) {
+          console.warn('RPC search_users falhou, usando valor informado como userId');
+        }
+      }
+
       if (isAdmin && user) {
         const { data, error } = await supabase.from('workout_plans').insert([{
           user_id: userId,
