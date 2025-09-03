@@ -101,7 +101,10 @@ export function useAdmin() {
           name,
           exercises,
           observations,
-          created_by: user.id
+          created_by: user.id,
+          plan_type: options?.planType || 'daily',
+          period_start_date: options?.periodStartDate || null,
+          period_end_date: options?.periodEndDate || null
         }]).select().single();
 
         if (!error && data) {
@@ -114,9 +117,9 @@ export function useAdmin() {
             createdBy: user.email || 'Admin',
             createdAt: new Date(data.created_at),
             exerciseSettings: exerciseSettings || {},
-            planType: 'daily',
-            periodStartDate: null,
-            periodEndDate: null
+            planType: (options?.planType || 'daily') as any,
+            periodStartDate: options?.periodStartDate || null,
+            periodEndDate: options?.periodEndDate || null
           };
           const updatedPlans = [newPlan, ...workoutPlans];
           setWorkoutPlans(updatedPlans);
