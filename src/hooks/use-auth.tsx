@@ -90,7 +90,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = useCallback(async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } finally {
+      // Clear local data and force navigation to login to avoid stuck session UI
+      try { localStorage.removeItem('workout_history'); } catch {}
+      // Clear any admin session flag
+      try {
+        const email = supabase.auth.getUser().then(r=>r.data.user?.email).catch(()=>undefined);
+      } catch {}
+      window.location.href = '/login';
+    }
   }, []);
 
   const value: AuthContextValue = {
