@@ -37,8 +37,8 @@ const Workout = () => {
   const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const { user } = useAuth();
-  const { isAdminUser, isAdminAuthenticated } = useAdminAuth();
-  const canManage = isAdminUser && isAdminAuthenticated;
+  const { isAdminUser } = useAdminAuth();
+  const canManage = isAdminUser;
 
   const planStorageKey = useMemo(() => {
     const uid = user?.id || 'guest';

@@ -16,8 +16,8 @@ const baseNavigationItems = [
 
 export function BottomNavigation() {
   const { isAdminUser } = useAdminAuth();
-  
-  const navigationItems = isAdminUser 
+  // Always show Perfil; append Admin when user email matches admin or configured override
+  const navigationItems = isAdminUser
     ? [...baseNavigationItems, { icon: Settings, label: "Admin", path: "/admin" }]
     : baseNavigationItems;
 
