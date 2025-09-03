@@ -300,6 +300,14 @@ export type Database = {
           plan_name: string
         }[]
       }
+      get_user_emails: {
+        Args: { user_ids: string[] }
+        Returns: {
+          email: string
+          full_name: string
+          id: string
+        }[]
+      }
       get_user_weekly_plan: {
         Args: { user_id?: string }
         Returns: {
@@ -332,6 +340,14 @@ export type Database = {
       is_email_verified: {
         Args: { user_id?: string }
         Returns: boolean
+      }
+      search_users: {
+        Args: { search_term: string }
+        Returns: {
+          email: string
+          full_name: string
+          id: string
+        }[]
       }
     }
     Enums: {

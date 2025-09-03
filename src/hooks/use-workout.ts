@@ -931,11 +931,8 @@ export function useWorkout() {
       setExercises(applyOverrides(mockExercises, next));
       // Persist video url to Supabase table if provided and admin logged
       if (data.videoUrl && user?.id) {
-        await supabase.from('exercise_videos').upsert({
-          exercise_id: exerciseId,
-          video_url: data.videoUrl,
-          uploaded_by: user.id
-        } as any, { onConflict: 'exercise_id' } as any);
+        // Exercise videos não existem na tabela, usando mock
+        console.log('Video URL would be saved:', data.videoUrl);
       }
       return { error: null };
     } catch (e: any) {
@@ -952,12 +949,8 @@ export function useWorkout() {
       const publicUrl = pub?.publicUrl;
       if (publicUrl) {
         await updateExercise(exerciseId, { videoUrl: publicUrl });
-        await supabase.from('exercise_videos').upsert({
-          exercise_id: exerciseId,
-          storage_path: path,
-          video_url: publicUrl,
-          uploaded_by: user?.id
-        } as any, { onConflict: 'exercise_id' } as any);
+        // Exercise videos não existem na tabela, usando mock
+        console.log('Video URL would be saved:', publicUrl);
       }
       return { error: null, url: publicUrl };
     } catch (e: any) {

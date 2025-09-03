@@ -46,13 +46,12 @@ export function useChat() {
     if (ids.length === 0) return;
     (async () => {
       try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('user_id, full_name')
-          .in('user_id', ids);
+        const { data, error } = await supabase.rpc('get_user_emails', {
+          user_ids: ids
+        });
         if (error) return;
         const map: Record<string, string> = {};
-        for (const u of data || []) map[u.user_id] = u.full_name || 'Usuário';
+        for (const u of data || []) map[u.id] = u.email;
         setUserIdToEmail((prev) => ({ ...prev, ...map }));
       } catch {}
     })();
@@ -69,7 +68,7 @@ export function useChat() {
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: true });
       if (error) throw error;
-      setMessages(data ? data.map(d => ({ ...d, id: String(d.id) })) : []);
+      setMessages(data?.map(msg => ({...msg, id: msg.id.toString()})) as ChatMessage[] || []);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -141,4 +140,3 @@ export function useChat() {
     userIdToEmail,
   };
 }
-

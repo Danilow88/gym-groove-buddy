@@ -10,8 +10,6 @@ export interface Appointment {
   end_time: string;
   status: "available" | "booked" | "cancelled";
   meeting_url?: string | null;
-  created_at: string;
-  updated_at: string;
 }
 
 export function useAppointments() {
@@ -30,7 +28,7 @@ export function useAppointments() {
         .from("appointments")
         .select("*")
         .gte("start_time", nowIso)
-        .in("status", ["available"])  // apenas disponíveis
+        .in("status", ["available"])
         .order("start_time", { ascending: true });
       if (e1) throw e1;
       setAvailable(av as Appointment[]);
@@ -105,7 +103,7 @@ export function useAppointments() {
 
   const propose = useCallback(async (start: Date, end: Date) => {
     if (!user?.id) return { error: "not_auth" };
-    const { data: adminId, error: e1 } = await (supabase as any).rpc('get_default_admin_id');
+    const { data: adminId, error: e1 } = await supabase.rpc('get_default_admin_id');
     if (e1) return { error: e1.message };
     if (!adminId) return { error: 'no_admin' };
     const { error } = await supabase.from('appointments').insert([
@@ -118,4 +116,3 @@ export function useAppointments() {
 
   return { loading, error, available, mine, reload: load, book, cancel, createSlot, approve, propose };
 }
-
