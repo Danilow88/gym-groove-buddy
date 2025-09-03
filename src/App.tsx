@@ -22,7 +22,11 @@ const queryClient = new QueryClient();
 function PrivateRoute({ children }: { children: JSX.Element }) {
   const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
-  if (isLoading) return null;
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground">
+      Carregando...
+    </div>
+  );
   return isAuthenticated ? children : <Navigate to="/login" replace state={{ from: location }} />;
 }
 
