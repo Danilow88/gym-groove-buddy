@@ -25,30 +25,50 @@ export function useAdmin() {
   
   const isAdmin = isAdminAuthenticated;
 
-  // Load workout plans from Supabase profiles (storing in metadata or separate table)
+  // Load workout plans from Supabase; reload when auth/admin state changes
   useEffect(() => {
     loadWorkoutPlans();
-  }, []);
+  }, [user?.id, isAdminAuthenticated]);
 
   const loadWorkoutPlans = async () => {
     setLoading(true);
     try {
       // Try fetch from Supabase first
-      const { data, error } = await supabase.from('workout_plans').select('*').order('created_at', { ascending: false });
+      const { data, error } = await supabase
+        .from('workout_plans')
+        .select('*')
+        .order('created_at', { ascending: false });
       if (!error && data) {
-        const mapped: WorkoutPlan[] = data.map((row: any) => ({
-          id: row.id,
-          userId: row.user_id,
-          name: row.name,
-          exercises: Array.isArray(row.exercises) ? row.exercises.map(String) : [],
-          observations: row.observations ?? '',
-          createdBy: row.created_by,
-          createdAt: new Date(row.created_at),
-          planType: row.plan_type || 'daily',
-          periodStartDate: row.period_start_date || null,
-          periodEndDate: row.period_end_date || null,
-          exerciseSettings: row.exercise_settings || undefined,
-        }));
+        // Merge with any locally stored settings so we don't lose per-exercise defaults
+        let local: WorkoutPlan[] = [];
+        try {
+          const stored = localStorage.getItem('admin_workout_plans');
+          local = stored ? JSON.parse(stored) : [];
+        } catch {}
+
+        const mapped: WorkoutPlan[] = data.map((row: any) => {
+          const base: WorkoutPlan = {
+            id: row.id,
+            userId: row.user_id,
+            name: row.name,
+            exercises: Array.isArray(row.exercises) ? row.exercises.map(String) : [],
+            observations: row.observations ?? '',
+            createdBy: row.created_by,
+            createdAt: new Date(row.created_at),
+          } as WorkoutPlan;
+
+          // Attach any locally saved exerciseSettings and optional fields (if previously created locally)
+          const localMatch = local.find(p => p.id === row.id);
+          if (localMatch?.exerciseSettings) {
+            base.exerciseSettings = localMatch.exerciseSettings;
+          }
+          if (localMatch?.planType) base.planType = localMatch.planType;
+          if (localMatch?.periodStartDate) base.periodStartDate = localMatch.periodStartDate;
+          if (localMatch?.periodEndDate) base.periodEndDate = localMatch.periodEndDate;
+
+          return base;
+        });
+
         setWorkoutPlans(mapped);
         await saveWorkoutPlans(mapped);
       } else {
@@ -97,17 +117,20 @@ export function useAdmin() {
       }
 
       if (isAdmin && user) {
-        const { data, error } = await supabase.from('workout_plans').insert([{
-          user_id: userId,
-          name,
-          exercises,
-          observations,
-          created_by: user.id,
-          plan_type: options?.planType || 'daily',
-          period_start_date: options?.periodStartDate || null,
-          period_end_date: options?.periodEndDate || null,
-          exercise_settings: exerciseSettings || null
-        }]).select().single();
+        // Insert only existing columns to avoid DB errors
+        const { data, error } = await supabase
+          .from('workout_plans')
+          .insert([
+            {
+              user_id: userId,
+              name,
+              exercises,
+              observations,
+              created_by: user.id,
+            }
+          ])
+          .select()
+          .single();
 
         if (!error && data) {
           const newPlan: WorkoutPlan = {
@@ -118,6 +141,7 @@ export function useAdmin() {
             observations: data.observations || '',
             createdBy: user.email || 'Admin',
             createdAt: new Date(data.created_at),
+            // Persist optional settings locally so they appear to the user
             exerciseSettings: exerciseSettings || {},
             planType: (options?.planType || 'daily') as any,
             periodStartDate: options?.periodStartDate || null,
