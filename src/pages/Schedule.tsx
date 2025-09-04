@@ -74,18 +74,28 @@ const Schedule = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20">
-      <div className="p-4 space-y-4">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <CalendarIcon className="h-6 w-6 text-spotify-green" />
+      <div className="p-3 md:p-4 space-y-3 md:space-y-4">
+        <h1 className="text-xl md:text-2xl font-bold flex items-center gap-2">
+          <CalendarIcon className="h-5 w-5 md:h-6 md:w-6 text-spotify-green" />
           Agenda de Videoaulas
         </h1>
 
         {isAdminUser && isAdminAuthenticated && (
-          <Card className="p-4">
-            <h2 className="font-semibold mb-3">Criar horário (admin)</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <Input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
-              <Input type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} />
+          <Card className="p-3 md:p-4">
+            <h2 className="font-semibold mb-3 text-sm md:text-base">Criar horário (admin)</h2>
+            <div className="space-y-2 md:grid md:grid-cols-3 md:gap-2 md:space-y-0">
+              <Input 
+                type="datetime-local" 
+                value={start} 
+                onChange={(e) => setStart(e.target.value)}
+                className="text-sm"
+              />
+              <Input 
+                type="datetime-local" 
+                value={end} 
+                onChange={(e) => setEnd(e.target.value)}
+                className="text-sm"
+              />
               <Button
                 onClick={async () => {
                   if (!start || !end) return;
@@ -94,6 +104,7 @@ const Schedule = () => {
                   setEnd("");
                 }}
                 disabled={!start || !end}
+                className="w-full"
               >
                 Criar slot
               </Button>
@@ -101,30 +112,35 @@ const Schedule = () => {
           </Card>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-4 md:col-span-1">
-            <h2 className="font-semibold mb-3">Calendário de disponibilidade</h2>
-            <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
-              modifiers={{
-                available: (day: Date) => {
-                  const key = toLocalDateKey(day);
-                  return availableByDate.has(key);
-                },
-              }}
-              modifiersClassNames={{
-                available: "bg-spotify-green/20 text-spotify-green rounded-full",
-              }}
-            />
-            <div className="text-xs text-muted-foreground mt-2">
+        <div className="space-y-3 md:space-y-4">
+          {/* Mobile: Stack vertically, Desktop: Grid layout */}
+          <Card className="p-3 md:p-4">
+            <h2 className="font-semibold mb-3 text-sm md:text-base">Calendário</h2>
+            <div className="flex justify-center">
+              <Calendar
+                mode="single"
+                selected={selectedDate}
+                onSelect={setSelectedDate}
+                modifiers={{
+                  available: (day: Date) => {
+                    const key = toLocalDateKey(day);
+                    return availableByDate.has(key);
+                  },
+                }}
+                modifiersClassNames={{
+                  available: "bg-spotify-green/20 text-spotify-green rounded-full",
+                }}
+                className="w-fit"
+              />
+            </div>
+            <div className="text-xs text-muted-foreground mt-2 text-center md:text-left">
               Dias em verde possuem horários disponíveis.
             </div>
             {selectedDate && (
               <Button
                 variant="ghost"
-                className="mt-2 text-xs"
+                size="sm"
+                className="mt-2 text-xs w-full md:w-auto"
                 onClick={() => setSelectedDate(undefined)}
               >
                 Limpar seleção
@@ -132,78 +148,126 @@ const Schedule = () => {
             )}
           </Card>
 
-          <Card className="p-4 md:col-span-2">
-            <h2 className="font-semibold mb-3">
+          <Card className="p-3 md:p-4">
+            <h2 className="font-semibold mb-3 text-sm md:text-base">
               {selectedDate ? (
-                <>
-                  Disponíveis em {selectedDate.toLocaleDateString()}
-                </>
+                <>Disponíveis em {selectedDate.toLocaleDateString()}</>
               ) : (
-                <>Disponíveis (agenda do administrador)</>
+                <>Horários Disponíveis</>
               )}
             </h2>
             <div className="space-y-2">
               {filteredAvailable.map((slot) => (
-                <div key={slot.id} className="flex items-center justify-between p-2 rounded-md bg-spotify-surface">
-                  <div className="text-sm">
-                    {new Date(slot.start_time).toLocaleString()} - {new Date(slot.end_time).toLocaleTimeString()}
+                <div key={slot.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-spotify-surface">
+                  <div className="text-sm font-medium">
+                    <div>{new Date(slot.start_time).toLocaleDateString()}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(slot.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {new Date(slot.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    </div>
                   </div>
-                  <Button size="sm" onClick={() => book(slot.id)} disabled={loading}>Agendar</Button>
+                  <Button 
+                    size="sm" 
+                    onClick={() => book(slot.id)} 
+                    disabled={loading}
+                    className="w-full sm:w-auto"
+                  >
+                    Agendar
+                  </Button>
                 </div>
               ))}
               {filteredAvailable.length === 0 && (
-                <div className="text-sm text-muted-foreground">Sem horários disponíveis</div>
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  Sem horários disponíveis
+                </div>
               )}
             </div>
           </Card>
 
-          {/* Usuário pode propor um horário quando não houver disponível */}
-          <Card className="p-4 md:col-span-3">
-            <h2 className="font-semibold mb-3">Sugerir horário ao administrador</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <Input type="datetime-local" value={start} onChange={(e) => setStart(e.target.value)} />
-              <Input type="datetime-local" value={end} onChange={(e) => setEnd(e.target.value)} />
-              <Button onClick={async () => {
-                if (!start || !end) return;
-                const { error } = await propose(new Date(start), new Date(end));
-                if (!error) {
-                  setStart(""); setEnd("");
-                  toast({ title: 'Pedido enviado', description: 'Aguarde aprovação do administrador.' });
-                } else {
-                  toast({ title: 'Erro', description: error, variant: 'destructive' });
-                }
-              }} disabled={!start || !end}>Enviar pedido</Button>
+          <Card className="p-3 md:p-4">
+            <h2 className="font-semibold mb-3 text-sm md:text-base">Sugerir Horário</h2>
+            <div className="space-y-2 md:grid md:grid-cols-3 md:gap-2 md:space-y-0">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Início</label>
+                <Input 
+                  type="datetime-local" 
+                  value={start} 
+                  onChange={(e) => setStart(e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
+                <Input 
+                  type="datetime-local" 
+                  value={end} 
+                  onChange={(e) => setEnd(e.target.value)}
+                  className="text-sm"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button 
+                  onClick={async () => {
+                    if (!start || !end) return;
+                    const { error } = await propose(new Date(start), new Date(end));
+                    if (!error) {
+                      setStart(""); setEnd("");
+                      toast({ title: 'Pedido enviado', description: 'Aguarde aprovação do administrador.' });
+                    } else {
+                      toast({ title: 'Erro', description: error, variant: 'destructive' });
+                    }
+                  }} 
+                  disabled={!start || !end}
+                  className="w-full"
+                >
+                  Enviar Pedido
+                </Button>
+              </div>
             </div>
-            <div className="text-xs text-muted-foreground mt-2">O admin receberá e poderá aprovar seu pedido.</div>
+            <div className="text-xs text-muted-foreground mt-2">
+              O administrador receberá e poderá aprovar seu pedido.
+            </div>
           </Card>
 
-          <Card className="p-4 md:col-span-3">
-            <h2 className="font-semibold mb-3">Minhas aulas</h2>
-            <div className="space-y-3">
+          <Card className="p-3 md:p-4">
+            <h2 className="font-semibold mb-3 text-sm md:text-base">Minhas Aulas</h2>
+            <div className="space-y-4">
               {pending.length > 0 && (
                 <div>
-                  <div className="text-sm font-medium mb-2">Pendentes</div>
+                  <div className="text-sm font-medium mb-2 text-spotify-green">Pendentes de Aprovação</div>
                   <div className="space-y-2">
                     {pending.map((a) => (
-                      <div key={a.id} className="flex items-center justify-between p-2 rounded-md bg-spotify-surface">
-                        <div className="text-sm">
-                          {new Date(a.start_time).toLocaleString()} - {new Date(a.end_time).toLocaleTimeString()}
+                      <div key={a.id} className="p-3 rounded-lg bg-spotify-surface space-y-2">
+                        <div className="text-sm font-medium">
+                          <div>{new Date(a.start_time).toLocaleDateString()}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(a.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {new Date(a.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           {isAdminUser && isAdminAuthenticated && (
                             <>
                               <Input
                                 placeholder="Link da reunião"
                                 value={meetingUrl}
                                 onChange={(e) => setMeetingUrl(e.target.value)}
-                                className="w-40"
+                                className="text-sm"
                               />
-                              <Button size="sm" variant="default" onClick={() => approve(a.id, meetingUrl)}>
+                              <Button 
+                                size="sm" 
+                                variant="default" 
+                                onClick={() => approve(a.id, meetingUrl)}
+                                className="w-full sm:w-auto"
+                              >
                                 <CheckCircle className="h-4 w-4 mr-1" /> Aprovar
                               </Button>
                             </>
                           )}
-                          <Button size="sm" variant="destructive" onClick={() => cancel(a.id)}>
+                          <Button 
+                            size="sm" 
+                            variant="destructive" 
+                            onClick={() => cancel(a.id)}
+                            className="w-full sm:w-auto"
+                          >
                             <XCircle className="h-4 w-4 mr-1" /> Cancelar
                           </Button>
                         </div>
@@ -215,16 +279,23 @@ const Schedule = () => {
 
               {approved.length > 0 && (
                 <div>
-                  <div className="text-sm font-medium mb-2">Aprovadas</div>
+                  <div className="text-sm font-medium mb-2 text-spotify-green">Aprovadas</div>
                   <div className="space-y-2">
                     {approved.map((a) => (
-                      <div key={a.id} className="flex items-center justify-between p-2 rounded-md bg-spotify-surface">
-                        <div className="text-sm">
-                          {new Date(a.start_time).toLocaleString()} - {new Date(a.end_time).toLocaleTimeString()}
+                      <div key={a.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-3 rounded-lg bg-spotify-surface">
+                        <div className="text-sm font-medium">
+                          <div>{new Date(a.start_time).toLocaleDateString()}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(a.start_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - {new Date(a.end_time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                          </div>
                         </div>
                         {a.meeting_url && (
-                          <Button size="sm" onClick={() => navigate(`/call/${a.id}`)}>
-                            Entrar
+                          <Button 
+                            size="sm" 
+                            onClick={() => navigate(`/call/${a.id}`)}
+                            className="w-full sm:w-auto bg-spotify-green hover:bg-spotify-green/90"
+                          >
+                            Entrar na Aula
                           </Button>
                         )}
                       </div>
@@ -234,7 +305,9 @@ const Schedule = () => {
               )}
 
               {pending.length === 0 && approved.length === 0 && (
-                <div className="text-sm text-muted-foreground">Nenhuma reserva</div>
+                <div className="text-sm text-muted-foreground text-center py-4">
+                  Nenhuma aula agendada
+                </div>
               )}
             </div>
           </Card>
@@ -246,4 +319,3 @@ const Schedule = () => {
 };
 
 export default Schedule;
-
