@@ -170,6 +170,12 @@ const Admin = () => {
         setPlanType('daily');
         setPeriodStart('');
         setPeriodEnd('');
+      } else {
+        toast({
+          title: "Não foi possível criar o treino",
+          description: "Verifique o ID/email do usuário e tente novamente.",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       toast({

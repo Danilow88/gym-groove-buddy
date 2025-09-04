@@ -104,19 +104,32 @@ export function useAdmin() {
     options?: { planType?: 'daily' | 'weekly' | 'monthly' | 'custom'; periodStartDate?: string; periodEndDate?: string }
   ) => {
     try {
-      // Resolve user id quando o admin digita email em vez do UUID
-      let userId = userIdInput;
-      if (userIdInput.includes('@')) {
+      // Resolve target user id when an email is provided instead of UUID
+      const normalize = (s: string) => String(s).trim().toLowerCase();
+      const inputRaw = String(userIdInput || '');
+      let userId = inputRaw.trim();
+      const isUuid = (v: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v);
+      if (inputRaw.includes('@')) {
         try {
-          const { data } = await (supabase as any).rpc('search_users', { search_term: userIdInput });
-          const match = (data || []).find((u: any) => u.email === userIdInput);
-          if (match?.id) userId = match.id;
+          const emailNorm = normalize(inputRaw);
+          const { data } = await (supabase as any).rpc('search_users', { search_term: emailNorm });
+          const match = (data || []).find((u: any) => normalize(u.email) === emailNorm);
+          if (match?.id) {
+            userId = match.id;
+          }
         } catch (e) {
-          console.warn('RPC search_users falhou, usando valor informado como userId');
+          console.warn('RPC search_users falhou; não foi possível resolver email para UUID');
         }
       }
 
+      // If we still don't have a valid UUID for the target user, abort (for admin flow)
+      const hasValidTargetUserId = isUuid(userId);
+
       if (isAdmin && user) {
+        if (!hasValidTargetUserId) {
+          console.error('Target userId inválido; criação de plano abortada');
+          return false;
+        }
         // Insert only existing columns to avoid DB errors
         const { data, error } = await supabase
           .from('workout_plans')
@@ -153,9 +166,10 @@ export function useAdmin() {
           return true;
         }
         console.error('Error saving to Supabase:', error);
+        return false;
       }
 
-      // Fallback local (sem exigir admin autenticado)
+      // Fallback local (somente quando não autenticado como admin)
       const newPlan: WorkoutPlan = {
         id: Math.random().toString(36).substr(2, 9),
         userId,
