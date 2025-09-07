@@ -6,16 +6,18 @@ import { BottomNavigation } from "@/components/ui/bottom-navigation";
 import { useChat } from "@/hooks/use-chat";
 import { useUserSearch } from "@/hooks/use-user-search";
 import { useAuth } from "@/hooks/use-auth";
-import { Send, MessageCircle } from "lucide-react";
+import { Send, MessageCircle, ImagePlus, FileImage } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Chat = () => {
   const { user } = useAuth();
-  const { peers, selectedPeerId, setSelectedPeerId, getConversation, sendMessage } = useChat();
+  const { peers, selectedPeerId, setSelectedPeerId, getConversation, sendMessage, uploadImage } = useChat();
   const { users, loading: searching, searchUsers, clearUsers } = useUserSearch();
   const [message, setMessage] = useState("");
   const [search, setSearch] = useState("");
+  const [uploading, setUploading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { toast } = useToast();
 
   const conversation = useMemo(() => (selectedPeerId ? getConversation(selectedPeerId) : []), [selectedPeerId, getConversation]);
@@ -32,6 +34,42 @@ const Chat = () => {
       return;
     }
     setMessage("");
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !selectedPeerId) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast({ title: "Erro", description: "Por favor, selecione apenas imagens", variant: "destructive" });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB limit
+      toast({ title: "Erro", description: "Imagem muito grande. Máximo 5MB", variant: "destructive" });
+      return;
+    }
+
+    setUploading(true);
+    try {
+      const { url, error } = await uploadImage(file);
+      if (error) {
+        toast({ title: "Erro no upload", description: error, variant: "destructive" });
+        return;
+      }
+      
+      if (url) {
+        const { error: sendError } = await sendMessage(selectedPeerId, "📷 Foto enviada", url);
+        if (sendError) {
+          toast({ title: "Falha ao enviar", description: sendError, variant: "destructive" });
+        }
+      }
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
   };
 
   return (
@@ -102,7 +140,21 @@ const Chat = () => {
                 conversation.map((m) => (
                   <div key={m.id} className={`flex ${m.sender_id === user?.id ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[75%] p-2 rounded-lg ${m.sender_id === user?.id ? "bg-spotify-green text-white" : "bg-spotify-surface"}`}>
-                      <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                      {m.image_url ? (
+                        <div className="space-y-2">
+                          <img 
+                            src={m.image_url} 
+                            alt="Imagem enviada" 
+                            className="max-w-full h-auto rounded cursor-pointer hover:opacity-90 transition-opacity"
+                            onClick={() => window.open(m.image_url!, '_blank')}
+                          />
+                          {m.content && (
+                            <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="text-sm whitespace-pre-wrap">{m.content}</div>
+                      )}
                       <div className="text-[10px] opacity-70 mt-1">{new Date(m.created_at).toLocaleString()}</div>
                     </div>
                   </div>
@@ -120,9 +172,28 @@ const Chat = () => {
                 onKeyDown={(e) => {
                   if (e.key === "Enter") handleSend();
                 }}
-                disabled={!selectedPeerId}
+                disabled={!selectedPeerId || uploading}
               />
-              <Button onClick={handleSend} disabled={!selectedPeerId || !message.trim()}>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <Button 
+                onClick={() => fileInputRef.current?.click()} 
+                disabled={!selectedPeerId || uploading}
+                variant="outline"
+                size="icon"
+              >
+                {uploading ? (
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-spotify-green"></div>
+                ) : (
+                  <ImagePlus className="h-4 w-4" />
+                )}
+              </Button>
+              <Button onClick={handleSend} disabled={!selectedPeerId || !message.trim() || uploading}>
                 <Send className="h-4 w-4" />
               </Button>
             </div>

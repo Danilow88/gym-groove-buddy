@@ -9,6 +9,7 @@ export interface ChatMessage {
   content: string;
   created_at: string;
   read_at?: string | null;
+  image_url?: string | null;
 }
 
 export function useChat() {
@@ -64,7 +65,7 @@ export function useChat() {
     try {
       const { data, error } = await supabase
         .from("chat_messages")
-        .select("id, sender_id, recipient_id, content, created_at, read_at")
+        .select("id, sender_id, recipient_id, content, created_at, read_at, image_url")
         .or(`sender_id.eq.${userId},recipient_id.eq.${userId}`)
         .order("created_at", { ascending: true });
       if (error) throw error;
@@ -86,13 +87,39 @@ export function useChat() {
   );
 
   const sendMessage = useCallback(
-    async (recipientId: string, content: string) => {
-      if (!userId || !content.trim()) return { error: "missing" };
+    async (recipientId: string, content: string, imageUrl?: string) => {
+      if (!userId || (!content.trim() && !imageUrl)) return { error: "missing" };
       const { error } = await supabase.from("chat_messages").insert([
-        { sender_id: userId, recipient_id: recipientId, content }
+        { sender_id: userId, recipient_id: recipientId, content, image_url: imageUrl }
       ]);
       if (error) return { error: error.message };
       return { error: null };
+    },
+    [userId]
+  );
+
+  const uploadImage = useCallback(
+    async (file: File): Promise<{ url?: string; error?: string }> => {
+      if (!userId) return { error: "Usuário não autenticado" };
+      
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${userId}/${Date.now()}.${fileExt}`;
+        
+        const { data, error } = await supabase.storage
+          .from('chat-images')
+          .upload(fileName, file);
+          
+        if (error) return { error: error.message };
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-images')
+          .getPublicUrl(fileName);
+          
+        return { url: publicUrl };
+      } catch (err) {
+        return { error: (err as Error).message };
+      }
     },
     [userId]
   );
@@ -136,6 +163,7 @@ export function useChat() {
     setSelectedPeerId,
     getConversation,
     sendMessage,
+    uploadImage,
     reload: loadMessages,
     userIdToEmail,
   };

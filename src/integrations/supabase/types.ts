@@ -79,6 +79,7 @@ export type Database = {
           content: string
           created_at: string
           id: number
+          image_url: string | null
           read_at: string | null
           recipient_id: string
           sender_id: string
@@ -88,6 +89,7 @@ export type Database = {
           content: string
           created_at?: string
           id?: never
+          image_url?: string | null
           read_at?: string | null
           recipient_id: string
           sender_id: string
@@ -97,6 +99,7 @@ export type Database = {
           content?: string
           created_at?: string
           id?: never
+          image_url?: string | null
           read_at?: string | null
           recipient_id?: string
           sender_id?: string
@@ -107,27 +110,36 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          birth_date: string | null
           created_at: string
           full_name: string | null
+          height: number | null
           id: string
           updated_at: string
           user_id: string
+          weight: number | null
         }
         Insert: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           full_name?: string | null
+          height?: number | null
           id?: string
           updated_at?: string
           user_id: string
+          weight?: number | null
         }
         Update: {
           avatar_url?: string | null
+          birth_date?: string | null
           created_at?: string
           full_name?: string | null
+          height?: number | null
           id?: string
           updated_at?: string
           user_id?: string
+          weight?: number | null
         }
         Relationships: []
       }
