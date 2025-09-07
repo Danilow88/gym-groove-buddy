@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { ProgressReport } from "@/components/progress/progress-report";
 
 const Profile = () => {
   const { workoutHistory, exercises } = useWorkout();
@@ -269,88 +270,7 @@ const Profile = () => {
           </TabsContent>
 
           <TabsContent value="progress" className="space-y-4">
-            <Card className="bg-gradient-card border-border p-4">
-              <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                <TrendingUp className="h-5 w-5 text-spotify-green" />
-                Relatório de Progresso
-              </h2>
-              
-              {/* Estatísticas de Progresso */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="text-center p-4 bg-spotify-surface rounded-lg">
-                  <div className="text-2xl font-bold text-spotify-green">{totalWorkouts}</div>
-                  <div className="text-sm text-muted-foreground">Total de Treinos</div>
-                </div>
-                <div className="text-center p-4 bg-spotify-surface rounded-lg">
-                  <div className="text-2xl font-bold text-spotify-green">{totalSets}</div>
-                  <div className="text-sm text-muted-foreground">Total de Séries</div>
-                </div>
-              </div>
-
-              {/* Informações do Perfil */}
-              <div className="space-y-4">
-                <h3 className="font-medium text-foreground">Dados Físicos</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Peso:</span>
-                    <span className="font-medium">{profile.weight ? `${profile.weight} kg` : 'Não informado'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Altura:</span>
-                    <span className="font-medium">{profile.height ? `${profile.height} cm` : 'Não informado'}</span>
-                  </div>
-                  {calculateBMI() && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">IMC:</span>
-                      <span className="font-medium">{calculateBMI()}</span>
-                    </div>
-                  )}
-                  {calculateAge() && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Idade:</span>
-                      <span className="font-medium">{calculateAge()} anos</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Resumo de Atividade */}
-              <div className="mt-6 space-y-4">
-                <h3 className="font-medium text-foreground">Resumo de Atividade</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Treinos esta semana:</span>
-                    <span className="font-medium text-spotify-green">{thisWeek}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Média por semana:</span>
-                    <span className="font-medium">{totalWorkouts > 0 ? (totalWorkouts / Math.max(1, Math.ceil(workoutHistory.length / 7))).toFixed(1) : '0'}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Exercícios diferentes:</span>
-                    <span className="font-medium">{new Set(workoutHistory.flatMap(session => session.sets.map(set => set.exerciseId))).size}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recomendações baseadas no perfil */}
-              {(profile.weight || profile.height || calculateAge()) && (
-                <div className="mt-6 p-4 bg-spotify-surface rounded-lg">
-                  <h3 className="font-medium text-foreground mb-2">💡 Recomendações Personalizadas</h3>
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    {calculateBMI() && (
-                      <p>• Com seu IMC de {calculateBMI()}, mantenha uma rotina consistente de exercícios</p>
-                    )}
-                    {calculateAge() && calculateAge()! < 30 && (
-                      <p>• Aproveite sua idade para focar em exercícios de força e resistência</p>
-                    )}
-                    {thisWeek < 3 && (
-                      <p>• Tente aumentar a frequência para 3-4 treinos por semana</p>
-                    )}
-                  </div>
-                </div>
-              )}
-            </Card>
+            <ProgressReport workoutHistory={workoutHistory} profile={profile} />
           </TabsContent>
 
           <TabsContent value="weekly">
