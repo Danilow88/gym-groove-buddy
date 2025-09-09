@@ -114,6 +114,17 @@ const Profile = () => {
     return (profile.weight / (heightInM * heightInM)).toFixed(1);
   };
 
+  const getBMICategory = () => {
+    const bmi = calculateBMI();
+    if (!bmi) return null;
+    const bmiValue = parseFloat(bmi);
+    
+    if (bmiValue < 18.5) return { category: 'Abaixo do peso', color: 'text-blue-500' };
+    if (bmiValue < 25) return { category: 'Peso normal', color: 'text-green-500' };
+    if (bmiValue < 30) return { category: 'Sobrepeso', color: 'text-yellow-500' };
+    return { category: 'Obesidade', color: 'text-red-500' };
+  };
+
   const calculateAge = () => {
     if (!profile.birth_date) return null;
     const today = new Date();
@@ -253,9 +264,16 @@ const Profile = () => {
                     <span>{profile.height ? `${profile.height} cm` : 'Não informado'}</span>
                   </div>
                   {calculateBMI() && (
-                    <div className="col-span-2 flex items-center gap-2">
-                      <Activity className="h-4 w-4 text-spotify-green" />
-                      <span>IMC: {calculateBMI()}</span>
+                    <div className="col-span-2 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Activity className="h-4 w-4 text-spotify-green" />
+                        <span>IMC: {calculateBMI()}</span>
+                      </div>
+                      {getBMICategory() && (
+                        <div className={`text-sm ${getBMICategory()?.color}`}>
+                          {getBMICategory()?.category}
+                        </div>
+                      )}
                     </div>
                   )}
                   {calculateAge() && (
